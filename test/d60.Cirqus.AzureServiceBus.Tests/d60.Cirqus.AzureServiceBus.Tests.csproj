@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="2.0.3" />
+    <PackageReference Include="NUnit" Version="2.6.3" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="2.4.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\d60.Cirqus.AzureServiceBus\d60.Cirqus.AzureServiceBus.csproj" />
+    <ProjectReference Include="..\..\src\d60.Cirqus\d60.Cirqus.csproj" />
+  </ItemGroup>
+
+</Project>
