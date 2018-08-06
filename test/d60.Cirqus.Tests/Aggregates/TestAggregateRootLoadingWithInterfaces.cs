@@ -37,7 +37,7 @@ namespace d60.Cirqus.Tests.Aggregates
             const string aggregateRootId = "someId";
             _commandProcessor.ProcessCommand(new CustomCommand(context =>
             {
-                var instance = context.Load<Root>(aggregateRootId);
+                var instance = context.Create<Root>(aggregateRootId);
 
                 instance.DoStuff();
             }));

@@ -304,7 +304,7 @@ Then:
             var @event = Context.History.Single();
             @event.ShouldBeOfType<EventWithNoRoot>();
             @event.Meta[DomainEvent.MetadataKeys.AggregateRootId].ShouldBe("stream-id");
-            @event.Meta[DomainEvent.MetadataKeys.Owner].ShouldBe("System.Object, mscorlib");
+            @event.Meta[DomainEvent.MetadataKeys.Owner].ShouldBe("System.Object, System.Private.CoreLib");
         }
 
         [Test]

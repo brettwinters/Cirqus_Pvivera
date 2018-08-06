@@ -1,29 +1,100 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.2.1507.118" />
-    <PackageReference Include="NUnit" Version="2.6.3" />
-    <PackageReference Include="Shouldly" Version="2.5.0" />
+    <Compile Remove="EntityFramework\**" />
+    <Compile Remove="MongoDb\**" />
+    <Compile Remove="MsSql\**" />
+    <Compile Remove="PostgreSql\**" />
+    <EmbeddedResource Remove="EntityFramework\**" />
+    <EmbeddedResource Remove="MongoDb\**" />
+    <EmbeddedResource Remove="MsSql\**" />
+    <EmbeddedResource Remove="PostgreSql\**" />
+    <None Remove="EntityFramework\**" />
+    <None Remove="MongoDb\**" />
+    <None Remove="MsSql\**" />
+    <None Remove="PostgreSql\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\d60.Cirqus.EntityFramework\d60.Cirqus.EntityFramework.csproj" />
-    <ProjectReference Include="..\..\src\d60.Cirqus.HybridDb\d60.Cirqus.HybridDb.csproj" />
-    <ProjectReference Include="..\..\src\d60.Cirqus.MongoDb\d60.Cirqus.MongoDb.csproj" />
+    <Compile Remove="Bugs\ReplicationScenario\VerifyThatWeCannotAccidentallyLoadOldRootsInReplicatedSetup.cs" />
+    <Compile Remove="Bugs\VerifyThatDuplicateSequenceNumbersAreNotAssigned.cs" />
+    <Compile Remove="Config\TestConfigurationApi.cs" />
+    <Compile Remove="Contracts\AggregateRootRepository\Factories\DefaultAggregateRootRepositoryFactory.cs" />
+    <Compile Remove="Contracts\AggregateRootRepository\TestAggregateRootRepositories.cs" />
+    <Compile Remove="Contracts\EventStore\EventStoreTest.cs" />
+    <Compile Remove="Contracts\EventStore\Factories\CachedEventStoreFactory.cs" />
+    <Compile Remove="Contracts\EventStore\Factories\MongoDbEventStoreFactory.cs" />
+    <Compile Remove="Contracts\EventStore\Factories\MsSqlEventStoreFactory.cs" />
+    <Compile Remove="Contracts\EventStore\Factories\NtfsEventStoreFactory.cs" />
+    <Compile Remove="Contracts\EventStore\Factories\PostgreSqlEventStoreFactory.cs" />
+    <Compile Remove="Contracts\EventStore\Factories\SQLiteEventStoreFactory .cs" />
+    <Compile Remove="Contracts\EventStore\InsertPerfOverTime.cs" />
+    <Compile Remove="Contracts\Views\DomainEventBatchDispatch.cs" />
+    <Compile Remove="Contracts\Views\Factories\EntityFrameworkViewManagerFactory.cs" />
+    <Compile Remove="Contracts\Views\Factories\HybridDbViewManagerFactory.cs" />
+    <Compile Remove="Contracts\Views\Factories\MongoDbViewManagerFactory.cs" />
+    <Compile Remove="Contracts\Views\Factories\MsSqlViewManagerFactory.cs" />
+    <Compile Remove="Contracts\Views\Factories\PostgreSqlViewManagerFactory.cs" />
+    <Compile Remove="Contracts\Views\GeneralViewManagerTests.cs" />
+    <Compile Remove="Contracts\Views\LoadingStuffDuringViewLocation.cs" />
+    <Compile Remove="Contracts\Views\ObjectGraph.cs" />
+    <Compile Remove="Contracts\Views\PolymorphicDispatch.cs" />
+    <Compile Remove="Contracts\Views\PurgeTest.cs" />
+    <Compile Remove="Contracts\Views\RecoveryTest.cs" />
+    <Compile Remove="Contracts\Views\RestTest.cs" />
+    <Compile Remove="Contracts\Views\UpdatedEvent.cs" />
+    <Compile Remove="Contracts\Views\ViewInstanceDeletion.cs" />
+    <Compile Remove="Contracts\Views\ViewLocators.cs" />
+    <Compile Remove="Contracts\Views\ViewProfiling.cs" />
+    <Compile Remove="Diagnostics\TestLapTimes.cs" />
+    <Compile Remove="Events\Replicator\BasicReplication.cs" />
+    <Compile Remove="Events\Replicator\ErrorHandling.cs" />
+    <Compile Remove="Events\Replicator\TestEventReplicator.cs" />
+    <Compile Remove="Examples\ReadmeSnippet.cs" />
+    <Compile Remove="Integration\IntegrationTestBase.cs" />
+    <Compile Remove="Integration\Scenarios\ProcessingYieldsNoEvents.cs" />
+    <Compile Remove="Integration\SimpleScenarioWithConcurrency.cs" />
+    <Compile Remove="Integration\SimpleScenarioWithPersistence.cs" />
+    <Compile Remove="Snapshotting\Models\Root.cs" />
+    <Compile Remove="Snapshotting\TestCachingAggregateRootRepositoryDecorator.cs" />
+    <Compile Remove="Snapshotting\TestNewNewSnapshotting.cs" />
+    <Compile Remove="Snapshotting\TestSnapshottingWithFairlyLongHistory.cs" />
+    <Compile Remove="Views\Distribution\TestAutomaticViewManagerDistribution.cs" />
+    <Compile Remove="Views\Distribution\TestMongoDbAutoDistributionPersistence.cs" />
+    <Compile Remove="Views\NewViewManager\TestViewManagerEventDispatcher.cs" />
+    <Compile Remove="Views\NewViewManager\TestViewManagerEventDispatcherWithOptimization.cs" />
+    <Compile Remove="Views\TestDependentViews.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
+    <PackageReference Include="Moq" Version="4.9.0" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="Sprache" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\d60.Cirqus.NUnit\d60.Cirqus.NUnit.csproj" />
-    <ProjectReference Include="..\..\src\d60.Cirqus.PostgreSql\d60.Cirqus.PostgreSql.csproj" />
-    <ProjectReference Include="..\..\src\d60.Cirqus.SQLite\d60.Cirqus.SQLite.csproj" />
-    <ProjectReference Include="..\..\src\d60.Cirqus.Testing\d60.Cirqus.Testing.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus\d60.Cirqus.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Contracts\AggregateRootRepository\Factories\" />
+    <Folder Include="Events\Replicator\" />
+    <Folder Include="Examples\" />
+    <Folder Include="Integration\Scenarios\" />
+    <Folder Include="Snapshotting\Models\" />
   </ItemGroup>
 
 </Project>

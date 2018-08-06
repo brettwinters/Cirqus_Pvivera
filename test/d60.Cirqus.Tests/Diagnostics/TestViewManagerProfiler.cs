@@ -78,7 +78,7 @@ namespace d60.Cirqus.Tests.Diagnostics
 
             public void Handle(IViewContext context, Event domainEvent)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
             }
         }
 
@@ -89,7 +89,7 @@ namespace d60.Cirqus.Tests.Diagnostics
 
             public void Handle(IViewContext context, Event domainEvent)
             {
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
         }
 

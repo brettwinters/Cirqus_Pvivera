@@ -48,7 +48,7 @@ namespace d60.Cirqus.Tests.Testing
         }
 
         [Test]
-        [Ignore]
+        [Ignore("")]
         public void RenderDefaultsWithMetadata()
         {
             var @event = new SomeEventWithNoProps();
@@ -65,7 +65,7 @@ namespace d60.Cirqus.Tests.Testing
         }
 
         [Test]
-        [Ignore]
+        [Ignore("")]
         public void RenderFixedTemplate()
         {
             var @event = new SomeEventWithNoProps();

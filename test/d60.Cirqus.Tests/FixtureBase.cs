@@ -14,7 +14,7 @@ namespace d60.Cirqus.Tests
     {
         List<IDisposable> _stuffToDispose;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void TestFixtureSetUp()
         {
             TimeMachine.Reset();

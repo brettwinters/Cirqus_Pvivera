@@ -34,9 +34,12 @@ namespace d60.Cirqus.Tests.Views.TestAggregateRootView
         [Test]
         public async Task YeahItWorks()
         {
-            var lastResult = Enumerable.Range(0,40)
-                .Select(i => _commandProcessor.ProcessCommand(new IncrementNumberCommand("id1")))
-                .Last();
+            CommandProcessingResult lastResult = null;
+
+            foreach (var i in Enumerable.Range(0, 40))
+            {
+                lastResult = _commandProcessor.ProcessCommand(new IncrementNumberCommand("id1"));
+            }
 
             await _waitHandler.WaitForAll(lastResult, TimeSpan.FromSeconds(10));
 

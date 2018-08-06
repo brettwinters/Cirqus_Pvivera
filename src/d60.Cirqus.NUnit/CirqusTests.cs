@@ -1,5 +1,6 @@
 ﻿using d60.Cirqus.Testing;
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using TestContext = NUnit.Framework.TestContext;
 
 namespace d60.Cirqus.NUnit
@@ -26,7 +27,7 @@ namespace d60.Cirqus.NUnit
         public void TeardownInternal()
         {
             Teardown();
-            End(TestContext.CurrentContext.Result.State != TestState.Error);
+            End(TestContext.CurrentContext.Result.Outcome != ResultState.Error);
         }
 
         protected virtual void Teardown()

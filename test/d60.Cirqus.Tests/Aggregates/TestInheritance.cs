@@ -35,7 +35,7 @@ namespace d60.Cirqus.Tests.Aggregates
                 Console.WriteLine(emittedEvent.Meta);
 
                 Assert.That(uow.EmittedEvents.Count(), Is.EqualTo(2));
-                Assert.That(emittedEvent.Meta[DomainEvent.MetadataKeys.Owner], Is.StringContaining(typeof(EvenMoreExtendedAggregate).Name));
+                Assert.That(emittedEvent.Meta[DomainEvent.MetadataKeys.Owner], Does.Contain(typeof(EvenMoreExtendedAggregate).Name));
             }
         }
 

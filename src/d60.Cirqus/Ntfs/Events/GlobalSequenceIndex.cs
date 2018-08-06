@@ -120,7 +120,7 @@ namespace d60.Cirqus.Ntfs.Events
         void OpenWriter()
         {
             _writer = new BinaryWriter(
-                new FileStream(_seqFilePath, FileMode.Append, FileAccess.ReadWrite, FileShare.Read, 100 * SizeofSeqRecord, FileOptions.None),
+                new FileStream(_seqFilePath, FileMode.Append, FileAccess.Write, FileShare.Read, 100 * SizeofSeqRecord, FileOptions.None),
                 Encoding.ASCII, leaveOpen: false);
         }
 
