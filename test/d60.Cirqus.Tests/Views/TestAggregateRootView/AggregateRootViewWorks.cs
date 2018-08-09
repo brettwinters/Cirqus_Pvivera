@@ -6,6 +6,7 @@ using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.Views.TestAggregateRootView.Model;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Views.TestAggregateRootView
@@ -23,10 +24,14 @@ namespace d60.Cirqus.Tests.Views.TestAggregateRootView
 
             _waitHandler = new ViewManagerWaitHandle();
 
-            _commandProcessor = CommandProcessor.With()
-                .EventStore(e => e.UseInMemoryEventStore())
-                .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager).WithWaitHandle(_waitHandler))
-                .Create();
+            var services = new ServiceCollection();
+            services.AddCirqus(c =>
+                c.EventStore(e => e.UseInMemoryEventStore())
+                    .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager).WithWaitHandle(_waitHandler)));
+
+            var provider = services.BuildServiceProvider();
+
+            _commandProcessor = provider.GetService<ICommandProcessor>();
 
             RegisterForDisposal(_commandProcessor);
         }

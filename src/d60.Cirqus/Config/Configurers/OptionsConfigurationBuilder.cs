@@ -4,12 +4,13 @@ using d60.Cirqus.Config.Decorators;
 using d60.Cirqus.Events;
 using d60.Cirqus.Exceptions;
 using d60.Cirqus.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Config.Configurers
 {
-    public class OptionsConfigurationBuilder : ConfigurationBuilder
+    public class OptionsConfigurationBuilder : NewConfigurationBuilder
     {
-        public OptionsConfigurationBuilder(IRegistrar registrar) : base(registrar) { }
+        public OptionsConfigurationBuilder(IRegistrar2 registrar) : base(registrar) { }
 
         /// <summary>
         /// Configures Cirqus to purge all views when initializing.
@@ -57,7 +58,7 @@ namespace d60.Cirqus.Config.Configurers
         /// </summary>
         public void AddCommandMappings(CommandMappings mappings)
         {
-            Decorate(c => mappings.CreateCommandMapperDecorator(c.Get<ICommandMapper>()));
+            Decorate<ICommandMapper>((inner, ctx) => mappings.CreateCommandMapperDecorator(inner));
         }
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace d60.Cirqus.Config.Configurers
         /// </summary>
         public void AddCommandTypeNameToMetadata()
         {
-            Decorate<ICommandProcessor>(c => new CommandTypeNameCommandProcessorDecorator(c.Get<ICommandProcessor>(), c.Get<IDomainTypeNameMapper>()));
+            Decorate<ICommandProcessor>((inner, ctx) => new CommandTypeNameCommandProcessorDecorator(inner, ctx.GetService<IDomainTypeNameMapper>()));
         }
     }
 }

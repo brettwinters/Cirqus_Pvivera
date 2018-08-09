@@ -5,6 +5,7 @@ using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Testing
 {
@@ -13,22 +14,20 @@ namespace d60.Cirqus.Testing
         public static SynchronousViewManagerEventDispatcherConfiguationBuilder UseSynchronousViewManangerEventDispatcher(
             this EventDispatcherConfigurationBuilder builder, params IViewManager[] viewManagers)
         {
-            var viewManagerConfigurationContainer = new ConfigurationContainer();
+            var viewManagerConfigurationContainer = builder.Clone();
 
             builder.UseEventDispatcher(context =>
             {
-                var viewManagerContext = viewManagerConfigurationContainer.CreateContext();
-
-                context.AddChildContext(viewManagerContext);
+                var scope = context.CreateScope();
 
                 var eventDispatcher = new SynchronousViewManagerEventDispatcher(
-                    context.Get<IEventStore>(),
-                    context.Get<IAggregateRootRepository>(),
-                    context.Get<IDomainEventSerializer>(),
-                    context.Get<IDomainTypeNameMapper>(),
+                    context.GetService<IEventStore>(),
+                    context.GetService<IAggregateRootRepository>(),
+                    context.GetService<IDomainEventSerializer>(),
+                    context.GetService<IDomainTypeNameMapper>(),
                     viewManagers);
 
-                var contextItems = viewManagerContext.GetOrDefault<IDictionary<string, object>>();
+                var contextItems = scope.ServiceProvider.GetService<IDictionary<string, object>>();
                 if (contextItems != null)
                 {
                     eventDispatcher.SetContextItems(contextItems);

@@ -23,12 +23,11 @@ namespace d60.Cirqus.Tests.Diagnostics
             var waitHandle = new ViewManagerWaitHandle();
             var profilero = new Profilero();
 
-            var commandProcessor = CommandProcessor.With()
+            var commandProcessor = CreateCommandProcessor(config => config
                 .Logging(l => l.UseConsole(minLevel:Logger.Level.Warn))
                 .EventStore(e => e.Register<IEventStore>(c => new SlowWrapper(new InMemoryEventStore())))
                 .EventDispatcher(e => e.UseViewManagerEventDispatcher().WithWaitHandle(waitHandle))
-                .Options(o => o.AddProfiler(profilero))
-                .Create();
+                .Options(o => o.AddProfiler(profilero)));
 
             RegisterForDisposal(commandProcessor);
 

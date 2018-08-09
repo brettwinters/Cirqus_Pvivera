@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using d60.Cirqus.Config.Configurers;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Config
@@ -8,25 +9,27 @@ namespace d60.Cirqus.Tests.Config
     [TestFixture]
     public class TestConfigurationContainer : FixtureBase
     {
-        ConfigurationContainer _container;
+        private ServiceProvider _provider;
 
         protected override void DoSetUp()
         {
-            _container = new ConfigurationContainer();
+            var services = new ServiceCollection();
+            var container = new NewConfigurationContainer(services);
+            _provider = services.BuildServiceProvider();
         }
 
         [Test]
         public void ThrowsWhenNoResolverIsPresent()
         {
-            Assert.Throws<ResolutionException>(() => _container.CreateContext().Get<string>());
+            Assert.Throws<ResolutionException>(() => _provider.GetService<string>());
         }
 
         [Test]
         public void CanGetPrimaryInstance()
         {
-            _container.Register(c => "hej");
+            _provider.(c => "hej");
 
-            var resolvedString = _container.CreateContext().Get<string>();
+            var resolvedString = _provider.GetService<string>();
 
             Assert.That(resolvedString, Is.EqualTo("hej"));
         }
@@ -34,10 +37,10 @@ namespace d60.Cirqus.Tests.Config
         [Test]
         public void CanGetDecoratedInstance()
         {
-            _container.Register(c => "hej");
-            _container.Decorate(c => c.Get<string>() + " med dig");
+            _provider.Register(c => "hej");
+            _provider.Decorate(c => c.GetService<string>() + " med dig");
 
-            var resolvedString = _container.CreateContext().Get<string>();
+            var resolvedString = _provider.GetService<string>();
 
             Assert.That(resolvedString, Is.EqualTo("hej med dig"));
         }
@@ -45,13 +48,13 @@ namespace d60.Cirqus.Tests.Config
         [Test]
         public void CanGetDecoratedInstanceWithAnArbitraryNumberOfDecorators()
         {
-            _container.Register(c => "hej");
+            _provider.Register(c => "hej");
 
             Enumerable.Range(1, 7)
                 .ToList()
-                .ForEach(tal => _container.Decorate(c => c.Get<string>() + " " + tal));
+                .ForEach(tal => _provider.Decorate(c => c.GetService<string>() + " " + tal));
 
-            var resolvedString = _container.CreateContext().Get<string>();
+            var resolvedString = _provider.GetService<string>();
 
             Assert.That(resolvedString, Is.EqualTo("hej 1 2 3 4 5 6 7"));
         }
@@ -59,13 +62,13 @@ namespace d60.Cirqus.Tests.Config
         [Test]
         public void CanGetDecoratedInstanceWithAnArbitraryNumberOfInterleavedDecorators()
         {
-            _container.Register(c => "1");
-            _container.Register(c => int.Parse(c.Get<string>()) + 1);
+            _provider.Register(c => "1");
+            _provider.Register(c => int.Parse(c.GetService<string>()) + 1);
 
-            _container.Decorate(c => c.Get<int>().ToString() + "2");
-            _container.Decorate(c => int.Parse(c.Get<string>()) + 2);
+            _provider.Decorate(c => c.GetService<int>().ToString() + "2");
+            _provider.Decorate(c => int.Parse(c.GetService<string>()) + 2);
 
-            var resolvedString = _container.CreateContext().Get<int>();
+            var resolvedString = _provider.GetService<int>();
 
             Assert.That(resolvedString, Is.EqualTo(24)); //..... ok, this is what happens:
 
@@ -84,9 +87,9 @@ namespace d60.Cirqus.Tests.Config
         public void CanRegisterAndGetInstance()
         {
             const string friendlyInstance = "hej med dig min ven";
-            _container.RegisterInstance(friendlyInstance);
+            _provider.RegisterInstance(friendlyInstance);
 
-            var instance = _container.CreateContext().Get<string>();
+            var instance = _provider.GetService<string>();
 
             Assert.That(instance, Is.EqualTo(friendlyInstance));
         }
@@ -95,19 +98,19 @@ namespace d60.Cirqus.Tests.Config
         public void CannotRegisterInstanceMultipleTimesByDefault()
         {
             const string friendlyInstance = "hej med dig min ven";
-            _container.RegisterInstance(friendlyInstance);
+            _provider.RegisterInstance(friendlyInstance);
 
-            Assert.Throws<InvalidOperationException>(() => _container.RegisterInstance("hej igen"));
+            Assert.Throws<InvalidOperationException>(() => _provider.RegisterInstance("hej igen"));
         }
 
         [Test]
         public void CanRegisterMultipleInstancesIfMultipleIsSpecified()
         {
-            _container.RegisterInstance("hej", multi:true);
-            _container.RegisterInstance("med", multi:true);
-            _container.RegisterInstance("dig", multi:true);
+            _provider.RegisterInstance("hej", multi:true);
+            _provider.RegisterInstance("med", multi:true);
+            _provider.RegisterInstance("dig", multi:true);
 
-            var all = _container.CreateContext().GetAll<string>();
+            var all = _provider.GetAll<string>();
 
             Assert.That(string.Join(" ", all), Is.EqualTo("hej med dig"));
         }

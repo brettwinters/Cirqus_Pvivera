@@ -16,9 +16,8 @@ namespace d60.Cirqus.Tests.Integration
 
         protected override void DoSetUp()
         {
-            _commandProcessor = CommandProcessor.With()
-                .EventStore(e => e.UseInMemoryEventStore())
-                .Create();
+            _commandProcessor = CreateCommandProcessor(config => config
+                .EventStore(e => e.UseInMemoryEventStore()));
 
             RegisterForDisposal(_commandProcessor);
         }

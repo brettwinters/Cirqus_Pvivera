@@ -3,6 +3,7 @@ using d60.Cirqus.Aggregates;
 using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.Serialization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Snapshotting.New
 {
@@ -21,16 +22,15 @@ namespace d60.Cirqus.Snapshotting.New
 
             configureSnapshotting(snapshottingConfigurationBuilder);
 
-            builder.Decorate<IAggregateRootRepository>(c =>
+            builder.Decorate<IAggregateRootRepository>((inner, ctx) =>
             {
-                var aggregateRootRepository = c.Get<IAggregateRootRepository>();
-                var eventStore = c.Get<IEventStore>();
-                var domainEventSerializer = c.Get<IDomainEventSerializer>();
-                var snapshotStore = c.Get<ISnapshotStore>();
+                var eventStore = ctx.GetService<IEventStore>();
+                var domainEventSerializer = ctx.GetService<IDomainEventSerializer>();
+                var snapshotStore = ctx.GetService<ISnapshotStore>();
 
                 var threshold = snapshottingConfigurationBuilder.PreparationThreshold;
 
-                return new NewSnapshottingAggregateRootRepositoryDecorator(aggregateRootRepository, eventStore, domainEventSerializer, snapshotStore, threshold);
+                return new NewSnapshottingAggregateRootRepositoryDecorator(inner, eventStore, domainEventSerializer, snapshotStore, threshold);
             });
         }
     }

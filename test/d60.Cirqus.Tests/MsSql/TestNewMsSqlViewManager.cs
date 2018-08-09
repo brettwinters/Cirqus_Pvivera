@@ -129,7 +129,7 @@ namespace d60.Cirqus.Tests.MsSql
                 HashOfInts = new HashSet<int> { 9, 3 };
                 ArrayOfStrings = new[] { "hej", "med", "dig", "min", "ven" };
 
-                DateTime = new DateTime(1979, 3, 19, 14, 00, 00, DateTimeKind.Local);
+                DateTime = new DateTime(1979, 3, 19, 13, 00, 00, DateTimeKind.Utc);
 
                 DateTimeOffset = new DateTimeOffset(1979, 3, 19, 14, 00, 00, TimeSpan.FromHours(1));
 

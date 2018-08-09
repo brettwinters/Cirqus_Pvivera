@@ -1,4 +1,6 @@
 ﻿using System.Configuration;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace d60.Cirqus.MsSql
 {
@@ -10,11 +12,15 @@ namespace d60.Cirqus.MsSql
         /// </summary>
         public static string GetConnectionString(string connectionStringOrConnectionStringName)
         {
-            var connectionStringSettings = ConfigurationManager.ConnectionStrings[connectionStringOrConnectionStringName];
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
 
-            var connectionString = connectionStringSettings != null
-                ? connectionStringSettings.ConnectionString
-                : connectionStringOrConnectionStringName;
+            var configuration = builder.Build();
+
+            var connectionStringSettings = configuration.GetConnectionString(connectionStringOrConnectionStringName);
+
+            var connectionString = connectionStringSettings ?? connectionStringOrConnectionStringName;
 
             return connectionString;
         }

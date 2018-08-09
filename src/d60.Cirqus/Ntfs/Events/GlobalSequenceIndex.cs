@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Text;
+using System.Threading;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 
@@ -18,14 +18,14 @@ namespace d60.Cirqus.Ntfs.Events
         public const int SizeofSeqRecord = 8 + 1 + 255 + 8;
 
         readonly string _seqFilePath;
-        
+
         BinaryWriter _writer;
 
         public GlobalSequenceIndex(string basePath, bool dropEvents)
         {
             _seqFilePath = Path.Combine(basePath, "seq.idx");
 
-            if (dropEvents && File.Exists(_seqFilePath)) 
+            if (dropEvents && File.Exists(_seqFilePath))
                 File.Delete(_seqFilePath);
 
             OpenWriter();

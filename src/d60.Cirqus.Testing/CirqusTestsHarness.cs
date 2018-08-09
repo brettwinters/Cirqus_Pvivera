@@ -9,6 +9,7 @@ using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Identity;
 using EnergyProjects.Tests.Utils;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -38,7 +39,7 @@ namespace d60.Cirqus.Testing
 
             formatter = new TextFormatter(writer);
 
-            Context = TestContext.Create();
+            Configure();
         }
 
         protected void End(bool isInExceptionalState)
@@ -50,11 +51,13 @@ namespace d60.Cirqus.Testing
             }
         }
 
-        protected void Configure(Action<IOptionalConfiguration<TestContext>> configurator)
+        protected void Configure(Action<IOptionalConfiguration<TestContext>> configurator = null)
         {
-            var configuration = TestContext.With();
-            configurator(configuration);
-            Context = configuration.Create();
+            var services = new ServiceCollection();
+            services.AddTestContext(configurator);
+
+            var provider = services.BuildServiceProvider();
+            Context = provider.GetService<TestContext>();
         }
 
         protected abstract void Fail();

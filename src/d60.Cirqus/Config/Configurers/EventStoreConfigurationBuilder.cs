@@ -5,12 +5,12 @@ namespace d60.Cirqus.Config.Configurers
     /// <summary>
     /// Configuration builder to help with configuring the <see cref="IEventStore"/> implementation
     /// </summary>
-    public class EventStoreConfigurationBuilder : ConfigurationBuilder<IEventStore>
+    public class EventStoreConfigurationBuilder : NewConfigurationBuilder<IEventStore>
     {
         /// <summary>
         /// Constructs the builder
         /// </summary>
-        public EventStoreConfigurationBuilder(IRegistrar registrar) : base(registrar) { }
+        public EventStoreConfigurationBuilder(IRegistrar2 registrar) : base(registrar) { }
 
         /// <summary>
         /// Enables an in-memory event cache that caches the most recently used events. <see cref="maxCacheEntries"/> specifies
@@ -18,7 +18,7 @@ namespace d60.Cirqus.Config.Configurers
         /// </summary>
         public void EnableCaching(int maxCacheEntries)
         {
-            Decorate(context => new CachingEventStoreDecorator(context.Get<IEventStore>())
+            Decorate((inner, context) => new CachingEventStoreDecorator(inner)
             {
                 MaxCacheEntries = maxCacheEntries
             });

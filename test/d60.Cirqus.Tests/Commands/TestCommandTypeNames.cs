@@ -6,6 +6,7 @@ using d60.Cirqus.Events;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Commands
@@ -18,15 +19,14 @@ namespace d60.Cirqus.Tests.Commands
 
         protected override void DoSetUp()
         {
-            _commandProcessor = CommandProcessor.With()
+            _commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => _eventStore = e.UseInMemoryEventStore())
                 .EventDispatcher(e => e.UseEventDispatcher(c => 
-                    new ConsoleOutEventDispatcher(c.Get<IEventStore>())))
+                    new ConsoleOutEventDispatcher(c.GetService<IEventStore>())))
                 .Options(o =>
                 {
                     o.AddCommandTypeNameToMetadata();
-                })
-                .Create();
+                }));
 
             RegisterForDisposal(_commandProcessor);
         }

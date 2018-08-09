@@ -14,7 +14,7 @@ namespace d60.Cirqus.Tests.Bugs
 
         protected override void DoSetUp()
         {
-            _context = RegisterForDisposal(TestContext.Create());
+            _context = RegisterForDisposal(CreateTestContext());
         }
 
         [Test]

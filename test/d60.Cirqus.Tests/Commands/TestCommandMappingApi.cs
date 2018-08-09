@@ -43,16 +43,14 @@ namespace d60.Cirqus.Tests.Commands
                         .DoStuff();
                 });
 
-            _realCommandProcessor = CommandProcessor.With()
+            _realCommandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.Register<IEventStore>(c => new InMemoryEventStore()))
-                .Options(o => o.AddCommandMappings(commandMappings))
-                .Create();
-
+                .Options(o => o.AddCommandMappings(commandMappings)));
+            
             RegisterForDisposal(_realCommandProcessor);
 
-            _fakeCommandProcessor = TestContext.With()
-                .Options(x => x.AddCommandMappings(commandMappings))
-                .Create();
+            _fakeCommandProcessor =
+                CreateTestContext(config => config.Options(x => x.AddCommandMappings(commandMappings)));
         }
 
         [Test]

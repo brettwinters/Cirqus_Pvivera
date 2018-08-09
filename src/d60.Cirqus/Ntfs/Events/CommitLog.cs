@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 
 namespace d60.Cirqus.Ntfs.Events
 {
@@ -12,7 +13,6 @@ namespace d60.Cirqus.Ntfs.Events
     {
         public const int SizeofHalfRecord = sizeof(long);
         public const int SizeofFullRecord = SizeofHalfRecord * 2;
-
         readonly string _commitsFilePath;
         
         BinaryWriter _writer;
@@ -22,7 +22,7 @@ namespace d60.Cirqus.Ntfs.Events
         {
             _commitsFilePath = Path.Combine(basePath, "commits.idx");
 
-            if (dropEvents && File.Exists(_commitsFilePath)) 
+            if (dropEvents && File.Exists(_commitsFilePath))
                 File.Delete(_commitsFilePath);
 
             OpenWriter();
@@ -112,8 +112,7 @@ namespace d60.Cirqus.Ntfs.Events
         {
             _writer.Dispose();
 
-            long garbage;
-            Read(out garbage);
+            Read(out long garbage);
 
             if (garbage == 0)
             {
@@ -121,7 +120,7 @@ namespace d60.Cirqus.Ntfs.Events
                     "Recover must not be called if there's is no garbage. Please check that before the call.");
             }
 
-            using (var stream = new FileStream(_commitsFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, 1024, FileOptions.None))
+            using (var stream = new FileStream(_commitsFilePath, FileMode.Open, FileAccess.Write, FileShare.Read, 1024, FileOptions.None))
             {
                 stream.SetLength(stream.Length - garbage);
                 stream.Flush();

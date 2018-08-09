@@ -9,12 +9,12 @@ namespace d60.Cirqus.Testing
     /// <summary>
     /// Configuration builder that allows for configuring a <see cref="ViewManagerEventDispatcher"/>
     /// </summary>
-    public class SynchronousViewManagerEventDispatcherConfiguationBuilder : ConfigurationBuilder<SynchronousViewManagerEventDispatcher>
+    public class SynchronousViewManagerEventDispatcherConfiguationBuilder : NewConfigurationBuilder<SynchronousViewManagerEventDispatcher>
     {
         /// <summary>
         /// Creates the builder
         /// </summary>
-        public SynchronousViewManagerEventDispatcherConfiguationBuilder(IRegistrar registrar) : base(registrar) { }
+        public SynchronousViewManagerEventDispatcherConfiguationBuilder(IRegistrar2 registrar) : base(registrar) { }
 
         /// <summary>
         /// Makes the given dictionary of items available in the <see cref="IViewContext"/> passed to the view's

@@ -23,7 +23,7 @@ namespace d60.Cirqus.Tests.Testing
 
         protected override void DoSetUp()
         {
-            _context = RegisterForDisposal(TestContext.Create());
+            _context = RegisterForDisposal(CreateTestContext());
         }
 
         [Test]
@@ -207,7 +207,7 @@ namespace d60.Cirqus.Tests.Testing
 
             public async Task<long> GetPosition(bool canGetFromCache = true)
             {
-                return _position;
+                return await Task.FromResult(_position);
             }
 
             public void Dispatch(IViewContext viewContext, IEnumerable<DomainEvent> batch, IViewManagerProfiler viewManagerProfiler)

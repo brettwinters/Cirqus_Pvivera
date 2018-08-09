@@ -5,14 +5,14 @@ namespace d60.Cirqus.Config.Configurers
     /// <summary>
     /// Configuration builder that is used to register factory methods for various services
     /// </summary>
-    public abstract class ConfigurationBuilder
+    public abstract class NewConfigurationBuilder
     {
-        protected IRegistrar Registrar;
+        protected IRegistrar2 Registrar;
 
         /// <summary>
         /// Constructs the builder
         /// </summary>
-        protected ConfigurationBuilder(IRegistrar registrar)
+        protected NewConfigurationBuilder(IRegistrar2 registrar)
         {
             Registrar = registrar;
         }
@@ -20,7 +20,7 @@ namespace d60.Cirqus.Config.Configurers
         /// <summary>
         /// Registers a factory method for <typeparamref name="TService"/>
         /// </summary>
-        public void Register<TService>(Func<ResolutionContext, TService> serviceFactory)
+        public void Register<TService>(Func<IServiceProvider, TService> serviceFactory) where TService : class 
         {
             Registrar.Register(serviceFactory);
         }
@@ -28,7 +28,7 @@ namespace d60.Cirqus.Config.Configurers
         /// <summary>
         /// Registers a specific instance (which by definition is not a decorator) for <typeparamref name="TService"/>
         /// </summary>
-        public void RegisterInstance<TService>(TService instance, bool multi = false)
+        public void RegisterInstance<TService>(TService instance, bool multi = false) where TService : class 
         {
             Registrar.RegisterInstance(instance, multi);
         }
@@ -36,34 +36,23 @@ namespace d60.Cirqus.Config.Configurers
         /// <summary>
         /// Registers a factory method for decorating <typeparamref name="TService"/>
         /// </summary>
-        public void Decorate<TService>(Func<ResolutionContext, TService> serviceFactory)
+        public void Decorate<TService>(Func<TService, IServiceProvider, TService> serviceFactory) where TService : class
         {
             Registrar.Decorate(serviceFactory);
         }
-
-        /// <summary>
-        /// Checks whether the given service type has a registration. Optionally checks whether a primary (i.e. non-decorator) is present.
-        /// </summary>
-        public bool HasService<TService>(bool checkForPrimary = false)
-        {
-            return Registrar.HasService<TService>(checkForPrimary);
-        }
     }
 
-    /// <summary>
-    /// Typed configuration builder that can be used to fixate the type that the registered factory must return
-    /// </summary>
-    public abstract class ConfigurationBuilder<TService> : ConfigurationBuilder
+    public abstract class NewConfigurationBuilder<TService> : NewConfigurationBuilder
     {
         /// <summary>
         /// Constructs the builder
         /// </summary>
-        protected ConfigurationBuilder(IRegistrar registrar) : base(registrar) {}
+        protected NewConfigurationBuilder(IRegistrar2 registrar) : base(registrar) { }
 
         /// <summary>
         /// Registers a factory method for <typeparamref name="TService"/>
         /// </summary>
-        public void Register(Func<ResolutionContext, TService> serviceFactory)
+        public void Register<TService>(Func<IServiceProvider, TService> serviceFactory) where TService : class
         {
             Registrar.Register(serviceFactory);
         }
@@ -71,7 +60,7 @@ namespace d60.Cirqus.Config.Configurers
         /// <summary>
         /// Registers a specific instance (which by definition is not a decorator) for <typeparamref name="TService"/>
         /// </summary>
-        public void RegisterInstance(TService instance, bool multi = false)
+        public void RegisterInstance<TService>(TService instance, bool multi = false) where TService : class
         {
             Registrar.RegisterInstance(instance, multi);
         }
@@ -79,7 +68,7 @@ namespace d60.Cirqus.Config.Configurers
         /// <summary>
         /// Registers a factory method for decorating <typeparamref name="TService"/>
         /// </summary>
-        public void Decorate(Func<ResolutionContext, TService> serviceFactory)
+        public void Decorate(Func<TService, IServiceProvider, TService> serviceFactory)
         {
             Registrar.Decorate(serviceFactory);
         }

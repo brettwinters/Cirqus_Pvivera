@@ -18,13 +18,13 @@ using NUnit.Framework;
 namespace d60.Cirqus.Tests.Contracts.EventStore
 {
     [Description("Contract test for event stores. Verifies that event store implementation and sequence number generation works in tandem")]
-    [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
+//    [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
     [TestFixture(typeof(InMemoryEventStoreFactory))]
     [TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
+//    [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     [TestFixture(typeof(NtfsEventStoreFactory))]
-    [TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
-    [TestFixture(typeof(CachedEventStoreFactory), Category = TestCategories.MongoDb, Description = "Uses MongoDB behind the scenes")]
+//    [TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
+//    [TestFixture(typeof(CachedEventStoreFactory), Category = TestCategories.MongoDb, Description = "Uses MongoDB behind the scenes")]
     public class EventStoreTest<TEventStoreFactory> : FixtureBase where TEventStoreFactory : IEventStoreFactory, new()
     {
         TEventStoreFactory _eventStoreFactory;
@@ -417,10 +417,10 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         }
 
         [TestCase(100, 3)]
-        [TestCase(1000, 10, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(10000, 10, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(1000, 100, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(1000, 1000, Ignore = TestCategories.IgnoreLongRunning)]
+        [TestCase(1000, 10, Ignore = "TestCategories.IgnoreLongRunning")]
+        [TestCase(10000, 10, Ignore = "TestCategories.IgnoreLongRunning")]
+        [TestCase(1000, 100, Ignore = "TestCategories.IgnoreLongRunning")]
+        [TestCase(1000, 1000, Ignore = "TestCategories.IgnoreLongRunning")]
         public void CompareSavePerformance(int numberOfBatches, int numberOfEventsPerBatch)
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();
@@ -442,7 +442,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         }
 
         [TestCase(1000)]
-        [TestCase(10000, Ignore = TestCategories.IgnoreLongRunning)]
+        [TestCase(10000, Ignore = "TestCategories.IgnoreLongRunning")]
         public void CompareLoadPerformance(int numberOfEvents)
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();
@@ -460,8 +460,8 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         }
 
         [TestCase(1000)]
-        [TestCase(10000, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(100000, Ignore = TestCategories.IgnoreLongRunning)]
+        [TestCase(10000, Ignore = "TestCategories.IgnoreLongRunning")]
+        [TestCase(100000, Ignore = "TestCategories.IgnoreLongRunning")]
         public void CompareStreamPerformance(int numberOfEvents)
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();
@@ -484,11 +484,10 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 
             var serializer = new JsonDomainEventSerializer();
 
-            var processor = CommandProcessor.With()
+            var processor = CreateCommandProcessor(config => config
                 .EventStore(e => e.RegisterInstance(_eventStore))
                 .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
-                .Options(o => o.RegisterInstance<IDomainEventSerializer>(serializer))
-                .Create();
+                .Options(o => o.RegisterInstance<IDomainEventSerializer>(serializer)));;
 
             RegisterForDisposal(processor);
 

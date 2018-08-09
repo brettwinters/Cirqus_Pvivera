@@ -10,6 +10,7 @@ using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;
 using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Tests.Integration
 {
@@ -34,16 +35,15 @@ namespace d60.Cirqus.Tests.Integration
 
         protected override void DoSetUp()
         {
-            _cirqus = CommandProcessor.With()
+            _cirqus = CreateCommandProcessor(config => config
                 .EventStore(e => _eventStore = e.UseInMemoryEventStore())
                 .AggregateRootRepository(r => r.Register(c =>
                 {
-                    _aggregateRootRepository = new DefaultAggregateRootRepository(c.Get<IEventStore>(), c.Get<IDomainEventSerializer>(), c.Get<IDomainTypeNameMapper>());
+                    _aggregateRootRepository = new DefaultAggregateRootRepository(c.GetService<IEventStore>(), c.GetService<IDomainEventSerializer>(), c.GetService<IDomainTypeNameMapper>());
                     
                     return _aggregateRootRepository;
                 }))
-                .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
-                .Create();
+                .EventDispatcher(e => e.UseConsoleOutEventDispatcher()));
 
             RegisterForDisposal(_cirqus);
         }

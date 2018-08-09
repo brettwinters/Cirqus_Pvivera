@@ -11,6 +11,7 @@ using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus
 {
@@ -31,7 +32,7 @@ namespace d60.Cirqus
         /// </summary>
         public static ILoggingAndEventStoreConfiguration With()
         {
-            return new CommandProcessorConfigurationBuilder();
+            return new CommandProcessorConfigurationBuilder(new ServiceCollection());
         }
 
         readonly Retryer _retryer = new Retryer();

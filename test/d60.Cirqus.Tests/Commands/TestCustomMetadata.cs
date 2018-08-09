@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
+using d60.Cirqus.Extensions;
 using d60.Cirqus.Numbers;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Commands
@@ -19,10 +21,14 @@ namespace d60.Cirqus.Tests.Commands
 
         protected override void DoSetUp()
         {
-            _cirqus = CommandProcessor.With()
-                .EventStore(e => _eventStore = e.UseInMemoryEventStore())
-                .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
-                .Create();
+            var services = new ServiceCollection();
+            services.AddCirqus(c =>
+                c.EventStore(e => _eventStore = e.UseInMemoryEventStore())
+                    .EventDispatcher(e => e.UseConsoleOutEventDispatcher()));
+
+            var provider = services.BuildServiceProvider();
+
+            _cirqus = provider.GetService<ICommandProcessor>();
 
             RegisterForDisposal(_cirqus);
         }

@@ -5,9 +5,11 @@ using d60.Cirqus.Aggregates;
 using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Exceptions;
+using d60.Cirqus.Extensions;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Commands
@@ -26,16 +28,21 @@ namespace d60.Cirqus.Tests.Commands
                     throw new InvalidOperationException("oh no, you cannot do that");
                 });
 
-            _cirqus = CommandProcessor.With()
-                .EventStore(e => _eventStore = e.UseInMemoryEventStore())
-                .EventDispatcher(e => e.UseEventDispatcher(c => 
-                    new ConsoleOutEventDispatcher(c.Get<IEventStore>())))
-                .Options(o =>
-                {
-                    o.AddDomainExceptionType<InvalidOperationException>();
-                    o.AddCommandMappings(commandMappings);
-                })
-                .Create();
+            var services = new ServiceCollection();
+
+            services.AddCirqus(config =>
+                config.EventStore(e => _eventStore = e.UseInMemoryEventStore())
+                    .EventDispatcher(e => e.UseEventDispatcher(c =>
+                        new ConsoleOutEventDispatcher(c.GetService<IEventStore>())))
+                    .Options(o =>
+                    {
+                        o.AddDomainExceptionType<InvalidOperationException>();
+                        o.AddCommandMappings(commandMappings);
+                    }));
+
+            var provider = services.BuildServiceProvider();
+
+            _cirqus = provider.GetService<ICommandProcessor>();
 
             RegisterForDisposal(_cirqus);
         }

@@ -11,6 +11,7 @@ using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Stubs;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 
@@ -30,7 +31,11 @@ namespace d60.Cirqus.Tests.Aggregates
         {
             const string aggregateRootId = "bim";
 
-            using (var context = TestContext.With().Options(x => x.Asynchronous()).Create())
+            var service = new ServiceCollection();
+            service.AddTestContext(config => config.Options(x => x.Asynchronous()));
+            var provider = service.BuildServiceProvider();
+
+            using (var context = provider.GetService<TestContext>())
             {
                 Console.WriteLine("Saving {0} to history of '{1}'", numberOfEvents, aggregateRootId);
 

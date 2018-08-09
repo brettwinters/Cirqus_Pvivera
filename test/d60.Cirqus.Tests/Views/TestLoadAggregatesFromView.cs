@@ -15,6 +15,7 @@ using d60.Cirqus.Tests.Stubs;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Views
@@ -37,20 +38,19 @@ namespace d60.Cirqus.Tests.Views
             _viewManager3 = new InMemoryViewManager<MyViewInstanceEmitting>();
             _viewManager4 = new InMemoryViewManager<MyViewInstanceLoadingNonexistentRoot>();
 
-            _cirqus = CommandProcessor.With()
+            _cirqus = CreateCommandProcessor(config => config
                 .EventStore(e => e.UseInMemoryEventStore())
                 .EventDispatcher(e => e.Register<IEventDispatcher>(c =>
                 {
-                    var repository = c.Get<IAggregateRootRepository>();
-                    var store = c.Get<IEventStore>();
-                    var serializer = c.Get<IDomainEventSerializer>();
-                    var typeMapper = c.Get<IDomainTypeNameMapper>();
+                    var repository = c.GetService<IAggregateRootRepository>();
+                    var store = c.GetService<IEventStore>();
+                    var serializer = c.GetService<IDomainEventSerializer>();
+                    var typeMapper = c.GetService<IDomainTypeNameMapper>();
 
                     _eventDispatcher = new ViewManagerEventDispatcher(repository, store, serializer, typeMapper);
 
                     return _eventDispatcher;
-                }))
-                .Create();
+                })));
 
             RegisterForDisposal(_cirqus);
         }

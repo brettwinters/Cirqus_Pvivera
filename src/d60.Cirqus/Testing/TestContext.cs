@@ -12,6 +12,7 @@ using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Testing
 {
@@ -44,12 +45,7 @@ namespace d60.Cirqus.Testing
 
         public static IOptionalConfiguration<TestContext> With()
         {
-            return new TestContextConfigurationBuilder();
-        }
-
-        public static TestContext Create()
-        {
-            return With().Create();
+            return new TestContextConfigurationBuilder(new ServiceCollection());
         }
 
         public IDomainEventSerializer EventSerializer

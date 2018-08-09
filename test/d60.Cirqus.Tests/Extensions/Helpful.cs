@@ -5,7 +5,7 @@ using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Stubs;
-using d60.Cirqus.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Tests.Extensions
 {
@@ -19,21 +19,16 @@ namespace d60.Cirqus.Tests.Extensions
 
         internal static Task<InMemoryEventStore> UseInMemoryEventStore(this EventStoreConfigurationBuilder builder)
         {
-            var taskCompletionSource = new TaskCompletionSource<InMemoryEventStore>();
-            
-            builder.Register<IEventStore>(c =>
-            {
-                var inMemoryEventStore = new InMemoryEventStore();
-                taskCompletionSource.SetResult(inMemoryEventStore);
-                return inMemoryEventStore;
-            });
+            var inMemoryEventStore = new InMemoryEventStore();
 
-            return taskCompletionSource.Task;
+            builder.RegisterInstance<IEventStore>(inMemoryEventStore);
+
+            return Task.FromResult(inMemoryEventStore);
         }
 
         internal static void UseConsoleOutEventDispatcher(this EventDispatcherConfigurationBuilder builder)
         {
-            builder.UseEventDispatcher(c => new ConsoleOutEventDispatcher(c.Get<IEventStore>()));
+            builder.UseEventDispatcher(c => new ConsoleOutEventDispatcher(c.GetService<IEventStore>()));
         }
     }
 }

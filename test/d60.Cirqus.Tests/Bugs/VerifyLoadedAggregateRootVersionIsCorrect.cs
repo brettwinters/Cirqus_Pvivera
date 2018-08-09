@@ -10,6 +10,7 @@ using d60.Cirqus.Extensions;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Bugs
@@ -23,15 +24,19 @@ namespace d60.Cirqus.Tests.Bugs
             var waitHandle = new ViewManagerWaitHandle();
             var viewManager = new InMemoryViewManager<Wview>();
 
-            var commandProcessor = CommandProcessor.With()
-                .EventStore(e => e.UseInMemoryEventStore())
-                .EventDispatcher(e =>
-                {
-                    e.UseViewManagerEventDispatcher(viewManager)
-                        .WithWaitHandle(waitHandle);
-                })
-                .Options(o => o.SetMaxRetries(0))
-                .Create();
+            var services = new ServiceCollection();
+            services.AddCirqus(c =>
+                c.EventStore(e => e.UseInMemoryEventStore())
+                    .EventDispatcher(e =>
+                    {
+                        e.UseViewManagerEventDispatcher(viewManager)
+                            .WithWaitHandle(waitHandle);
+                    })
+                    .Options(o => o.SetMaxRetries(0)));
+
+            var provider = services.BuildServiceProvider();
+
+            var commandProcessor = provider.GetService<ICommandProcessor>();
 
             const string oneWootId = "oneWoot";
             const string anotherWootId = "anotherWoot";

@@ -3,12 +3,13 @@ using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Snapshotting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Config.Configurers
 {
-    public class AggregateRootRepositoryConfigurationBuilder : ConfigurationBuilder<IAggregateRootRepository>
+    public class AggregateRootRepositoryConfigurationBuilder : NewConfigurationBuilder<IAggregateRootRepository>
     {
-        public AggregateRootRepositoryConfigurationBuilder(IRegistrar registrar) : base(registrar) { }
+        public AggregateRootRepositoryConfigurationBuilder(IRegistrar2 registrar) : base(registrar) { }
 
         /// <summary>
         /// Registers a <see cref="FactoryBasedAggregateRootRepository"/> as the <see cref="IAggregateRootRepository"/> implementation. 
@@ -17,9 +18,9 @@ namespace d60.Cirqus.Config.Configurers
         {
             Register(context =>
                 new FactoryBasedAggregateRootRepository(
-                    context.Get<IEventStore>(),
-                    context.Get<IDomainEventSerializer>(),
-                    context.Get<IDomainTypeNameMapper>(),
+                    context.GetService<IEventStore>(),
+                    context.GetService<IDomainEventSerializer>(),
+                    context.GetService<IDomainTypeNameMapper>(),
                     factoryMethod));
         }
 
@@ -29,15 +30,15 @@ namespace d60.Cirqus.Config.Configurers
         /// </summary>
         public void EnableInMemorySnapshotCaching(int approximateMaxNumberOfCacheEntries)
         {
-            Decorate(context =>
+            Decorate((inner, context) =>
                 new CachingAggregateRootRepositoryDecorator(
-                    context.Get<IAggregateRootRepository>(),
+                    inner,
                     new InMemorySnapshotCache
                     {
                         ApproximateMaxNumberOfCacheEntries = approximateMaxNumberOfCacheEntries
                     },
-                    context.Get<IEventStore>(),
-                    context.Get<IDomainEventSerializer>()));
+                    context.GetService<IEventStore>(),
+                    context.GetService<IDomainEventSerializer>()));
         }
     }
 }

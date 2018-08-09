@@ -75,10 +75,9 @@ namespace d60.Cirqus.Tests.Integration
 
         void SetUpCommandProcessor(IDomainTypeNameMapper typeNameMapperToUse)
         {
-            _commandProcessor = CommandProcessor.With()
+            _commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => _eventStore = e.UseInMemoryEventStore())
-                .Options(o => o.UseCustomDomainTypeNameMapper(typeNameMapperToUse))
-                .Create();
+                .Options(o => o.UseCustomDomainTypeNameMapper(typeNameMapperToUse)));
 
             RegisterForDisposal(_commandProcessor);
         }

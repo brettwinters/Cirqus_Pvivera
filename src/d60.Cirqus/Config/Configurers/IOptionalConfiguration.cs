@@ -22,10 +22,5 @@ namespace d60.Cirqus.Config.Configurers
         /// Begins the additional options configuration, which can be completed by supplying an action that makes an additional call to the passed-in <see cref="OptionsConfigurationBuilder"/>
         /// </summary>
         IOptionalConfiguration<T> Options(Action<OptionsConfigurationBuilder> func);
-
-        /// <summary>
-        /// Finishes off the configuration (returns an implementation of <see cref="ICommandProcessor"/> if you're configuring Cirqus 4real, or the TestContext if you're going to do some testing)
-        /// </summary>
-        T Create();
     }
 }

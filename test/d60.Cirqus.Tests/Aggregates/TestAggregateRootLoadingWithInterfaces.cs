@@ -8,6 +8,7 @@ using d60.Cirqus.Extensions;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Aggregates
@@ -21,12 +22,16 @@ namespace d60.Cirqus.Tests.Aggregates
         protected override void DoSetUp()
         {
             _viewManager = new InMemoryViewManager<RootView>();
-            
-            _commandProcessor = CommandProcessor.With()
-                .EventStore(e => e.UseInMemoryEventStore())
-                .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager))
-                .Create();
 
+            var services = new ServiceCollection();
+            services.AddCirqus(c => 
+                c.EventStore(e => e.UseInMemoryEventStore())
+                .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager)));
+
+            var provider = services.BuildServiceProvider();
+
+            _commandProcessor = provider.GetService<ICommandProcessor>();
+                
             RegisterForDisposal(_commandProcessor);
         }
 

@@ -27,7 +27,7 @@ namespace d60.Cirqus.Tests.Diagnostics
             var view1 = new InMemoryViewManager<SlowView>();
             var view2 = new InMemoryViewManager<QuickView>();
 
-            var commandProcessor = CommandProcessor.With()
+            var commandProcessor = CreateCommandProcessor(config => config
                 .Logging(l => l.UseConsole(minLevel: Logger.Level.Debug))
                 .EventStore(e => e.UseInMemoryEventStore())
                 .EventDispatcher(e =>
@@ -35,8 +35,7 @@ namespace d60.Cirqus.Tests.Diagnostics
                     e.UseViewManagerEventDispatcher(view1, view2)
                         .WithWaitHandle(waitHandle)
                         .WithProfiler(myProfiler);
-                })
-                .Create();
+                }));
 
             using (commandProcessor)
             {

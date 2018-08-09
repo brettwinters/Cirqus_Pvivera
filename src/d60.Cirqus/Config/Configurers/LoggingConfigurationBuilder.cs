@@ -9,12 +9,12 @@ namespace d60.Cirqus.Config.Configurers
     /// <summary>
     /// Configuration builder for configuring logging
     /// </summary>
-    public class LoggingConfigurationBuilder : ConfigurationBuilder
+    public class LoggingConfigurationBuilder : NewConfigurationBuilder
     {
         /// <summary>
         /// Constructs the builder
         /// </summary>
-        public LoggingConfigurationBuilder(IRegistrar registrar) : base(registrar) { }
+        public LoggingConfigurationBuilder(IRegistrar2 registrar) : base(registrar) { }
 
         /// <summary>
         /// Configures Cirqus to log using the console.

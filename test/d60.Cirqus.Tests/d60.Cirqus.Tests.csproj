@@ -24,16 +24,13 @@
     <Compile Remove="Bugs\ReplicationScenario\VerifyThatWeCannotAccidentallyLoadOldRootsInReplicatedSetup.cs" />
     <Compile Remove="Bugs\VerifyThatDuplicateSequenceNumbersAreNotAssigned.cs" />
     <Compile Remove="Config\TestConfigurationApi.cs" />
+    <Compile Remove="Config\TestConfigurationContainer.cs" />
     <Compile Remove="Contracts\AggregateRootRepository\Factories\DefaultAggregateRootRepositoryFactory.cs" />
     <Compile Remove="Contracts\AggregateRootRepository\TestAggregateRootRepositories.cs" />
-    <Compile Remove="Contracts\EventStore\EventStoreTest.cs" />
     <Compile Remove="Contracts\EventStore\Factories\CachedEventStoreFactory.cs" />
     <Compile Remove="Contracts\EventStore\Factories\MongoDbEventStoreFactory.cs" />
-    <Compile Remove="Contracts\EventStore\Factories\MsSqlEventStoreFactory.cs" />
-    <Compile Remove="Contracts\EventStore\Factories\NtfsEventStoreFactory.cs" />
     <Compile Remove="Contracts\EventStore\Factories\PostgreSqlEventStoreFactory.cs" />
     <Compile Remove="Contracts\EventStore\Factories\SQLiteEventStoreFactory .cs" />
-    <Compile Remove="Contracts\EventStore\InsertPerfOverTime.cs" />
     <Compile Remove="Contracts\Views\DomainEventBatchDispatch.cs" />
     <Compile Remove="Contracts\Views\Factories\EntityFrameworkViewManagerFactory.cs" />
     <Compile Remove="Contracts\Views\Factories\HybridDbViewManagerFactory.cs" />
@@ -72,12 +69,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="MsSql\MsSqlTestHelper.cs" />
+    <Compile Include="MsSql\TestMsSqlEventStorePerformance.cs" />
+    <Compile Include="MsSql\TestNewMsSqlViewManager.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Moq" Version="4.9.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="Sprache" Version="2.1.2" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -90,11 +96,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Config\" />
     <Folder Include="Contracts\AggregateRootRepository\Factories\" />
     <Folder Include="Events\Replicator\" />
     <Folder Include="Examples\" />
     <Folder Include="Integration\Scenarios\" />
     <Folder Include="Snapshotting\Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -6,9 +6,42 @@ using System.Text;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 using d60.Cirqus.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Config.Configurers
 {
+    public interface IRegistrar2
+    {
+        void Register<TService>(Func<IServiceProvider, TService> serviceFactory) where TService : class;
+        void RegisterInstance<TService>(TService instance, bool multi = false) where TService : class;
+        void Decorate<TService>(Func<TService, IServiceProvider, TService> serviceFactory);
+    }
+
+    public class NewConfigurationContainer : IRegistrar2
+    {
+        private readonly IServiceCollection _services;
+
+        public NewConfigurationContainer(IServiceCollection services)
+        {
+            _services = services;
+        }
+
+        public void Register<TService>(Func<IServiceProvider, TService> serviceFactory) where TService : class 
+        {
+            _services.AddScoped(serviceFactory.Invoke);
+        }
+
+        public void RegisterInstance<TService>(TService instance, bool multi = false) where TService : class
+        {
+            _services.AddScoped(ctx => instance);
+        }
+
+        public void Decorate<TService>(Func<TService, IServiceProvider, TService> serviceFactory)
+        {
+            _services.Decorate(serviceFactory);
+        }
+    }
+
     public class ConfigurationContainer : IRegistrar
     {
         readonly List<ResolutionContext.Resolver> _resolvers = new List<ResolutionContext.Resolver>();

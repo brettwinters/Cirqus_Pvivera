@@ -34,17 +34,17 @@ namespace d60.Cirqus.Snapshotting.New
         /// <summary>
         /// Registers the given factory method as a primary resolver of a <see cref="ISnapshotStore"/>
         /// </summary>
-        public void Register(Func<ResolutionContext, ISnapshotStore> factory)
+        public void Register(Func<IServiceProvider, ISnapshotStore> factory)
         {
-            _optionsConfigurationBuilder.Register(factory);
+            _optionsConfigurationBuilder.Register(factory.Invoke);
         }
 
         /// <summary>
         /// Registers the given factory method as a decorator resolver of a <see cref="ISnapshotStore"/>
         /// </summary>
-        public void Decorate(Func<ResolutionContext, ISnapshotStore> factory)
+        public void Decorate(Func<ISnapshotStore, IServiceProvider, ISnapshotStore> factory)
         {
-            _optionsConfigurationBuilder.Decorate(factory);
+            _optionsConfigurationBuilder.Decorate<ISnapshotStore>(factory.Invoke);
         }
     }
 }
