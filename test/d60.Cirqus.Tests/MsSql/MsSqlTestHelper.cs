@@ -1,33 +1,26 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Linq;
-using d60.Cirqus.MsSql;
+using Microsoft.Extensions.Configuration;
 
 namespace d60.Cirqus.Tests.MsSql
 {
     class MsSqlTestHelper : SqlTestHelperBase
     {
-        public static string ConnectionString
+        private readonly IConfigurationRoot _configuration;
+        public static string TestDbName = "sqltestdb";
+
+        public MsSqlTestHelper(IConfigurationRoot configuration)
         {
-            get
-            {
-                var connectionString = SqlHelper.GetConnectionString("sqltestdb");
-
-                var configuredDatabaseName = GetDatabaseName(connectionString);
-
-                var databaseNameToUse = PossiblyAppendTeamcityAgentNumber(configuredDatabaseName);
-
-                Console.WriteLine("Using test SQL database '{0}'", databaseNameToUse);
-
-                return connectionString.Replace(configuredDatabaseName, databaseNameToUse);
-            }
+            _configuration = configuration;
         }
 
-        public static void EnsureTestDatabaseExists()
+        public string ConnectionString => _configuration.GetConnectionString(TestDbName);
+
+        public void EnsureTestDatabaseExists()
         {
-            var connectionString = ConnectionString;
-            var databaseName = GetDatabaseName(connectionString);
-            var masterConnectionString = connectionString.Replace(databaseName, "master");
+            var databaseName = GetDatabaseName(ConnectionString);
+            var masterConnectionString = ConnectionString.Replace(databaseName, "master");
 
             try
             {
@@ -58,7 +51,7 @@ END
             }
         }
 
-        public static void DropTable(string tableName)
+        public void DropTable(string tableName)
         {
             try
             {

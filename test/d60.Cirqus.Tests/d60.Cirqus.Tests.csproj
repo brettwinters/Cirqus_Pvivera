@@ -92,10 +92,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Configuration" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Config\" />
     <Folder Include="Contracts\AggregateRootRepository\Factories\" />
     <Folder Include="Events\Replicator\" />

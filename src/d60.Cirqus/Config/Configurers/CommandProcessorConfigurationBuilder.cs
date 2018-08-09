@@ -82,10 +82,11 @@ namespace d60.Cirqus.Config.Configurers
                     context.GetService<IDomainEventSerializer>(),
                     context.GetService<IDomainTypeNameMapper>()));
 
-            _services.AddScoped<IDomainEventSerializer>(context => new JsonDomainEventSerializer());
-            _services.AddScoped<IEventDispatcher>(context => new NullEventDispatcher());
-            _services.AddScoped<ICommandMapper>(context => new DefaultCommandMapper());
-            _services.AddScoped<IDomainTypeNameMapper>(context => new DefaultDomainTypeNameMapper());
+            _services.AddScoped<IDomainEventSerializer, JsonDomainEventSerializer>();
+            _services.AddScoped<IEventDispatcher, NullEventDispatcher>();
+            _services.AddScoped<ICommandMapper, DefaultCommandMapper>();
+            _services.AddScoped<IDomainTypeNameMapper, DefaultDomainTypeNameMapper>();
+            _services.AddScoped<IConnectionStringHelper, ConnectionStringHelper>();
         }
     }
 }

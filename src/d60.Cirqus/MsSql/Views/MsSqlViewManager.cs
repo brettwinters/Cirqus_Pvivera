@@ -6,11 +6,13 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using Microsoft.Extensions.Configuration;
 
 namespace d60.Cirqus.MsSql.Views
 {
@@ -35,9 +37,10 @@ namespace d60.Cirqus.MsSql.Views
 
         long _cachedPosition;
 
-        public MsSqlViewManager(string connectionStringOrConnectionStringName, string tableName, string positionTableName = null, bool automaticallyCreateSchema = true)
+        public MsSqlViewManager(IConfigurationRoot configuration, string connectionStringName,
+            string tableName, string positionTableName = null, bool automaticallyCreateSchema = true)
         {
-            _connectionString = SqlHelper.GetConnectionString(connectionStringOrConnectionStringName);
+            _connectionString = configuration.GetConnectionString(connectionStringName);
             _tableName = tableName;
             _positionTableName = positionTableName ?? tableName + "_Position";
             _viewTableSchema = SchemaHelper.GetSchema<TViewInstance>();
@@ -48,8 +51,8 @@ namespace d60.Cirqus.MsSql.Views
             }
         }
 
-        public MsSqlViewManager(string connectionStringOrConnectionStringName, bool automaticallyCreateSchema = true)
-            : this(connectionStringOrConnectionStringName, typeof(TViewInstance).Name, automaticallyCreateSchema: automaticallyCreateSchema)
+        public MsSqlViewManager(IConfigurationRoot configuration, string connectionStringName, bool automaticallyCreateSchema = true)
+            : this(configuration, connectionStringName, typeof(TViewInstance).Name, automaticallyCreateSchema: automaticallyCreateSchema)
         {
         }
 

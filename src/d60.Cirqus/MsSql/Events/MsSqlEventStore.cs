@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.Exceptions;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Numbers;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace d60.Cirqus.MsSql.Events
@@ -17,11 +19,11 @@ namespace d60.Cirqus.MsSql.Events
         readonly Func<SqlConnection> _connectionProvider;
         readonly Action<SqlConnection> _cleanupAction;
 
-        public MsSqlEventStore(string connectionStringOrConnectionStringName, string tableName, bool automaticallyCreateSchema = true)
+        public MsSqlEventStore(IConfigurationRoot configuration, string connectionStringName, string tableName, bool automaticallyCreateSchema = true)
         {
             _tableName = tableName;
 
-            var connectionString = SqlHelper.GetConnectionString(connectionStringOrConnectionStringName);
+            var connectionString = configuration.GetConnectionString(connectionStringName);
 
             _connectionProvider = () =>
             {

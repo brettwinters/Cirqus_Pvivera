@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.MsSql.Views;
 using d60.Cirqus.Numbers;
@@ -22,13 +23,15 @@ namespace d60.Cirqus.Tests.MsSql
 
         protected override void DoSetUp()
         {
-            MsSqlTestHelper.EnsureTestDatabaseExists();
+            var configuration = Configuration.Get();
 
-            var connectionString = MsSqlTestHelper.ConnectionString;
+            var helper = new MsSqlTestHelper(configuration);
 
-            MsSqlTestHelper.DropTable("views");
+            helper.EnsureTestDatabaseExists();
 
-            _viewManager = new MsSqlViewManager<ViewInstanceWithManyPropertyTypes>(connectionString, "views");
+            helper.DropTable("views");
+
+            _viewManager = new MsSqlViewManager<ViewInstanceWithManyPropertyTypes>(configuration, MsSqlTestHelper.TestDbName, "views");
         }
 
         [Test]

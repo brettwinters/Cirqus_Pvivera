@@ -1,22 +1,28 @@
+using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.MsSql.Events;
 using d60.Cirqus.Tests.MsSql;
+using Microsoft.Extensions.Configuration;
 
 namespace d60.Cirqus.Tests.Contracts.EventStore.Factories
 {
     public class MsSqlEventStoreFactory : IEventStoreFactory
     {
-        readonly MsSqlEventStore _eventStore;
+        private readonly MsSqlEventStore _eventStore;
 
         public MsSqlEventStoreFactory()
         {
-            MsSqlTestHelper.EnsureTestDatabaseExists();
+            var configuration = Configuration.Get();
 
-            var connectionString = MsSqlTestHelper.ConnectionString;
-            
-            MsSqlTestHelper.DropTable("events");
+            var helper = new MsSqlTestHelper(configuration);
 
-            _eventStore = new MsSqlEventStore(connectionString, "events");
+            helper.EnsureTestDatabaseExists();
+
+            var connectionString = helper.ConnectionString;
+
+            helper.DropTable("events");
+
+            _eventStore = new MsSqlEventStore(configuration, MsSqlTestHelper.TestDbName, "events");
             
             _eventStore.DropEvents();
         }

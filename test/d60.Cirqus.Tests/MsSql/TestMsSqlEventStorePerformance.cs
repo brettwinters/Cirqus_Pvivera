@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.MsSql.Events;
 using d60.Cirqus.Numbers;
+using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.MsSql
@@ -20,9 +22,13 @@ namespace d60.Cirqus.Tests.MsSql
 
         protected override void DoSetUp()
         {
-            MsSqlTestHelper.DropTable("Events");
+            var configuration = Configuration.Get();
 
-            _eventStore = new MsSqlEventStore(MsSqlTestHelper.ConnectionString, "Events");
+            var helper = new MsSqlTestHelper(configuration);
+
+            helper.DropTable("Events");
+
+            _eventStore = new MsSqlEventStore(configuration, MsSqlTestHelper.TestDbName, "Events");
 
             _globalSequenceNumber = 0;
         }
