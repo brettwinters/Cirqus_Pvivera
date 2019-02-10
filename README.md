@@ -1,22 +1,3 @@
-# Notice
-
-This is a fork from d60.Cirqus that intent to be active and up to date, based that the original project is some kind of abandoned and isn't used in production by the authors.
-
-I've been used it in production for the last 4 years and I want to improve it adding features, support and improve the existing ones.
-
-### Roadmap
-
-- [x] Restructure the solution
-- [ ] netstandard 2.0 support
-- [ ] Remove internal container in favor of Microsoft.Extensions.DependencyInjection
-- [ ] Remove logger base implemantation in favor of Microsoft.Extensions.Logging
-- [ ] async
-- [ ] Move MsSql and NTFS support from core library
-- [ ] Rename project to mark a difference with the original
-- [ ] Update documentation
-- [ ] Release packages
-- [ ] Process Manager
-
 # d60 Cirqus
 
 Simple but powerful event sourcing + CQRS kit. 

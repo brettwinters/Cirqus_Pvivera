@@ -1,0 +1,42 @@
+﻿using d60.Cirqus.Testing;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
+using TestContext = NUnit.Framework.TestContext;
+
+namespace d60.Cirqus.NUnit
+{
+    public class CirqusTests : CirqusTestsHarness
+    {
+        [SetUp]
+        public void SetupInternal()
+        {
+            Begin(GetWriter());
+            Setup();
+        }
+
+        protected virtual IWriter GetWriter()
+        {
+            return new ConsoleWriter();
+        }
+
+        protected virtual void Setup()
+        {
+        }
+
+        [TearDown]
+        public void TeardownInternal()
+        {
+            Teardown();
+            End(TestContext.CurrentContext.Result.Outcome != ResultState.Error);
+        }
+
+        protected virtual void Teardown()
+        {
+        }
+
+        protected override void Fail()
+        {
+            throw new AssertionException("");
+        }
+    }
+}

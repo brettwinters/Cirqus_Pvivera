@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
+    <PackageReference Include="NUnit" Version="2.6.3" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\d60.Cirqus\d60.Cirqus.csproj" />
+  </ItemGroup>
+
+</Project>

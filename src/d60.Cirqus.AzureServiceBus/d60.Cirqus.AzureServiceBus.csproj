@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAzure.ConfigurationManager" Version="3.2.3" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.5.3" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.5.3" />
+    <PackageReference Include="WindowsAzure.ServiceBus" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
+  </ItemGroup>
+
+</Project>
