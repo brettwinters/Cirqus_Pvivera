@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework" Version="1.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\d60.Cirqus.Testing\d60.Cirqus.Testing.csproj" />
+    <ProjectReference Include="..\..\d60.Cirqus\d60.Cirqus.csproj" />
+  </ItemGroup>
+
+</Project>
