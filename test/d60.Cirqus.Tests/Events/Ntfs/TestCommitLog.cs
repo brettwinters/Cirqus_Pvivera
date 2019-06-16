@@ -1,9 +1,11 @@
 using d60.Cirqus.Ntfs.Events;
+using NUnit.Framework;
 using Xunit;
 using Assert = NUnit.Framework.Assert;
 
 namespace d60.Cirqus.Tests.Events.Ntfs
 {
+    [TestFixture]
     public class TestCommitLog : FixtureBase
     {
         readonly CommitLog _log;
@@ -12,7 +14,12 @@ namespace d60.Cirqus.Tests.Events.Ntfs
         {
             _log = RegisterForDisposal(new CommitLog("testdata", dropEvents: true));
         }
-        
+
+        protected override void DoTearDown() {
+            base.DoTearDown();
+            DisposeStuff();
+        }
+
         [Fact]
         public void GetLastComittedGlobalSequenceNumberFromEmptyFile()
         {

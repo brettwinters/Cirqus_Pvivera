@@ -506,7 +506,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             }, Encoding.UTF8.GetBytes("hej"));
         }
 
-        public class MakeSomeRootEmitTheEvent : Command<SomeRoot>
+        public class MakeSomeRootEmitTheEvent : d60.Cirqus.Commands.Command<SomeRoot>
         {
             public MakeSomeRootEmitTheEvent(string aggregateRootId) : base(aggregateRootId) { }
 

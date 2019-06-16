@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Logging.Console;
 using d60.Cirqus.Testing;
@@ -36,15 +37,27 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _factory = RegisterForDisposal(new TFactory());
             _viewManager = _factory.GetViewManager<View>();
 
-            //brett
-            _context = base.CreateTestContext(config => config
-                .EventDispatcher(x => x.UseViewManagerEventDispatcher(_viewManager)) //WithMaxDomainEventsPerBatch(10))
-                .Options(x => x.Asynchronous()));
+            //brett v2
+            _context = RegisterForDisposal(base.CreateTestContext(config => config
+                .EventDispatcher(x => { x
+                    .UseViewManagerEventDispatcher(_viewManager)
+                    .WithConfiguration(new ViewManagerEventDispatcherConfiguration(10));
+                }) 
+                .Options(x => x.Asynchronous())));
+
+            //brett v1
+            //_context = base.CreateTestContext(config => config
+            //    .EventDispatcher(x => x.UseViewManagerEventDispatcher(_viewManager)) //WithMaxDomainEventsPerBatch(10))
+            //    .Options(x => x.Asynchronous()));
+
+            //orig
             //_context = RegisterForDisposal(
             //    TestContext.With()
             //        .EventDispatcher(x => x.UseViewManagerEventDispatcher(_viewManager).WithMaxDomainEventsPerBatch(10))
             //        .Options(x => x.Asynchronous())
             //        .Create());
+
+
         }
 
         [TestCase(100, 1.2, 0.1)]

@@ -3,7 +3,7 @@ using d60.Cirqus.Commands;
 
 namespace d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest
 {
-    public class GenerateNewId : Command<IdGenerator>
+    public class GenerateNewId : d60.Cirqus.Commands.Command<IdGenerator>
     {
         public GenerateNewId(string aggregateRootId)
             : base(aggregateRootId)

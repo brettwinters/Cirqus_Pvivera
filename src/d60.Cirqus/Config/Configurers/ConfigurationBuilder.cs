@@ -68,9 +68,20 @@ namespace d60.Cirqus.Config.Configurers
         /// <summary>
         /// Registers a factory method for decorating <typeparamref name="TService"/>
         /// </summary>
-        public void Decorate(Func<TService, IServiceProvider, TService> serviceFactory)
-        {
+        //public void Decorate(Func<TService, IServiceProvider, TService> serviceFactory) {
+        //    Registrar.Decorate(serviceFactory);
+        //}
+
+        public void Decorate(Func<TService, IServiceProvider, TService> serviceFactory) {
             Registrar.Decorate(serviceFactory);
         }
+
+
+        /// <summary>
+        /// Registers a factory method for decorating <typeparamref name="TService"/>
+        /// </summary>
+        //public void Decorate<TService>(Func<ResolutionContext, TService> serviceFactory) {
+        //    Registrar.Decorate(serviceFactory);
+        //}
     }
 }

@@ -26,7 +26,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _factory = RegisterForDisposal(new TFactory());
 
             //brett
-            _context = base.CreateTestContext(config => config.Options(x => x.Asynchronous()));
+            _context = RegisterForDisposal(base.CreateTestContext(config => config.Options(x => x.Asynchronous())));
             //_context = RegisterForDisposal(
             //    TestContext.With()
             //        .Options(x => x.Asynchronous())

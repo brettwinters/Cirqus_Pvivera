@@ -81,6 +81,7 @@ namespace d60.Cirqus.Ntfs.Events
         
         public void Dispose()
         {
+
             GlobalSequenceIndex.Dispose();
             CommitLog.Dispose();
         }

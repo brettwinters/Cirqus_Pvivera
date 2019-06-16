@@ -38,13 +38,13 @@ namespace d60.Cirqus.Tests.Views
             var waitHandle = new ViewManagerWaitHandle();
             var specialWaitHandle = new ViewManagerWaitHandle();
 
-            var commandProcessor = CommandProcessor.With()
+            //Brett
+            var commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.UseInMemoryEventStore())
-                .EventDispatcher(e =>
-                {
+                .EventDispatcher(e => {
                     e.UseViewManagerEventDispatcher(firstView)
                         .WithWaitHandle(waitHandle);
-                    
+
                     e.UseViewManagerEventDispatcher(secondView)
                         .WithWaitHandle(waitHandle);
 
@@ -56,14 +56,40 @@ namespace d60.Cirqus.Tests.Views
                             {"heys", mongoDatabase.GetCollection<HeyCounter>(typeof (HeyCounter).Name).AsQueryable()},
                             {"words", mongoDatabase.GetCollection<WordCounter>(typeof (WordCounter).Name).AsQueryable()},
                         });
-                })
-                .Create();
+                }));
+
+            //Orig
+            //var commandProcessor = CommandProcessor.With()
+            //    .EventStore(e => e.UseInMemoryEventStore())
+            //    .EventDispatcher(e =>
+            //    {
+            //        e.UseViewManagerEventDispatcher(firstView)
+            //            .WithWaitHandle(waitHandle);
+                    
+            //        e.UseViewManagerEventDispatcher(secondView)
+            //            .WithWaitHandle(waitHandle);
+
+            //        e.UseDependentViewManagerEventDispatcher(dependentView)
+            //            .WithWaitHandle(specialWaitHandle)
+            //            .DependentOn(firstView, secondView)
+            //            .WithViewContext(new Dictionary<string, object>
+            //            {
+            //                {"heys", mongoDatabase.GetCollection<HeyCounter>(typeof (HeyCounter).Name).AsQueryable()},
+            //                {"words", mongoDatabase.GetCollection<WordCounter>(typeof (WordCounter).Name).AsQueryable()},
+            //            });
+            //    })
+            //    .Create();
 
             RegisterForDisposal(commandProcessor);
 
-            var result = Enumerable.Range(0, 100)
-                .Select(i => commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)))
-                .Last();
+            //Brett
+            CommandProcessingResult result = null;
+            Enumerable.Range(0, 100).ToList().ForEach(i => result = commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)));
+
+            //orig
+            //result = Enumerable.Range(0, 100)
+            //    .Select(i => commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)))
+            //    .Last();
 
             await waitHandle.WaitForAll(result, TimeSpan.FromSeconds(5));
 
@@ -140,7 +166,7 @@ namespace d60.Cirqus.Tests.Views
             }
         }
 
-        public class DoStuff : Command<SomeRoot>
+        public class DoStuff : d60.Cirqus.Commands.Command<SomeRoot>
         {
             public string Text { get; private set; }
 

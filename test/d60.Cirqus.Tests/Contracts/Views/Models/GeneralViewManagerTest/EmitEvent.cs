@@ -3,7 +3,7 @@ using d60.Cirqus.Commands;
 
 namespace d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest
 {
-    public class EmitEvent : Command<EventEmitter>
+    public class EmitEvent : d60.Cirqus.Commands.Command<EventEmitter>
     {
         public EmitEvent(string aggregateRootId)
             : base(aggregateRootId)

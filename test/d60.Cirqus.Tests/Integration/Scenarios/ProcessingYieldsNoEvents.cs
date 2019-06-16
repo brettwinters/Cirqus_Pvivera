@@ -8,9 +8,9 @@ namespace d60.Cirqus.Tests.Integration.Scenarios
     public class ProcessingYieldsNoEvents : IntegrationTestBase
     {
         [TestCase(EventStoreOption.InMemory)]
-        [TestCase(EventStoreOption.SqlServer)]
+        //[TestCase(EventStoreOption.SqlServer)]
         [TestCase(EventStoreOption.MongoDb)]
-        [TestCase(EventStoreOption.Postgres)]
+        //[TestCase(EventStoreOption.Postgres)]
         public void Run(EventStoreOption eventStoreOption)
         {
             var commandProcessor = GetCommandProcessor(eventStoreOption);

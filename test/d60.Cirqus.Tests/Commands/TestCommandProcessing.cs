@@ -121,7 +121,7 @@ namespace d60.Cirqus.Tests.Commands
             Assert.That(inner.Message, Contains.Substring("oh no, you cannot do that"));
         }
 
-        class CommandThatThrowsDomainException : Command<Root>
+        class CommandThatThrowsDomainException : d60.Cirqus.Commands.Command<Root>
         {
             public CommandThatThrowsDomainException(string aggregateRootId)
                 : base(aggregateRootId)
@@ -134,7 +134,7 @@ namespace d60.Cirqus.Tests.Commands
             }
         }
 
-        class CommandThatThrowsUnanticipatedException : Command<Root>
+        class CommandThatThrowsUnanticipatedException : d60.Cirqus.Commands.Command<Root>
         {
             public CommandThatThrowsUnanticipatedException(string aggregateRootId)
                 : base(aggregateRootId)
@@ -159,7 +159,7 @@ namespace d60.Cirqus.Tests.Commands
             Assert.That(_eventStore.Result.ToList().Count, Is.EqualTo(1));
         }
 
-        class MappedCommand : Command<Root>
+        class MappedCommand : d60.Cirqus.Commands.Command<Root>
         {
             public MappedCommand(string aggregateRootId) : base(aggregateRootId) { }
 
@@ -177,7 +177,7 @@ namespace d60.Cirqus.Tests.Commands
             Assert.That(_eventStore.Result.ToList().Count, Is.EqualTo(1));
         }
 
-        class OrdinaryCommand : Command<Root>
+        class OrdinaryCommand : d60.Cirqus.Commands.Command<Root>
         {
             public OrdinaryCommand(string aggregateRootId) : base(aggregateRootId) { }
 
@@ -194,7 +194,7 @@ namespace d60.Cirqus.Tests.Commands
                 _cirqus.ProcessCommand(new AnotherCommand("rootid")));
         }
 
-        class AnotherCommand : Command<Root>
+        class AnotherCommand : d60.Cirqus.Commands.Command<Root>
         {
             public AnotherCommand(string aggregateRootId) : base(aggregateRootId) { }
 
@@ -246,7 +246,7 @@ namespace d60.Cirqus.Tests.Commands
 
             }
         }
-        public class AnotherOrdinaryCommand : Command<AnotherRoot>
+        public class AnotherOrdinaryCommand : d60.Cirqus.Commands.Command<AnotherRoot>
         {
             public AnotherOrdinaryCommand(string aggregateRootId)
                 : base(aggregateRootId)

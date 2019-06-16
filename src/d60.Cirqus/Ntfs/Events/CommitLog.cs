@@ -23,7 +23,7 @@ namespace d60.Cirqus.Ntfs.Events
             _commitsFilePath = Path.Combine(basePath, "commits.idx");
 
             if (dropEvents && File.Exists(_commitsFilePath))
-                File.Delete(_commitsFilePath);
+                File.Delete(_commitsFilePath); //System.IO.IOException 
 
             OpenWriter();
             OpenReader();
@@ -145,6 +145,11 @@ namespace d60.Cirqus.Ntfs.Events
 
         public void Dispose()
         {
+            //Brett
+            _writer.Close();
+            _reader.Close();
+
+
             _writer.Dispose();
             _reader.Dispose();
         }

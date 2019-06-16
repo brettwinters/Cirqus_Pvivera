@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
+using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Logging.Console;
@@ -89,15 +90,25 @@ Views:
 
         ICommandProcessor CreateCommandProcessor(string id, IEnumerable<IViewManager> viewManagers)
         {
-            var commandProcessor = CommandProcessor.With()
+            //Brett
+            var commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.UseMongoDb(_mongoDatabase, "Events"))
-                .EventDispatcher(e =>
-                {
+                .EventDispatcher(e => {
                     e.UseViewManagerEventDispatcher(viewManagers.ToArray())
-                        .AutomaticallyRedistributeViews(id, new MongoDbAutoDistributionState(_mongoDatabase, "AutoDistribution"))
-                        .WithMaxDomainEventsPerBatch(1);
-                })
-                .Create();
+                        .WithConfiguration(new ViewManagerEventDispatcherConfiguration(1))
+                        .AutomaticallyRedistributeViews(id, new MongoDbAutoDistributionState(_mongoDatabase, "AutoDistribution"));
+                })              
+           );
+
+            //var commandProcessor = CommandProcessor.With()
+            //    .EventStore(e => e.UseMongoDb(_mongoDatabase, "Events"))
+            //    .EventDispatcher(e =>
+            //    {
+            //        e.UseViewManagerEventDispatcher(viewManagers.ToArray())
+            //            .AutomaticallyRedistributeViews(id, new MongoDbAutoDistributionState(_mongoDatabase, "AutoDistribution"))
+            //            .WithMaxDomainEventsPerBatch(1);
+            //    })
+            //    .Create();
 
             RegisterForDisposal(commandProcessor);
 

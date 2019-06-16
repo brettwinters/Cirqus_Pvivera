@@ -22,11 +22,18 @@ namespace d60.Cirqus.Tests.Bugs
             // arrange
             var eventStore = new MongoDbEventStore(MongoHelper.InitializeTestDatabase(), "events");
 
-            var commandProcessor = CommandProcessor.With()
+            //Brett
+            var commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.Register<IEventStore>(c => eventStore))
-                .EventDispatcher(e => e.Register<IEventDispatcher>(c => 
-                    new ConsoleOutEventDispatcher(eventStore)))
-                .Create();
+                .EventDispatcher(e => e.Register<IEventDispatcher>(c => new ConsoleOutEventDispatcher(eventStore)))
+            );
+
+            //Orig
+            //var commandProcessor = CommandProcessor.With()
+            //    .EventStore(e => e.Register<IEventStore>(c => eventStore))
+            //    .EventDispatcher(e => e.Register<IEventDispatcher>(c => 
+            //        new ConsoleOutEventDispatcher(eventStore)))
+            //    .Create();
 
             RegisterForDisposal(commandProcessor);
 
@@ -46,7 +53,7 @@ namespace d60.Cirqus.Tests.Bugs
         public void NoProblemoWithTestContext()
         {
             // arrange
-            var context = RegisterForDisposal(TestContext.Create());
+            var context = RegisterForDisposal( CreateTestContext());
 
             try
             {
@@ -66,7 +73,7 @@ namespace d60.Cirqus.Tests.Bugs
             // assert
         }
 
-        public class DoSomethingToABunchOfRootsCommand : Command<SomeRoot>
+        public class DoSomethingToABunchOfRootsCommand : d60.Cirqus.Commands.Command<SomeRoot>
         {
             public string[] AdditionalRootIds { get; set; }
 

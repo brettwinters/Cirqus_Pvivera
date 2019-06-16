@@ -220,7 +220,7 @@ caching in use: {3}",
         {
         }
 
-        public class CrushItRealGood : Command<Beetroot>
+        public class CrushItRealGood : d60.Cirqus.Commands.Command<Beetroot>
         {
             public CrushItRealGood(string aggregateRootId, decimal howMuch)
                 : base(aggregateRootId)

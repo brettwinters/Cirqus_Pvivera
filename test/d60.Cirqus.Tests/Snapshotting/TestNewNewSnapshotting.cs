@@ -188,26 +188,48 @@ namespace d60.Cirqus.Tests.Snapshotting
 
         ICommandProcessor CreateCommandProcessor(bool enableSnapshotting, IViewManager viewManager, ConcurrentQueue<DispatchStats> handleTimes)
         {
-            return CommandProcessor.With()
+            //Brett
+
+            return CreateCommandProcessor(config => config
                 .EventStore(e => e.UseMongoDb(_database, "Events"))
-                .EventDispatcher(e =>
-                {
+                .EventDispatcher(e => {
                     var items = new Dictionary<string, object> { { "stats", handleTimes } };
 
                     e.UseViewManagerEventDispatcher(viewManager)
                         .WithViewContext(items);
                 })
-                .Options(o =>
-                {
-                    if (enableSnapshotting)
-                    {
+                .Options(o => {
+                    if (enableSnapshotting) {
                         Console.WriteLine("Enabling snapshotting");
 
                         o.EnableSnapshotting(s => s.UseMongoDb(_database, "GoodSnaps"));
                         //o.EnableSnapshotting(s => s.UseInMemorySnapshotStore());
                     }
                 })
-                .Create();
+            );
+
+
+            //orig
+            //return CommandProcessor.With()
+            //    .EventStore(e => e.UseMongoDb(_database, "Events"))
+            //    .EventDispatcher(e =>
+            //    {
+            //        var items = new Dictionary<string, object> { { "stats", handleTimes } };
+
+            //        e.UseViewManagerEventDispatcher(viewManager)
+            //            .WithViewContext(items);
+            //    })
+                //.Options(o =>
+                //{
+                //    if (enableSnapshotting)
+                //    {
+                //        Console.WriteLine("Enabling snapshotting");
+
+                //        o.EnableSnapshotting(s => s.UseMongoDb(_database, "GoodSnaps"));
+                //        //o.EnableSnapshotting(s => s.UseInMemorySnapshotStore());
+                //    }
+                //})
+            //    .Create();
         }
 
         public class DispatchStats

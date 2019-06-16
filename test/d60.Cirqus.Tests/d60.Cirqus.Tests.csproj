@@ -7,23 +7,20 @@
 
   <ItemGroup>
     <Compile Remove="EntityFramework\**" />
+    <Compile Remove="Events\Ntfs\**" />
     <Compile Remove="MsSql\**" />
     <Compile Remove="PostgreSql\**" />
     <EmbeddedResource Remove="EntityFramework\**" />
+    <EmbeddedResource Remove="Events\Ntfs\**" />
     <EmbeddedResource Remove="MsSql\**" />
     <EmbeddedResource Remove="PostgreSql\**" />
     <None Remove="EntityFramework\**" />
+    <None Remove="Events\Ntfs\**" />
     <None Remove="MsSql\**" />
     <None Remove="PostgreSql\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Bugs\ReplicationScenario\VerifyThatWeCannotAccidentallyLoadOldRootsInReplicatedSetup.cs" />
-    <Compile Remove="Bugs\VerifyThatDuplicateSequenceNumbersAreNotAssigned.cs" />
-    <Compile Remove="Config\TestConfigurationApi.cs" />
-    <Compile Remove="Config\TestConfigurationContainer.cs" />
-    <Compile Remove="Contracts\AggregateRootRepository\Factories\DefaultAggregateRootRepositoryFactory.cs" />
-    <Compile Remove="Contracts\AggregateRootRepository\TestAggregateRootRepositories.cs" />
     <Compile Remove="Contracts\EventStore\Factories\CachedEventStoreFactory.cs" />
     <Compile Remove="Contracts\EventStore\Factories\PostgreSqlEventStoreFactory.cs" />
     <Compile Remove="Contracts\EventStore\Factories\SQLiteEventStoreFactory .cs" />
@@ -31,30 +28,11 @@
     <Compile Remove="Contracts\Views\Factories\HybridDbViewManagerFactory.cs" />
     <Compile Remove="Contracts\Views\Factories\MsSqlViewManagerFactory.cs" />
     <Compile Remove="Contracts\Views\Factories\PostgreSqlViewManagerFactory.cs" />
-    <Compile Remove="Diagnostics\TestLapTimes.cs" />
-    <Compile Remove="Events\Replicator\BasicReplication.cs" />
-    <Compile Remove="Events\Replicator\ErrorHandling.cs" />
-    <Compile Remove="Events\Replicator\TestEventReplicator.cs" />
     <Compile Remove="Examples\ReadmeSnippet.cs" />
-    <Compile Remove="Integration\IntegrationTestBase.cs" />
-    <Compile Remove="Integration\Scenarios\ProcessingYieldsNoEvents.cs" />
-    <Compile Remove="Integration\SimpleScenarioWithConcurrency.cs" />
-    <Compile Remove="Integration\SimpleScenarioWithPersistence.cs" />
-    <Compile Remove="Snapshotting\Models\Root.cs" />
-    <Compile Remove="Snapshotting\TestCachingAggregateRootRepositoryDecorator.cs" />
-    <Compile Remove="Snapshotting\TestNewNewSnapshotting.cs" />
-    <Compile Remove="Snapshotting\TestSnapshottingWithFairlyLongHistory.cs" />
-    <Compile Remove="Views\Distribution\TestAutomaticViewManagerDistribution.cs" />
-    <Compile Remove="Views\Distribution\TestMongoDbAutoDistributionPersistence.cs" />
-    <Compile Remove="Views\NewViewManager\TestViewManagerEventDispatcher.cs" />
-    <Compile Remove="Views\NewViewManager\TestViewManagerEventDispatcherWithOptimization.cs" />
-    <Compile Remove="Views\TestDependentViews.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="MsSql\MsSqlTestHelper.cs" />
-    <Compile Include="MsSql\TestMsSqlEventStorePerformance.cs" />
-    <Compile Include="MsSql\TestNewMsSqlViewManager.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -79,13 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Config\" />
-    <Folder Include="Contracts\AggregateRootRepository\Factories\" />
-    <Folder Include="Events\Replicator\" />
     <Folder Include="Examples\" />
-    <Folder Include="Integration\Scenarios\" />
-    <Folder Include="NewFolder\" />
-    <Folder Include="Snapshotting\Models\" />
   </ItemGroup>
 
   <ItemGroup>

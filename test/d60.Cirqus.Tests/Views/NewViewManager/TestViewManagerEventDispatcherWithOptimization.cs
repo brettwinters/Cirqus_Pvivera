@@ -34,25 +34,45 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
 
             _mongoDatabase = MongoHelper.InitializeTestDatabase();
 
-            _commandProcessor = CommandProcessor.With()
+            //Brett
+            _commandProcessor = CreateCommandProcessor(config => config
                 .Logging(l => l.UseConsole(minLevel: Logger.Level.Warn))
                 .EventStore(e => e.UseMongoDb(_mongoDatabase, "Events"))
-                .EventDispatcher(e => e.Register<IEventDispatcher>(r =>
-                {
-                    var repository = r.Get<IAggregateRootRepository>();
-                    var serializer = r.Get<IDomainEventSerializer>();
-                    var typeMapper = r.Get<IDomainTypeNameMapper>();
+                .EventDispatcher(e => e.Register<IEventDispatcher>(r => {
+                    var repository = (IAggregateRootRepository)r.GetService(typeof(IAggregateRootRepository));
+                    var serializer = (IDomainEventSerializer)r.GetService(typeof(IDomainEventSerializer));
+                    var typeMapper = (IDomainTypeNameMapper)r.GetService(typeof(IDomainTypeNameMapper));
 
                     _thisBadBoyEnsuresThatTheEventStoreIsNotUsed = new ThrowingEventStore();
 
-                    _dispatcher = new ViewManagerEventDispatcher(repository, _thisBadBoyEnsuresThatTheEventStoreIsNotUsed, serializer, typeMapper)
-                    {
+                    _dispatcher = new ViewManagerEventDispatcher(repository, _thisBadBoyEnsuresThatTheEventStoreIsNotUsed, serializer, typeMapper) {
                         AutomaticCatchUpInterval = TimeSpan.FromHours(24) //<effectively disable automatic catchup
                     };
 
                     return _dispatcher;
                 }))
-                .Create();
+            );
+
+            //Orig
+            //_commandProcessor = CommandProcessor.With()
+            //    .Logging(l => l.UseConsole(minLevel: Logger.Level.Warn))
+            //    .EventStore(e => e.UseMongoDb(_mongoDatabase, "Events"))
+            //    .EventDispatcher(e => e.Register<IEventDispatcher>(r =>
+            //    {
+            //        var repository = r.Get<IAggregateRootRepository>();
+            //        var serializer = r.Get<IDomainEventSerializer>();
+            //        var typeMapper = r.Get<IDomainTypeNameMapper>();
+
+            //        _thisBadBoyEnsuresThatTheEventStoreIsNotUsed = new ThrowingEventStore();
+
+            //        _dispatcher = new ViewManagerEventDispatcher(repository, _thisBadBoyEnsuresThatTheEventStoreIsNotUsed, serializer, typeMapper)
+            //        {
+            //            AutomaticCatchUpInterval = TimeSpan.FromHours(24) //<effectively disable automatic catchup
+            //        };
+
+            //        return _dispatcher;
+            //    }))
+            //    .Create();
 
             RegisterForDisposal(_commandProcessor);
         }
@@ -73,7 +93,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
             testViewManager.WaitUntilProcessed(result, TimeSpan.FromSeconds(3)).Wait();
         }
 
-        class LeCommand : Command<Root>
+        class LeCommand : d60.Cirqus.Commands.Command<Root>
         {
             public LeCommand(string aggregateRootId) : base(aggregateRootId)
             {

@@ -137,7 +137,7 @@ namespace d60.Cirqus.Tests.Aggregates
             public bool EmittedByNewAggregateRoot { get; set; }
         }
 
-        public class InvokeBam : Command<Root>
+        public class InvokeBam : d60.Cirqus.Commands.Command<Root>
         {
             public InvokeBam(string aggregateRootId)
                 : base(aggregateRootId)
@@ -150,7 +150,7 @@ namespace d60.Cirqus.Tests.Aggregates
             }
         }
 
-        public class InvokeBamOnFriend : Command<Root>
+        public class InvokeBamOnFriend : d60.Cirqus.Commands.Command<Root>
         {
             public InvokeBamOnFriend(string aggregateRootId)
                 : base(aggregateRootId)
@@ -165,7 +165,7 @@ namespace d60.Cirqus.Tests.Aggregates
             }
         }
 
-        public class InvokeBamOnOtherRoot : Command<OtherRoot>
+        public class InvokeBamOnOtherRoot : d60.Cirqus.Commands.Command<OtherRoot>
         {
             public InvokeBamOnOtherRoot(string aggregateRootId) : base(aggregateRootId)
             {

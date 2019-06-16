@@ -78,7 +78,7 @@ namespace d60.Cirqus.Tests.Bugs
             }
         }
 
-        class MakeOneWootReadAnotherWoot : Command<OneWoot>
+        class MakeOneWootReadAnotherWoot : d60.Cirqus.Commands.Command<OneWoot>
         {
             public string AnotherWootId { get; private set; }
 
@@ -93,7 +93,7 @@ namespace d60.Cirqus.Tests.Bugs
             }
         }
 
-        class MakeAnotherWootDoItsThing : Command<AnotherWoot>
+        class MakeAnotherWootDoItsThing : d60.Cirqus.Commands.Command<AnotherWoot>
         {
             public MakeAnotherWootDoItsThing(string aggregateRootId)
                 : base(aggregateRootId)

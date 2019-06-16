@@ -32,14 +32,19 @@ many time in parallel, and after some time the consistency of everything is veri
         ICommandProcessor _cirqus;
         MongoDatabase _mongoDatabase;
 
-        protected override void DoSetUp()
-        {
+        protected override void DoSetUp() {
             _mongoDatabase = MongoHelper.InitializeTestDatabase();
 
-            _cirqus = CommandProcessor.With()
+            //Brett
+            _cirqus = CreateCommandProcessor(config => config
                 .EventStore(e => e.UseMongoDb(_mongoDatabase, "events"))
-                .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
-                .Create();
+                .EventDispatcher(e => e.UseConsoleOutEventDispatcher()));
+
+            //orig
+            //_cirqus = CommandProcessor.With()
+            //    .EventStore(e => e.UseMongoDb(_mongoDatabase, "events"))
+            //    .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
+            //    .Create();
 
             RegisterForDisposal(_cirqus);
         }
@@ -48,23 +53,21 @@ many time in parallel, and after some time the consistency of everything is veri
         [TestCase(2, 100, 10)]
         [TestCase(3, 100, 10)]
         [TestCase(5, 100, 10)]
-        [TestCase(1, 1000, 40, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(2, 1000, 40, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(3, 1000, 40, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(5, 1000, 40, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(1, 1000, 500, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(2, 1000, 500, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(3, 1000, 500, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(5, 1000, 500, Ignore = TestCategories.IgnoreLongRunning)]
-        public void RunEntirePipelineAndProbePrivatesForMultipleAggregates(int parallellism, int numberOfOperations, int numberOfAggregates)
-        {
+        [LongRunningTestCase(1, 1000, 40)]
+        [LongRunningTestCase(2, 1000, 40)]
+        [LongRunningTestCase(3, 1000, 40)]
+        [LongRunningTestCase(5, 1000, 40)]
+        [LongRunningTestCase(1, 1000, 500)]
+        [LongRunningTestCase(2, 1000, 500)]
+        [LongRunningTestCase(3, 1000, 500)]
+        [LongRunningTestCase(5, 1000, 500)]
+        public void RunEntirePipelineAndProbePrivatesForMultipleAggregates(int parallellism, int numberOfOperations, int numberOfAggregates) {
             var description = string.Format("{0} threads performing {1} ops distributed evenly among {2} aggregate roots", parallellism, numberOfOperations, numberOfAggregates);
 
             TakeTime(description, () => RunTest(parallellism, numberOfOperations, numberOfAggregates));
         }
 
-        void RunTest(int parallellism, int numberOfOperations, int numberOfAggregates)
-        {
+        void RunTest(int parallellism, int numberOfOperations, int numberOfAggregates) {
             var random = new Random(DateTime.Now.GetHashCode());
             var aggregateRootIds = Enumerable.Range(0, numberOfAggregates).Select(i => i.ToString()).ToArray();
 
@@ -72,13 +75,11 @@ many time in parallel, and after some time the consistency of everything is veri
 
             var threads = Enumerable
                 .Range(0, parallellism)
-                .Select(i => new Thread(() =>
-                {
+                .Select(i => new Thread(() => {
                     var name = string.Format("thread {0}", i + 1);
                     Thread.CurrentThread.Name = name;
 
-                    numberOfOperations.Times(() =>
-                    {
+                    numberOfOperations.Times(() => {
                         var aggId = getRandomAggregateRootId();
 
                         _cirqus.ProcessCommand(new TakeNextStepCommand(aggId));
@@ -93,15 +94,13 @@ many time in parallel, and after some time the consistency of everything is veri
         }
 
 
-        public class TakeNextStepCommand : Command<ProgrammerAggregate>
+        public class TakeNextStepCommand : d60.Cirqus.Commands.Command<ProgrammerAggregate>
         {
             public TakeNextStepCommand(string aggregateRootId)
-                : base(aggregateRootId)
-            {
+                : base(aggregateRootId) {
             }
 
-            public override void Execute(ProgrammerAggregate aggregateRoot)
-            {
+            public override void Execute(ProgrammerAggregate aggregateRoot) {
                 aggregateRoot.TakeNextStep();
             }
         }
@@ -118,15 +117,12 @@ many time in parallel, and after some time the consistency of everything is veri
             ProgrammerState currentState;
             int knowledge;
 
-            public string GetCurrentState()
-            {
+            public string GetCurrentState() {
                 return currentState.ToString();
             }
 
-            public void TakeNextStep()
-            {
-                switch (currentState)
-                {
+            public void TakeNextStep() {
+                switch (currentState) {
                     case ProgrammerState.Born:
                         Emit(new FinishedEducation());
                         break;
@@ -141,18 +137,15 @@ many time in parallel, and after some time the consistency of everything is veri
                 }
             }
 
-            public void Apply(FinishedEducation e)
-            {
+            public void Apply(FinishedEducation e) {
                 currentState = ProgrammerState.Educated;
             }
 
-            public void Apply(LearnedAboutFunctionalProgramming e)
-            {
+            public void Apply(LearnedAboutFunctionalProgramming e) {
                 currentState = ProgrammerState.Knowing;
             }
 
-            public void Apply(IncreasedKnowledge e)
-            {
+            public void Apply(IncreasedKnowledge e) {
                 knowledge++;
             }
         }

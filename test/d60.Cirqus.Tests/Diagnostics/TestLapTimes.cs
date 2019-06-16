@@ -21,7 +21,8 @@ namespace d60.Cirqus.Tests.Diagnostics
     [TestFixture, Category(TestCategories.MongoDb)]
     public class TestLapTimes : FixtureBase
     {
-        [TestCase(1000)]
+        [TestCase(10)]
+        [LongRunningTestCase(1000)]
         public void CanDoTheThing(int numberOfCommandsToProcess)
         {
             var database = MongoHelper.InitializeTestDatabase();
@@ -39,22 +40,32 @@ namespace d60.Cirqus.Tests.Diagnostics
 
                 timer.Start();
 
-                var commandProcessor = RegisterForDisposal(
-                    CommandProcessor.With()
-                        .Logging(l => l.UseConsole(minLevel: Logger.Level.Warn))
-                        .EventStore(e => e.UseMongoDb(database, "Events"))
-                      
-                        // try commenting this line in/out
-                        .AggregateRootRepository(e => e.EnableInMemorySnapshotCaching(1000))
-                        
-                        .EventDispatcher(e => e.UseViewManagerEventDispatcher())
-                        .Options(o =>
-                        {
-                            o.AddProfiler(profiler);
-                            o.SetMaxRetries(0);
-                        })
-                        .Create()
-                    );
+                //Brett
+                var commandProcessor = RegisterForDisposal(base.CreateCommandProcessor(config => config
+                    .Logging(l => l.UseConsole(minLevel: Logger.Level.Warn))
+                    .EventStore(e => e.UseMongoDb(database, "Events"))
+                    .AggregateRootRepository(e => e.EnableInMemorySnapshotCaching(1000)) // try commenting this line in/out
+                    .EventDispatcher(e => e.UseViewManagerEventDispatcher())
+                    .Options(o => { o.AddProfiler(profiler); o.SetMaxRetries(0); })
+                ));
+
+                //orig
+                //var commandProcessor = RegisterForDisposal(
+                //    CommandProcessor.With()
+                //        .Logging(l => l.UseConsole(minLevel: Logger.Level.Warn))
+                //        .EventStore(e => e.UseMongoDb(database, "Events"))
+
+                //        // try commenting this line in/out
+                //        .AggregateRootRepository(e => e.EnableInMemorySnapshotCaching(1000))
+
+                //        .EventDispatcher(e => e.UseViewManagerEventDispatcher())
+                //        .Options(o =>
+                //        {
+                //            o.AddProfiler(profiler);
+                //            o.SetMaxRetries(0);
+                //        })
+                //        .Create()
+                //    );
 
                 numberOfCommandsToProcess.Times(() =>
                 {

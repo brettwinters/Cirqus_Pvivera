@@ -65,7 +65,7 @@ namespace d60.Cirqus.Tests.Bugs
             VerifyEventMetadata(1);
         }
 
-        public class OrdinaryCommand : Command<Root>
+        public class OrdinaryCommand : d60.Cirqus.Commands.Command<Root>
         {
             public OrdinaryCommand(string aggregateRootId)
                 : base(aggregateRootId)

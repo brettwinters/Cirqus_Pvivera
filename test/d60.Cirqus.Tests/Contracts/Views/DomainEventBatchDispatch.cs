@@ -45,7 +45,11 @@ namespace d60.Cirqus.Tests.Contracts.Views
             //brett
             _commandProcessor = base.CreateCommandProcessor(config => config
                 .EventStore(e => e.UseInMemoryEventStore())
-                .EventDispatcher(e => { e.UseViewManagerEventDispatcher(_viewManager).WithWaitHandle(_waitHandle); }));
+                .EventDispatcher(e => { e
+                    .UseViewManagerEventDispatcher(_viewManager)
+                    .WithWaitHandle(_waitHandle);
+                }));
+
             //_commandProcessor = CommandProcessor.With()
             //    .EventStore(e => e.UseInMemoryEventStore())
             //    .EventDispatcher(e => {

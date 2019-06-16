@@ -68,7 +68,7 @@ namespace d60.Cirqus.Tests.Aggregates
             Assert.That(actualSequenceOfEvents, Is.EqualTo(expectedSequenceOfEvents));
         }
 
-        public class MakeRootDoSomething : Command<Root>
+        public class MakeRootDoSomething : d60.Cirqus.Commands.Command<Root>
         {
             public MakeRootDoSomething(string aggregateRootId)
                 : base(aggregateRootId)

@@ -85,7 +85,7 @@ And we will repeat again here, at the bottom: There was never any problem. We we
 
             Console.WriteLine("Waiting for view to process event");
             _hongKongViewManager
-                .WaitUntilProcessed(result, TimeSpan.FromSeconds(20))
+                .WaitUntilProcessed(result, TimeSpan.FromSeconds(30))
                 .Wait();
 
             Console.WriteLine("Loading view instance");
@@ -97,21 +97,40 @@ And we will repeat again here, at the bottom: There was never any problem. We we
 
         ICommandProcessor CreateCommandProcessor(IEventStore commandProcessingEventStore, IEventStore eventProcessingEventStore, params IViewManager[] viewManagers)
         {
-            var commandProcessor = CommandProcessor.With()
+            //Brett
+            var commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.Register(c => commandProcessingEventStore))
-                .EventDispatcher(e => e.Register(c =>
-                {
-                    var aggregateRootRepository = c.Get<IAggregateRootRepository>();
-                    var domainEventSerializer = c.Get<IDomainEventSerializer>();
-                    var domainTypeNameMapper = c.Get<IDomainTypeNameMapper>();
-                    return new ViewManagerEventDispatcher(
-                        aggregateRootRepository,
-                        eventProcessingEventStore,
-                        domainEventSerializer,
-                        domainTypeNameMapper,
-                        viewManagers);
-                }))
-                .Create();
+                .EventDispatcher(ed => ed.UseViewManagerEventDispatcher(viewManagers))
+                
+                //.EventDispatcher(e => e.Register(c => {
+                //    var aggregateRootRepository = (IAggregateRootRepository)c.GetService(typeof(IAggregateRootRepository));
+                //    var domainEventSerializer = (IDomainEventSerializer)c.GetService(typeof(IDomainEventSerializer));
+                //    var domainTypeNameMapper = (IDomainTypeNameMapper)c.GetService(typeof(IDomainTypeNameMapper));
+                //    return new ViewManagerEventDispatcher(
+                //        aggregateRootRepository,
+                //        eventProcessingEventStore,
+                //        domainEventSerializer,
+                //        domainTypeNameMapper,
+                //        viewManagers);
+                //}))
+           );
+
+            //Orig
+            //var commandProcessor = CommandProcessor.With()
+            //    .EventStore(e => e.Register(c => commandProcessingEventStore))
+            //    .EventDispatcher(e => e.Register(c =>
+            //    {
+            //        var aggregateRootRepository = c.Get<IAggregateRootRepository>();
+            //        var domainEventSerializer = c.Get<IDomainEventSerializer>();
+            //        var domainTypeNameMapper = c.Get<IDomainTypeNameMapper>();
+            //        return new ViewManagerEventDispatcher(
+            //            aggregateRootRepository,
+            //            eventProcessingEventStore,
+            //            domainEventSerializer,
+            //            domainTypeNameMapper,
+            //            viewManagers);
+            //    }))
+            //    .Create();
 
             RegisterForDisposal(commandProcessor);
 

@@ -24,7 +24,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _factory = RegisterForDisposal(new TFactory());
 
             //brett
-            _context = base.CreateTestContext();
+            _context = RegisterForDisposal(base.CreateTestContext());
             //_context = RegisterForDisposal(TestContext.Create());
 
             _context.AddViewManager(_factory.GetViewManager<ViewRoot>());

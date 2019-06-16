@@ -31,30 +31,41 @@ this time by using actual MongoDB underneath
         ICommandProcessor _cirqus;
         IAggregateRootRepository _aggregateRootRepository;
 
-        protected override void DoSetUp()
-        {
+        protected override void DoSetUp() {
             var mongoDatabase = MongoHelper.InitializeTestDatabase();
 
-            _cirqus = CommandProcessor.With()
-                .EventStore(e => e.UseMongoDb(mongoDatabase, "events"))
-                .AggregateRootRepository(r => r.Register(c =>
-                {
-                    _aggregateRootRepository = new DefaultAggregateRootRepository(
-                        c.Get<IEventStore>(),
-                        c.Get<IDomainEventSerializer>(),
-                        c.Get<IDomainTypeNameMapper>());
 
+            //Brett
+
+            _cirqus = CreateCommandProcessor(config => config
+                .EventStore(e => e.UseMongoDb(mongoDatabase, "events"))
+                .AggregateRootRepository(r => r.Register(c => {
+                    _aggregateRootRepository =
+                    new DefaultAggregateRootRepository((IEventStore)c.GetService(typeof(IEventStore)), (IDomainEventSerializer)c.GetService(typeof(IDomainEventSerializer)), (IDomainTypeNameMapper)c.GetService(typeof(IDomainTypeNameMapper)));
                     return _aggregateRootRepository;
                 }))
-                .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
-                .Create();
+                .EventDispatcher(e => e.UseConsoleOutEventDispatcher()));
+
+            //Orig
+            //_cirqus = CommandProcessor.With()
+            //    .EventStore(e => e.UseMongoDb(mongoDatabase, "events"))
+            //    .AggregateRootRepository(r => r.Register(c =>
+            //    {
+            //        _aggregateRootRepository = new DefaultAggregateRootRepository(
+            //            c.Get<IEventStore>(),
+            //            c.Get<IDomainEventSerializer>(),
+            //            c.Get<IDomainTypeNameMapper>());
+
+            //        return _aggregateRootRepository;
+            //    }))
+            //    .EventDispatcher(e => e.UseConsoleOutEventDispatcher())
+            //    .Create();
 
             RegisterForDisposal(_cirqus);
         }
 
         [Test]
-        public void RunEntirePipelineAndProbePrivatesForMultipleAggregates()
-        {
+        public void RunEntirePipelineAndProbePrivatesForMultipleAggregates() {
             // verify that fresh aggregates are delivered
             Assert.That(_aggregateRootRepository.Get<ProgrammerAggregate>("id1").GetCurrentState(), Is.EqualTo("Born"));
             Assert.That(_aggregateRootRepository.Get<ProgrammerAggregate>("id2").GetCurrentState(), Is.EqualTo("Born"));
@@ -92,13 +103,11 @@ this time by using actual MongoDB underneath
 
         public class TakeNextStepCommand : Command<ProgrammerAggregate>
         {
-            public TakeNextStepCommand(string aggregateRootId) 
-                : base(aggregateRootId)
-            {
+            public TakeNextStepCommand(string aggregateRootId)
+                : base(aggregateRootId) {
             }
 
-            public override void Execute(ProgrammerAggregate aggregateRoot)
-            {
+            public override void Execute(ProgrammerAggregate aggregateRoot) {
                 aggregateRoot.TakeNextStep();
             }
         }
@@ -113,15 +122,12 @@ this time by using actual MongoDB underneath
             }
 
             ProgrammerState currentState;
-            public string GetCurrentState()
-            {
+            public string GetCurrentState() {
                 return currentState.ToString();
             }
 
-            public void TakeNextStep()
-            {
-                switch (currentState)
-                {
+            public void TakeNextStep() {
+                switch (currentState) {
                     case ProgrammerState.Born:
                         Emit(new FinishedEducation());
                         break;
@@ -136,25 +142,23 @@ this time by using actual MongoDB underneath
                 }
             }
 
-            public void Apply(FinishedEducation e)
-            {
+            public void Apply(FinishedEducation e) {
                 currentState = ProgrammerState.Educated;
             }
 
-            public void Apply(LearnedAboutFunctionalProgramming e)
-            {
+            public void Apply(LearnedAboutFunctionalProgramming e) {
                 currentState = ProgrammerState.Knowing;
             }
         }
 
         public class FinishedEducation : DomainEvent<ProgrammerAggregate>
         {
-            
+
         }
 
         public class LearnedAboutFunctionalProgramming : DomainEvent<ProgrammerAggregate>
         {
-            
+
         }
     }
 }

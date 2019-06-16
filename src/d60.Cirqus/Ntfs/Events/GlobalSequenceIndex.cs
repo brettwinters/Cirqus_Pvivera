@@ -21,36 +21,33 @@ namespace d60.Cirqus.Ntfs.Events
 
         BinaryWriter _writer;
 
-        public GlobalSequenceIndex(string basePath, bool dropEvents)
-        {
+        public GlobalSequenceIndex(string basePath, bool dropEvents) {
             _seqFilePath = Path.Combine(basePath, "seq.idx");
 
-            if (dropEvents && File.Exists(_seqFilePath))
-                File.Delete(_seqFilePath);
+            if (dropEvents && File.Exists(_seqFilePath)) {
+                File.Delete(_seqFilePath);   //System.IO.IOException  here
+            }
+
 
             OpenWriter();
         }
 
-        public void Write(IEnumerable<EventData> events)
-        {
+        public void Write(IEnumerable<EventData> events) {
             Write(from @event in events
-                  select new GlobalSequenceRecord
-                  {
+                  select new GlobalSequenceRecord {
                       GlobalSequenceNumber = @event.GetGlobalSequenceNumber(),
                       AggregateRootId = @event.GetAggregateRootId(),
                       LocalSequenceNumber = @event.GetSequenceNumber(),
                   });
         }
 
-        public void Write(IEnumerable<GlobalSequenceRecord> records)
-        {
-            foreach (var record in records)
-            {
+        public void Write(IEnumerable<GlobalSequenceRecord> records) {
+            foreach (var record in records) {
                 _writer.Write(record.GlobalSequenceNumber);
-                
+
                 var keyAsBytes = Encoding.UTF8.GetBytes(record.AggregateRootId);
                 var length = keyAsBytes.Length;
-                
+
                 Array.Resize(ref keyAsBytes, 255);
 
                 _writer.Write((byte)length);
@@ -61,17 +58,13 @@ namespace d60.Cirqus.Ntfs.Events
             _writer.Flush();
         }
 
-        public IEnumerable<GlobalSequenceRecord> Read(long lastCommittedGlobalSequenceNumber, long offset)
-        {
+        public IEnumerable<GlobalSequenceRecord> Read(long lastCommittedGlobalSequenceNumber, long offset) {
             using (var readStream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 100 * SizeofSeqRecord, FileOptions.None))
-            using (var reader = new BinaryReader(readStream, Encoding.ASCII))
-            {
+            using (var reader = new BinaryReader(readStream, Encoding.ASCII)) {
                 readStream.Seek(offset * SizeofSeqRecord, SeekOrigin.Begin);
 
-                while (readStream.Position + SizeofSeqRecord <= readStream.Length)
-                {
-                    var record = new GlobalSequenceRecord
-                    {
+                while (readStream.Position + SizeofSeqRecord <= readStream.Length) {
+                    var record = new GlobalSequenceRecord {
                         GlobalSequenceNumber = reader.ReadInt64(),
                         AggregateRootId = ReadFixedLengthString(reader),
                         LocalSequenceNumber = reader.ReadInt64(),
@@ -79,23 +72,21 @@ namespace d60.Cirqus.Ntfs.Events
 
                     if (record.GlobalSequenceNumber > lastCommittedGlobalSequenceNumber)
                         break;
-                    
+
                     yield return record;
                 }
             }
         }
 
-        public string ReadFixedLengthString(BinaryReader reader)
-        {
+        public string ReadFixedLengthString(BinaryReader reader) {
             var length = reader.ReadByte();
             var str = Encoding.UTF8.GetString(reader.ReadBytes(length));
             reader.ReadBytes(255 - length);
             return str;
         }
 
-        public void DetectCorruptionAndRecover(DataStore store, long lastCommittedGlobalSequenceNumber)
-        {
-            var numberOfRecords = _writer.BaseStream.Length/SizeofSeqRecord;
+        public void DetectCorruptionAndRecover(DataStore store, long lastCommittedGlobalSequenceNumber) {
+            var numberOfRecords = _writer.BaseStream.Length / SizeofSeqRecord;
             var expectedNumberOfRecords = lastCommittedGlobalSequenceNumber + 1;
 
             if (expectedNumberOfRecords == numberOfRecords)
@@ -103,29 +94,25 @@ namespace d60.Cirqus.Ntfs.Events
 
             _writer.Dispose();
 
-            foreach (var orphan in Read(long.MaxValue, lastCommittedGlobalSequenceNumber + 1))
-            {
+            foreach (var orphan in Read(long.MaxValue, lastCommittedGlobalSequenceNumber + 1)) {
                 store.Truncate(orphan.AggregateRootId, orphan.LocalSequenceNumber);
             }
 
-            using (var stream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, 1024, FileOptions.None))
-            {
+            using (var stream = new FileStream(_seqFilePath, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, 1024, FileOptions.None)) {
                 stream.SetLength(expectedNumberOfRecords * SizeofSeqRecord);
                 stream.Flush();
             }
 
-            OpenWriter();        
+            OpenWriter();
         }
 
-        void OpenWriter()
-        {
+        void OpenWriter() {
             _writer = new BinaryWriter(
                 new FileStream(_seqFilePath, FileMode.Append, FileAccess.Write, FileShare.Read, 100 * SizeofSeqRecord, FileOptions.None),
                 Encoding.ASCII, leaveOpen: false);
         }
 
-        public void Dispose()
-        {
+        public void Dispose() {
             _writer.Dispose();
         }
 

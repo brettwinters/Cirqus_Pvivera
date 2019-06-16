@@ -22,7 +22,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _factory = RegisterForDisposal(new TFactory());
 
             //brett
-            _context = base.CreateTestContext(); // RegisterForDisposal(TestContext.Create());
+            _context = RegisterForDisposal(base.CreateTestContext()); // RegisterForDisposal(TestContext.Create());
         }
 
         [Test]

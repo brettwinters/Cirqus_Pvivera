@@ -19,37 +19,42 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             _eventStore = RegisterForDisposal(new NtfsEventStore("testdata", dropEvents: true));
         }
 
+        protected override void DoTearDown() {
+            base.DoTearDown();
+            DisposeStuff();
+        }
+
         [Test]
-        public void OnlyReadCommittedOnLoad()
-        {
+        public void OnlyReadCommittedOnLoad() {
             // make one full commit
             _eventStore.Save(Guid.NewGuid(), new[]
             {
-                EventData.FromMetadata(new Metadata
-                {
-                    {DomainEvent.MetadataKeys.SequenceNumber, 0.ToString(Metadata.NumberCulture)},
-                    {DomainEvent.MetadataKeys.AggregateRootId, "id"}
+                        EventData.FromMetadata(new Metadata
+                        {
+                            {DomainEvent.MetadataKeys.SequenceNumber, 0.ToString(Metadata.NumberCulture)},
+                            {DomainEvent.MetadataKeys.AggregateRootId, "id"}
 
-                }, new byte[0])
-            });
+                        }, new byte[0])
+                    });
 
             // save an event to a file, without committing
             _eventStore.DataStore.Write(
                 EventData.FromMetadata(new Metadata
                 {
-                    {DomainEvent.MetadataKeys.SequenceNumber, 1.ToString(Metadata.NumberCulture)},
-                    {DomainEvent.MetadataKeys.AggregateRootId, "id"},
-                    {DomainEvent.MetadataKeys.GlobalSequenceNumber, 1.ToString(Metadata.NumberCulture)}
+                            {DomainEvent.MetadataKeys.SequenceNumber, 1.ToString(Metadata.NumberCulture)},
+                            {DomainEvent.MetadataKeys.AggregateRootId, "id"},
+                            {DomainEvent.MetadataKeys.GlobalSequenceNumber, 1.ToString(Metadata.NumberCulture)}
                 }, new byte[0]));
 
 
             var events = _eventStore.Load("id");
             Assert.AreEqual(1, events.Count());
+
+            _eventStore.Dispose();
         }
 
         [Test]
-        public void OnlyReadCommittedOnStream()
-        {
+        public void OnlyReadCommittedOnStream() {
             // make one full commit
             _eventStore.Save(Guid.NewGuid(), new[]
             {
@@ -73,11 +78,12 @@ namespace d60.Cirqus.Tests.Events.Ntfs
 
             var events = _eventStore.Stream();
             Assert.AreEqual(1, events.Count());
+
+            _eventStore.Dispose();
         }
 
         [Test]
-        public void CanRecoverAfterWritingIndex()
-        {
+        public void CanRecoverAfterWritingIndex() {
             // make one full commit
             _eventStore.Save(Guid.NewGuid(), new[]
             {
@@ -115,11 +121,12 @@ namespace d60.Cirqus.Tests.Events.Ntfs
 
             var load = _eventStore.Load("rootid");
             Assert.AreEqual(2, load.Count());
+
+            _eventStore.Dispose();
         }
 
         [Test]
-        public void CanRecoverAfterSavingEventData()
-        {
+        public void CanRecoverAfterSavingEventData() {
             // make one full commit
             _eventStore.Save(Guid.NewGuid(), new[]
             {
@@ -138,7 +145,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
                 {DomainEvent.MetadataKeys.GlobalSequenceNumber, 1.ToString(Metadata.NumberCulture)}
             }, Encoding.UTF8.GetBytes("The bad one"));
 
-            _eventStore.GlobalSequenceIndex.Write(new[] {domainEvent});
+            _eventStore.GlobalSequenceIndex.Write(new[] { domainEvent });
             _eventStore.DataStore.Write(domainEvent);
 
             // make one full commit
@@ -158,6 +165,8 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             var load = _eventStore.Load("rootid").ToList();
             Assert.AreEqual(2, load.Count());
             Assert.AreEqual("The good one", Encoding.UTF8.GetString(load.Last().Data));
+
+            _eventStore.Dispose();
         }
     }
 }

@@ -69,7 +69,7 @@ namespace d60.Cirqus.Tests.Commands
             });
         }
 
-        public class CommandWithMetaData : Command<SomeAggregate>
+        public class CommandWithMetaData : d60.Cirqus.Commands.Command<SomeAggregate>
         {
             public CommandWithMetaData(string aggregateRootId) : base(aggregateRootId) { }
 
@@ -99,7 +99,7 @@ namespace d60.Cirqus.Tests.Commands
             
         }
 
-        public class TakeNextStepCommand : Command<ProgrammerAggregate>
+        public class TakeNextStepCommand : d60.Cirqus.Commands.Command<ProgrammerAggregate>
         {
             public TakeNextStepCommand(string aggregateRootId)
                 : base(aggregateRootId)

@@ -36,7 +36,7 @@ namespace d60.Cirqus.Tests.Aggregates
 
         class Event : DomainEvent<Root> { }
 
-        class Commando : Command<Root>
+        class Commando : d60.Cirqus.Commands.Command<Root>
         {
             public Commando(string aggregateRootId) : base(aggregateRootId)
             {

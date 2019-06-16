@@ -79,7 +79,7 @@ namespace d60.Cirqus.Tests.Commands
 
         class Ewent : DomainEvent<Woot> { }
 
-        class Cwommand : Command<Woot>
+        class Cwommand : d60.Cirqus.Commands.Command<Woot>
         {
             public Cwommand(string aggregateRootId)
                 : base(aggregateRootId)

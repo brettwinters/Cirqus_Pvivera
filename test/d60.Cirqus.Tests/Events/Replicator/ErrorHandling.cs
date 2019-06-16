@@ -52,9 +52,9 @@ namespace d60.Cirqus.Tests.Events.Replicator
         [TestCase(10)]
         [TestCase(20)]
         [TestCase(100)]
-        [TestCase(200, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(1000, Ignore = TestCategories.IgnoreLongRunning)]
-        [TestCase(10000, Ignore = TestCategories.IgnoreLongRunning)]
+        [LongRunningTestCase(200)]
+        [LongRunningTestCase(1000)]
+        [LongRunningTestCase(10000)]
         public void CanReplicateEventsEvenWhenErrorsOccurVeryOften(int numberOfEvents)
         {
             try

@@ -2,7 +2,7 @@
 
 namespace d60.Cirqus.Tests.Contracts.Views.Models.ViewInstanceDeletion
 {
-    public class Undo : Command<Root>
+    public class Undo : d60.Cirqus.Commands.Command<Root>
     {
         public Undo(string aggregateRootId) : base(aggregateRootId)
         {

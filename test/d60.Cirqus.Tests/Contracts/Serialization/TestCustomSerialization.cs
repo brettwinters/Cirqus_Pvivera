@@ -86,7 +86,7 @@ namespace d60.Cirqus.Tests.Contracts.Serialization
             }
         }
 
-        public class LeCommand : Command<Root>
+        public class LeCommand : d60.Cirqus.Commands.Command<Root>
         {
             public LeCommand(string aggregateRootId)
                 : base(aggregateRootId)

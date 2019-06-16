@@ -32,7 +32,8 @@ namespace d60.Cirqus.Tests.Contracts.Views
 
             _factory = RegisterForDisposal(new TFactory());
 
-            //Brett
+
+
             //_context = RegisterForDisposal(
             //    TestContext.With()
             //        .Options(x => x.Asynchronous())
@@ -42,11 +43,19 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _viewManager2 = _factory.GetViewManager<ViewThatSubscribesToAggregateRootEvent>();
             _viewManager3 = _factory.GetViewManager<ViewThatSubscribesToAllEvents>();
 
-            _context = base.CreateTestContext();
-            _context
+            //Brett
+            _context = RegisterForDisposal( base.CreateTestContext(config => 
+                config.Options(x => x.Asynchronous()))
                 .AddViewManager(_viewManager1)
                 .AddViewManager(_viewManager2)
-                .AddViewManager(_viewManager3);
+                .AddViewManager(_viewManager3));
+
+
+            //_context = base.CreateTestContext();
+            //_context
+            //    .AddViewManager(_viewManager1)
+            //    .AddViewManager(_viewManager2)
+            //    .AddViewManager(_viewManager3);
         }
 
         [Test]
