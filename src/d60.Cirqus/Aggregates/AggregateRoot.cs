@@ -56,10 +56,11 @@ namespace d60.Cirqus.Aggregates
             get { return CurrentSequenceNumber == InitialAggregateRootSequenceNumber; }
         }
 
+        //Brett - changed this from protected to protected internal
         /// <summary>
         /// Emits the given domain event, adding the aggregate root's <see cref="Id"/> and a sequence number to its metadata, along with some type information
         /// </summary>
-        protected void Emit<TAggregateRoot>(DomainEvent<TAggregateRoot> e) where TAggregateRoot : AggregateRoot
+        protected internal void Emit<TAggregateRoot>(DomainEvent<TAggregateRoot> e) where TAggregateRoot : AggregateRoot
         {
             if (e == null) throw new ArgumentNullException("e", "Can't emit null!");
 
@@ -122,6 +123,7 @@ namespace d60.Cirqus.Aggregates
             UnitOfWork.AddEmittedEvent(this, e);
             EventEmitted(e);
         }
+
 
         internal void ApplyEvent(DomainEvent e, ReplayState replayState)
         {

@@ -10,31 +10,23 @@ namespace d60.Cirqus.MSTest
         public TestContext TestContext { get; protected set; }
 
         [TestInitialize]
-        public void SetupInternal()
-        {
+        public void SetupInternal() {
             Begin(new ConsoleWriter());
             Setup();
         }
 
-        protected virtual void Setup()
-        {
-        }
+        [DebuggerStepThrough]
+        protected virtual void Setup() { }
 
         [TestCleanup]
-        public void TeardownInternal()
-        {
+        public void TeardownInternal() {
             Teardown();
-            End(TestContext.CurrentTestOutcome != UnitTestOutcome.Error);
+            End(TestContext.CurrentTestOutcome != UnitTestOutcome.Passed); //brett - was UnitTestOutcome.Failed
         }
 
-        protected virtual void Teardown()
-        {
-        }
+        protected virtual void Teardown() {        }
 
         [DebuggerStepThrough]
-        protected override void Fail()
-        {
-            Assert.Fail();
-        }
+        protected override void Fail() => Assert.Fail();
     }
 }

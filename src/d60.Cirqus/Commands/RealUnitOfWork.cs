@@ -96,5 +96,9 @@ namespace d60.Cirqus.Commands
                 committed(eventsFromThisUnitOfWork);
             }
         }
+
+
+        //Brett
+        public IAggregateRootRepository Repository => _aggregateRootRepository;
     }
 }

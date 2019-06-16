@@ -16,8 +16,8 @@ namespace d60.Cirqus.Tests.MongoDb
         [TestCase(false, 100, 10, Description = "Indexes")]
         [TestCase(true, 100, 1000, Description = "Indexes")]
         [TestCase(false, 100, 1000, Description = "NO indexes")]
-        [TestCase(true, 100, 10*1000, Description = "Indexes", Ignore = "TestCategories.IgnoreLongRunning")]
-        [TestCase(false, 100, 10 * 1000, Description = "NO indexes", Ignore = "TestCategories.IgnoreLongRunning")]
+        [LongRunningTestCase(true, 100, 10*1000, Description = "Indexes")]
+        [LongRunningTestCase(false, 100, 10 * 1000, Description = "NO indexes")]
         public void IndexSpeedTest(bool useIndexes, int numberOfQueries, int numberOfEvents)
         {
             var sequenceNumbers = new Dictionary<string, long>();

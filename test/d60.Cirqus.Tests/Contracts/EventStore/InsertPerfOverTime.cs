@@ -12,10 +12,10 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 {
     [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
     [TestFixture(typeof(InMemoryEventStoreFactory))]
-    [TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
-//    [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
+   // [TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     [TestFixture(typeof(NtfsEventStoreFactory))]
-//    [TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
+    //[TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
     public class InsertPerfOverTime<TEventStoreFactory> : FixtureBase where TEventStoreFactory : IEventStoreFactory, new()
     {
         readonly Dictionary<Guid, long> _seqNoPerRoot = new Dictionary<Guid, long>();
@@ -40,9 +40,9 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
                 RegisterForDisposal((IDisposable)_eventStore);
         }
 
-        [TestCase(10, 10)]
-        [TestCase(30, 10, Ignore = "TestCategories.IgnoreLongRunning")]
-        [TestCase(300, 20, Ignore = "TestCategories.IgnoreLongRunning")]
+        [TestCase(10, 10) ]
+        [LongRunningTestCase(20, 10)]
+        [LongRunningTestCase(300, 20)]
         public void GenerateSaveReport(int testSeconds, int timeIntervals)
         {
             var stopwatch = Stopwatch.StartNew();

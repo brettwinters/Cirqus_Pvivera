@@ -7,20 +7,23 @@ using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Logging.Console;
+using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Extensions;
+using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using MongoDB.Driver;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
-    [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
     public class DomainEventBatchDispatch<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         TFactory _factory;
@@ -28,8 +31,8 @@ namespace d60.Cirqus.Tests.Contracts.Views
         ViewManagerWaitHandle _waitHandle;
         IViewManager<BatchView> _viewManager;
 
-        protected override void DoSetUp()
-        {
+
+        protected override void DoSetUp() {
             CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel: Logger.Level.Debug);
 
             _factory = RegisterForDisposal(new TFactory());
@@ -38,14 +41,18 @@ namespace d60.Cirqus.Tests.Contracts.Views
 
             _waitHandle = new ViewManagerWaitHandle();
 
-            _commandProcessor = CommandProcessor.With()
+
+            //brett
+            _commandProcessor = base.CreateCommandProcessor(config => config
                 .EventStore(e => e.UseInMemoryEventStore())
-                .EventDispatcher(e =>
-                {
-                    e.UseViewManagerEventDispatcher(_viewManager)
-                        .WithWaitHandle(_waitHandle);
-                })
-                .Create();
+                .EventDispatcher(e => { e.UseViewManagerEventDispatcher(_viewManager).WithWaitHandle(_waitHandle); }));
+            //_commandProcessor = CommandProcessor.With()
+            //    .EventStore(e => e.UseInMemoryEventStore())
+            //    .EventDispatcher(e => {
+            //        e.UseViewManagerEventDispatcher(_viewManager)
+            //            .WithWaitHandle(_waitHandle);
+            //    })
+            //    .Create();
 
             RegisterForDisposal(_commandProcessor);
         }
@@ -88,7 +95,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
             }
         }
 
-        class DoStuffCommand : Command<Root>
+        class DoStuffCommand : Cirqus.Commands.Command<Root>
         {
             public int NumberOfCallsToMake { get; private set; }
 

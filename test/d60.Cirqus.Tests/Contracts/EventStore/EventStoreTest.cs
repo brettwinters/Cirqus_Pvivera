@@ -20,7 +20,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
     [Description("Contract test for event stores. Verifies that event store implementation and sequence number generation works in tandem")]
     [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
     [TestFixture(typeof(InMemoryEventStoreFactory))]
-    [TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
 //    [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     [TestFixture(typeof(NtfsEventStoreFactory))]
 //    [TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
@@ -417,10 +417,10 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         }
 
         [TestCase(100, 3)]
-        [TestCase(1000, 10, Ignore = "TestCategories.IgnoreLongRunning")]
-        [TestCase(10000, 10, Ignore = "TestCategories.IgnoreLongRunning")]
-        [TestCase(1000, 100, Ignore = "TestCategories.IgnoreLongRunning")]
-        [TestCase(1000, 1000, Ignore = "TestCategories.IgnoreLongRunning")]
+        [LongRunningTestCase(1000, 10)]
+        [LongRunningTestCase(10000, 10)]
+        [LongRunningTestCase(1000, 100)]
+        [LongRunningTestCase(1000, 1000)]
         public void CompareSavePerformance(int numberOfBatches, int numberOfEventsPerBatch)
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();
@@ -442,7 +442,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         }
 
         [TestCase(1000)]
-        [TestCase(10000, Ignore = "TestCategories.IgnoreLongRunning")]
+        [LongRunningTestCase(10000)]
         public void CompareLoadPerformance(int numberOfEvents)
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();
@@ -460,8 +460,8 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         }
 
         [TestCase(1000)]
-        [TestCase(10000, Ignore = "TestCategories.IgnoreLongRunning")]
-        [TestCase(100000, Ignore = "TestCategories.IgnoreLongRunning")]
+        [LongRunningTestCase(10000)]
+        [LongRunningTestCase(100000)]
         public void CompareStreamPerformance(int numberOfEvents)
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();

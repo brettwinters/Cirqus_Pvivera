@@ -11,11 +11,11 @@ using TestContext = d60.Cirqus.Testing.TestContext;
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
-    [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
     public class PolymorphicDispatch<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         TFactory _factory;
@@ -24,21 +24,25 @@ namespace d60.Cirqus.Tests.Contracts.Views
         IViewManager<ViewThatSubscribesToAggregateRootEvent> _viewManager2;
         IViewManager<ViewThatSubscribesToAllEvents> _viewManager3;
 
-        protected override void DoSetUp()
-        {
+
+        protected override void DoSetUp() {
+            base.DoSetUp();
+
             CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel: Logger.Level.Warn);
 
             _factory = RegisterForDisposal(new TFactory());
 
-            _context = RegisterForDisposal(
-                TestContext.With()
-                    .Options(x => x.Asynchronous())
-                    .Create());
+            //Brett
+            //_context = RegisterForDisposal(
+            //    TestContext.With()
+            //        .Options(x => x.Asynchronous())
+            //        .Create());
 
             _viewManager1 = _factory.GetViewManager<ViewThatSubscribesToEvents>();
             _viewManager2 = _factory.GetViewManager<ViewThatSubscribesToAggregateRootEvent>();
             _viewManager3 = _factory.GetViewManager<ViewThatSubscribesToAllEvents>();
 
+            _context = base.CreateTestContext();
             _context
                 .AddViewManager(_viewManager1)
                 .AddViewManager(_viewManager2)

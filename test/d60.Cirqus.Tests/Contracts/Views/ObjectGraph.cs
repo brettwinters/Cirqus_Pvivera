@@ -10,7 +10,7 @@ using TestContext = d60.Cirqus.Testing.TestContext;
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
     [Description("Some view managers must be able to save and load an entire object graph")]
     public class ObjectGraph<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
@@ -18,12 +18,14 @@ namespace d60.Cirqus.Tests.Contracts.Views
         TFactory _factory;
         TestContext _context;
 
-        protected override void DoSetUp()
-        {
+        protected override void DoSetUp() {
             CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel: Logger.Level.Warn);
 
             _factory = RegisterForDisposal(new TFactory());
-            _context = RegisterForDisposal(TestContext.Create());
+
+            //brett
+            _context = base.CreateTestContext();
+            //_context = RegisterForDisposal(TestContext.Create());
 
             _context.AddViewManager(_factory.GetViewManager<ViewRoot>());
         }

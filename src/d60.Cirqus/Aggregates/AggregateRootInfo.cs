@@ -1,11 +1,12 @@
 ﻿using d60.Cirqus.Events;
+using System.Collections.Generic;
 
 namespace d60.Cirqus.Aggregates
 {
     /// <summary>
     /// Opens up <see cref="AggregateRoot"/> for getting sequence number information. Can be useful when working with caching
     /// </summary>
-    public class AggregateRootInfo
+    public class AggregateRootInfo 
     {
         public AggregateRoot Instance { get; private set; }
 
@@ -30,6 +31,8 @@ namespace d60.Cirqus.Aggregates
         {
             get { return Instance.CurrentSequenceNumber; }
         }
+
+
 
         /// <summary>
         /// Gets whether the instance is new, i.e. whether it has not yet had any events applied
@@ -60,5 +63,26 @@ namespace d60.Cirqus.Aggregates
         {
             Instance.UnitOfWork = unitOfWork;
         }
+
+        //Brett
+        public IUnitOfWork UnitOfWork => Instance.UnitOfWork;
+
+        public IEnumerable<DomainEvent> GetEvents() {
+            var uow = (Commands.RealUnitOfWork)Instance.UnitOfWork;
+            return ((DefaultAggregateRootRepository)uow.Repository).GetEvents(Instance.Id);
+        }
+
+        //Brett
+        public void Emit<TAggregateRoot>(DomainEvent<TAggregateRoot> domainEvent) where TAggregateRoot : AggregateRoot {
+            Instance.Emit<TAggregateRoot>(domainEvent);
+        }
+
+        public IEnumerable<DomainEvent> GetEmittedEvents() {
+            return ((Commands.RealUnitOfWork)Instance.UnitOfWork).EmittedEvents;
+        }
+
+
+
+        // public IEnumerable<DomainEvent> Events => ((Commands.RealUnitOfWork)Instance.UnitOfWork).Repository.;
     }
 }

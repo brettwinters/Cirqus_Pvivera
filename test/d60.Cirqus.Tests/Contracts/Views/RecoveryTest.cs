@@ -12,14 +12,17 @@ using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 using Timer = System.Timers.Timer;
 
+
+
 namespace d60.Cirqus.Tests.Contracts.Views
 {
+    
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql, Ignore = true, IgnoreReason = "The contained List<int> cannot be persisted by EF")]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
-    [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
     public class RecoveryTest<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         TFactory _factory;
@@ -33,11 +36,15 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _factory = RegisterForDisposal(new TFactory());
             _viewManager = _factory.GetViewManager<View>();
 
-            _context = RegisterForDisposal(
-                TestContext.With()
-                    .EventDispatcher(x => x.UseViewManagerEventDispatcher(_viewManager).WithMaxDomainEventsPerBatch(10))
-                    .Options(x => x.Asynchronous())
-                    .Create());
+            //brett
+            _context = base.CreateTestContext(config => config
+                .EventDispatcher(x => x.UseViewManagerEventDispatcher(_viewManager)) //WithMaxDomainEventsPerBatch(10))
+                .Options(x => x.Asynchronous()));
+            //_context = RegisterForDisposal(
+            //    TestContext.With()
+            //        .EventDispatcher(x => x.UseViewManagerEventDispatcher(_viewManager).WithMaxDomainEventsPerBatch(10))
+            //        .Options(x => x.Asynchronous())
+            //        .Create());
         }
 
         [TestCase(100, 1.2, 0.1)]

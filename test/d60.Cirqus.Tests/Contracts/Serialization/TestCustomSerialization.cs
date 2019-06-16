@@ -16,7 +16,7 @@ namespace d60.Cirqus.Tests.Contracts.Serialization
     [Description("Contract test for event stores. Verifies that event store implementation and sequence number generation works in tandem")]
     [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
     [TestFixture(typeof(InMemoryEventStoreFactory))]
-    [TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
 //    [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     [TestFixture(typeof(NtfsEventStoreFactory))]
 //    [TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]

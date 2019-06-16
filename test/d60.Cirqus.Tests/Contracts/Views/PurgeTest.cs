@@ -11,11 +11,11 @@ using TestContext = d60.Cirqus.Testing.TestContext;
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
-    [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
     public class PurgeTest<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         TFactory _factory;
@@ -28,10 +28,12 @@ namespace d60.Cirqus.Tests.Contracts.Views
 
             _factory = RegisterForDisposal(new TFactory());
 
-            _context = RegisterForDisposal(
-                TestContext.With()
-                    .Options(x => x.Asynchronous())
-                    .Create());
+            //brett
+            _context = base.CreateTestContext(config => config.Options(x => x.Asynchronous()));
+            //_context = RegisterForDisposal(
+            //    TestContext.With()
+            //        .Options(x => x.Asynchronous())
+            //        .Create());
 
             _viewManager = _factory.GetViewManager<PurgeTestView>();
             _context.AddViewManager(_viewManager);

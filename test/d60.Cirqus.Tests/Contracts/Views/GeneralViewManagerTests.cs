@@ -3,22 +3,25 @@ using System.Threading.Tasks;
 using d60.Cirqus.Events;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Logging.Console;
+using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.Testing;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest;
+using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
+using MongoDB.Driver;
 using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql, Ignore = true, IgnoreReason = "The contained HashSet<string> cannot be persisted by EF")]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql, Ignore = true, IgnoreReason = "The contained HashSet<string> cannot be persisted by EF")]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
-    [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+   // [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
     public class GeneralViewManagerTests<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         readonly TimeSpan _defaultTimeout = TimeSpan.FromSeconds(50);
@@ -26,15 +29,17 @@ namespace d60.Cirqus.Tests.Contracts.Views
         TFactory _factory;
         TestContext _context;
 
-        protected override void DoSetUp()
-        {
-            CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel:Logger.Level.Debug);
+
+        protected override void DoSetUp() {
+            CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel: Logger.Level.Debug);
 
             _factory = RegisterForDisposal(new TFactory());
 
-            var context = TestContext.With()
-                .Options(x => x.Asynchronous())
-                .Create();
+            //brett
+            var context = base.CreateTestContext(config => config.Options(x => x.Asynchronous()));
+            //var context = TestContext.With()
+            //    .Options(x => x.Asynchronous())
+            //    .Create();
 
             _context = RegisterForDisposal(context);
         }

@@ -8,11 +8,11 @@ using d60.Cirqus.Tests.Contracts.Views.Models.ViewInstanceDeletion;
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
-    [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+   // [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
     [Description("Verifies that view managers are capable of deleting a view instance")]
     public class ViewInstanceDeletion<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
@@ -23,7 +23,8 @@ namespace d60.Cirqus.Tests.Contracts.Views
         {
             _factory = RegisterForDisposal(new TFactory());
 
-            _context = RegisterForDisposal(TestContext.Create());
+            //brett
+            _context = base.CreateTestContext();// RegisterForDisposal(TestContext.Create());
         }
 
         [Test, Ignore("hmmmm...")]
