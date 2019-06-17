@@ -1,3 +1,5 @@
+> Forked @pvivera 's version which he converted to .NetStandard (2.0). This is a great CQRS/ES library which I'm using for my own project. But need to close some loose ends
+
 # d60 Cirqus
 
 Simple but powerful event sourcing + CQRS kit. 
