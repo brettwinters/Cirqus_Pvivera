@@ -8,7 +8,7 @@ namespace d60.Cirqus.MongoDb.Logging
     {
         readonly MongoCollection _logStatements;
 
-        public MongoDbLoggerFactory(IMongoDatabase database, string collectionName)
+        public MongoDbLoggerFactory(MongoDatabase database, string collectionName)
         {
             _logStatements = database.GetCollection(collectionName);
         }

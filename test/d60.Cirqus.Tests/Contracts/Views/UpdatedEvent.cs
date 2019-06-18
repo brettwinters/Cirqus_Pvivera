@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Models.UpdatedEvent;
+using d60.Cirqus.Tests.MongoDb;
 using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
     //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
     //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]

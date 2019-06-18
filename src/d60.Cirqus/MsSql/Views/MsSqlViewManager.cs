@@ -37,10 +37,9 @@ namespace d60.Cirqus.MsSql.Views
 
         long _cachedPosition;
 
-        public MsSqlViewManager(IConfigurationRoot configuration, string connectionStringName,
-            string tableName, string positionTableName = null, bool automaticallyCreateSchema = true)
+        public MsSqlViewManager(string connectionStringName,            string tableName, string positionTableName = null, bool automaticallyCreateSchema = true)
         {
-            _connectionString = configuration.GetConnectionString(connectionStringName);
+            _connectionString = connectionStringName; // configuration.GetConnectionString(connectionStringName);
             _tableName = tableName;
             _positionTableName = positionTableName ?? tableName + "_Position";
             _viewTableSchema = SchemaHelper.GetSchema<TViewInstance>();
@@ -51,10 +50,10 @@ namespace d60.Cirqus.MsSql.Views
             }
         }
 
-        public MsSqlViewManager(IConfigurationRoot configuration, string connectionStringName, bool automaticallyCreateSchema = true)
-            : this(configuration, connectionStringName, typeof(TViewInstance).Name, automaticallyCreateSchema: automaticallyCreateSchema)
-        {
-        }
+        //public MsSqlViewManager(IConfigurationRoot configuration, string connectionStringName, bool automaticallyCreateSchema = true)
+        //    : this(configuration, connectionStringName, typeof(TViewInstance).Name, automaticallyCreateSchema: automaticallyCreateSchema)
+        //{
+        //}
 
         public override string Id
         {

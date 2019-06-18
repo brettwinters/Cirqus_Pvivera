@@ -8,8 +8,8 @@ using d60.Cirqus.Tests.Contracts.Views.Models.ViewInstanceDeletion;
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
     //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
    // [TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]

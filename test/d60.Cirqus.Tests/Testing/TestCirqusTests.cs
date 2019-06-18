@@ -20,51 +20,55 @@ namespace d60.Cirqus.Tests.Testing
     {
         TestWriter writer;
 
-        protected override IWriter GetWriter()
-        {
+        protected override IWriter GetWriter() {
             writer = new TestWriter();
             return writer;
         }
 
         [Test]
-        public void FormatsGiven()
-        {
+        public void FormatsGiven() {
             Emit(NewId<RootA>(), new EventA3 { Content = "megaoksen" });
 
-            Assert.AreEqual(string.Format(
-@"Given that:
-  EventA3 ({0})
-    Content: megaoksen
+            //Brett
+            Assert.AreEqual($"Given that:{Environment.NewLine}  EventA3 ({Id<RootA>()}){Environment.NewLine}    Content: megaoksen{Environment.NewLine}{Environment.NewLine}", writer.Buffer);
 
-", Id<RootA>()), writer.Buffer);
+            //            Assert.AreEqual(string.Format(
+            //@"Given that:
+            //  EventA3 ({0})
+            //    Content: megaoksen
+
+            //", Id<RootA>()), writer.Buffer);
         }
 
         [Test]
-        public void FormatsGivenWhenThen()
-        {
+        public void FormatsGivenWhenThen() {
             Emit(NewId<RootA>(), new EventA1());
 
             When(new CommandResultingInOneEvent { Id = Id<RootA>() });
 
             Then(Id<RootA>(), new EventA2());
 
-            Assert.AreEqual(string.Format(
-@"Given that:
-  EventA1 ({0})
+            Assert.AreEqual(
+                $"Given that:{Environment.NewLine}  EventA1 ({Id<RootA>()}){Environment.NewLine}{Environment.NewLine}When users:{Environment.NewLine}  CommandResultingInOneEvent{Environment.NewLine}    Id: {Id<RootA>()}{Environment.NewLine}{Environment.NewLine}Then:{Environment.NewLine}  √ EventA2 ({Id<RootA>()}){Environment.NewLine}{Environment.NewLine}", 
+                writer.Buffer
+            );
 
-When users:
-  CommandResultingInOneEvent
-    Id: {0}
+//            Assert.AreEqual(string.Format(
+//@"Given that:
+//  EventA1 ({0})
 
-Then:
-  √ EventA2 ({0})
+            //When users:
+            //  CommandResultingInOneEvent
+            //    Id: {0}
 
-", Id<RootA>()), writer.Buffer);
+            //Then:
+            //  √ EventA2 ({0})
+
+            //", Id<RootA>()), writer.Buffer);
         }
 
         [Test]
-        public void GivenWhenThenWrongId()
-        {
+        public void GivenWhenThenWrongId() {
             Emit(NewId<RootA>(), new EventA1());
 
             When(new CommandResultingInOneEvent { Id = Id<RootA>() });
@@ -73,28 +77,28 @@ Then:
         }
 
         [Test]
-        public void GivenWhenThenDiff()
-        {
+        public void GivenWhenThenDiff() {
             Emit(NewId<RootA>(), new EventA1());
 
             When(new CommandResultingInA3 { Id = Id<RootA>() });
 
             Should.Throw<AssertionException>(() =>
-                Then(NewId<RootA>(), new EventA3
-                {
+                Then(NewId<RootA>(), new EventA3 {
                     Content = "asger"
                 }));
 
-            writer.Buffer.Trim().ShouldContain(
-@"
--   ""Content"": null
-+   ""Content"": ""asger""
-");
+            //Brett
+            writer.Buffer.Trim().ShouldContain($"{Environment.NewLine}-   \"Content\": null{Environment.NewLine}+   \"Content\": \"asger\"");
+
+//            writer.Buffer.Trim().ShouldContain(
+//@"
+//-   ""Content"": null
+//+   ""Content"": ""asger""
+//");
         }
 
         [Test]
-        public void GivenWithImplicitId()
-        {
+        public void GivenWithImplicitId() {
             Emit(NewId<RootA>(), new EventA1());
             Emit(Id<RootA>(), new EventA2());
 
@@ -104,8 +108,7 @@ Then:
         }
 
         [Test]
-        public void ThenWithImplicitId()
-        {
+        public void ThenWithImplicitId() {
             Emit(NewId<RootA>(), new EventA1());
 
             When(new CommandResultingInOneEvent { Id = Id<RootA>() });
@@ -114,8 +117,7 @@ Then:
         }
 
         [Test]
-        public void ThenWithExplicitId()
-        {
+        public void ThenWithExplicitId() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -126,8 +128,7 @@ Then:
         }
 
         [Test]
-        public void ThenWhenNoEventsAreEmitted()
-        {
+        public void ThenWhenNoEventsAreEmitted() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -138,8 +139,7 @@ Then:
         }
 
         [Test]
-        public void ThenWhenExpectingTwoButGotOne()
-        {
+        public void ThenWhenExpectingTwoButGotOne() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -151,8 +151,7 @@ Then:
         }
 
         [Test]
-        public void ThenWhenExpectingTwoAndGotTwo()
-        {
+        public void ThenWhenExpectingTwoAndGotTwo() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -164,17 +163,15 @@ Then:
         }
 
         [Test]
-        public void IdForDerivedClassIsNotApplicableToBaseClass()
-        {
+        public void IdForDerivedClassIsNotApplicableToBaseClass() {
             Emit(NewId<RootAExtended>(), new EventA1());
-            
+
             Assert.Throws<IndexOutOfRangeException>(() => Id<RootA>())
                 .Message.ShouldBe("Could not find Id<RootA> with index 1");
         }
 
         [Test]
-        public void EmittingForDerivedRootThenBaseRootWithSameIdYieldsOneRootOfDerivedType()
-        {
+        public void EmittingForDerivedRootThenBaseRootWithSameIdYieldsOneRootOfDerivedType() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootAExtended>(id, new EventA1());
@@ -185,8 +182,7 @@ Then:
         }
 
         [Test]
-        public void EmittingForBaseRootThenDerivedRootWithSameIdShouldFailOnEmit()
-        {
+        public void EmittingForBaseRootThenDerivedRootWithSameIdShouldFailOnEmit() {
             var id = Guid.NewGuid().ToString();
             Emit<RootA>(id, new EventA1());
 
@@ -194,8 +190,7 @@ Then:
         }
 
         [Test]
-        public void EmitWithHook()
-        {
+        public void EmitWithHook() {
             var flag = false;
             BeforeEmit += x => flag = true;
 
@@ -206,8 +201,7 @@ Then:
         }
 
         [Test]
-        public void WhenWithHook()
-        {
+        public void WhenWithHook() {
             var flag = false;
             BeforeExecute += x => flag = true;
 
@@ -220,15 +214,12 @@ Then:
         }
 
         [Test]
-        public void CanTestWithDependentViewManagerEventDispatcher()
-        {
+        public void CanTestWithDependentViewManagerEventDispatcher() {
             var a = new InMemoryViewManager<ViewA>();
             var b = new InMemoryViewManager<ViewB>();
 
-            Configure(x =>
-            {
-                x.EventDispatcher(d =>
-                {
+            Configure(x => {
+                x.EventDispatcher(d => {
                     var context = new Dictionary<string, object>
                     {
                         { "Tag", new Tag() }
@@ -246,8 +237,7 @@ Then:
         }
 
         [Test]
-        public void CanUpdateViewSynchronously()
-        {
+        public void CanUpdateViewSynchronously() {
             var view = new InMemoryViewManager<ViewA>();
 
             Configure(x => x.EventDispatcher(d => d
@@ -264,8 +254,7 @@ Then:
         }
 
         [Test]
-        public void CanUpdateMultipleViewsSynchronously()
-        {
+        public void CanUpdateMultipleViewsSynchronously() {
             var a = new InMemoryViewManager<ViewA>();
             var b = new InMemoryViewManager<ViewB>();
 
@@ -283,8 +272,7 @@ Then:
         }
 
         [Test]
-        public void ExceptionsInViewsBubblesToSurface()
-        {
+        public void ExceptionsInViewsBubblesToSurface() {
             var view = new InMemoryViewManager<ThrowingView>();
 
             Configure(x => x.EventDispatcher(d => d.UseSynchronousViewManangerEventDispatcher(view)));
@@ -295,8 +283,7 @@ Then:
         }
 
         [Test]
-        public void EmitToAnyStream()
-        {
+        public void EmitToAnyStream() {
             KeyFormat.For<object>("stream-*");
 
             Emit<object>("stream-id", new EventWithNoRoot());
@@ -308,8 +295,7 @@ Then:
         }
 
         [Test]
-        public void MultipleIdsOfSameType()
-        {
+        public void MultipleIdsOfSameType() {
             var id1 = NewId<RootA>();
             var id2 = NewId<RootA>();
             var id3 = NewId<RootA>();
@@ -320,8 +306,7 @@ Then:
         }
 
         [Test]
-        public void ThenWhenWithCorrectType()
-        {
+        public void ThenWhenWithCorrectType() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -332,8 +317,7 @@ Then:
         }
 
         [Test]
-        public void ThenWhenWithTypeMismatch()
-        {
+        public void ThenWhenWithTypeMismatch() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -344,8 +328,7 @@ Then:
         }
 
         [Test]
-        public void ThenWithoutWhen()
-        {
+        public void ThenWithoutWhen() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -356,26 +339,22 @@ Then:
         }
 
         [Test]
-        public void ThenWithoutWhenWithDifference()
-        {
+        public void ThenWithoutWhenWithDifference() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
 
-            Context.Save(id, new EventA3
-            {
+            Context.Save(id, new EventA3 {
                 Content = "asger"
             });
 
-            Should.Throw<AssertionException>(() => Then(id, new EventA3
-            {
+            Should.Throw<AssertionException>(() => Then(id, new EventA3 {
                 Content = "karin"
             }));
         }
 
         [Test]
-        public void ThenWithoutWhenWithNothingEmitted()
-        {
+        public void ThenWithoutWhenWithNothingEmitted() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -384,8 +363,7 @@ Then:
         }
 
         [Test]
-        public void ShallowThenWithoutWhen()
-        {
+        public void ShallowThenWithoutWhen() {
             var id = Guid.NewGuid().ToString();
 
             Emit<RootA>(id, new EventA1());
@@ -399,34 +377,28 @@ Then:
 
         public class RootA : AggregateRoot, IEmit<EventA1>, IEmit<EventA2>, IEmit<EventA3>
         {
-            public void DoA1()
-            {
+            public void DoA1() {
                 Emit(new EventA1());
             }
 
-            public void DoA2()
-            {
+            public void DoA2() {
                 Emit(new EventA2());
             }
 
-            public void DoA3()
-            {
+            public void DoA3() {
                 Emit(new EventA3());
             }
 
-            public void Apply(EventA1 e)
-            {
+            public void Apply(EventA1 e) {
 
             }
 
-            public void Apply(EventA2 e)
-            {
+            public void Apply(EventA2 e) {
 
             }
 
-            public void Apply(EventA3 e)
-            {
-                
+            public void Apply(EventA3 e) {
+
             }
         }
 
@@ -449,15 +421,14 @@ Then:
 
         public class EventWithNoRoot : DomainEvent
         {
-            
+
         }
 
         public class CommandResultingInOneEvent : ExecutableCommand
         {
             public string Id { get; set; }
 
-            public override void Execute(ICommandContext context)
-            {
+            public override void Execute(ICommandContext context) {
                 var rootA = context.Load<RootA>(Id);
                 rootA.DoA2();
             }
@@ -465,15 +436,14 @@ Then:
 
         public class CommandWithNoResult : ExecutableCommand
         {
-            public override void Execute(ICommandContext context) {}
+            public override void Execute(ICommandContext context) { }
         }
 
         public class CommandResultingInTwoEvents : ExecutableCommand
         {
             public string Id { get; set; }
 
-            public override void Execute(ICommandContext context)
-            {
+            public override void Execute(ICommandContext context) {
                 var rootA = context.Load<RootA>(Id);
                 rootA.DoA2();
                 rootA.DoA2();
@@ -484,8 +454,7 @@ Then:
         {
             public string Id { get; set; }
 
-            public override void Execute(ICommandContext context)
-            {
+            public override void Execute(ICommandContext context) {
                 context.Load<RootA>(Id).DoA3();
             }
         }
@@ -495,8 +464,7 @@ Then:
             public string Id { get; set; }
             public long LastGlobalSequenceNumber { get; set; }
 
-            public void Handle(IViewContext context, EventA1 domainEvent)
-            {
+            public void Handle(IViewContext context, EventA1 domainEvent) {
                 ((Tag)context.Items["Tag"]).Text = "Greetings from ViewA";
             }
         }
@@ -507,8 +475,7 @@ Then:
             public long LastGlobalSequenceNumber { get; set; }
             public string Tag { get; set; }
 
-            public void Handle(IViewContext context, EventA1 domainEvent)
-            {
+            public void Handle(IViewContext context, EventA1 domainEvent) {
                 Tag = ((Tag)context.Items["Tag"]).Text + ";Greetings from ViewB";
             }
         }
@@ -523,8 +490,7 @@ Then:
             public string Id { get; set; }
             public long LastGlobalSequenceNumber { get; set; }
 
-            public void Handle(IViewContext context, EventA1 domainEvent)
-            {
+            public void Handle(IViewContext context, EventA1 domainEvent) {
                 throw new InvalidOperationException("hej");
             }
         }

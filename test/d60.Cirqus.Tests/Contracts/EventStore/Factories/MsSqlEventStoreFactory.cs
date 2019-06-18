@@ -14,13 +14,13 @@ namespace d60.Cirqus.Tests.Contracts.EventStore.Factories
         {
             var configuration = Configuration.Get();
 
-            var helper = new MsSqlTestHelper(configuration);
+            //var helper = new MsSqlTestHelper(configuration);
 
-            helper.EnsureTestDatabaseExists();
+            MsSqlTestHelper.EnsureTestDatabaseExists();
 
-            var connectionString = helper.ConnectionString;
+            var connectionString = MsSqlTestHelper.ConnectionString;
 
-            helper.DropTable("events");
+            MsSqlTestHelper.DropTable("events");
 
             _eventStore = new MsSqlEventStore(configuration, MsSqlTestHelper.TestDbName, "events");
             

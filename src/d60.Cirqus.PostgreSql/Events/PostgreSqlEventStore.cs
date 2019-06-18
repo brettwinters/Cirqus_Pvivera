@@ -8,6 +8,7 @@ using d60.Cirqus.Exceptions;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Numbers;
 using d60.Cirqus.Serialization;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -20,10 +21,13 @@ namespace d60.Cirqus.PostgreSql.Events
         readonly string _tableName;
         readonly MetadataSerializer _metadataSerializer = new MetadataSerializer();
 
-        public PostgreSqlEventStore(string connectionStringOrConnectionStringName, string tableName, bool automaticallyCreateSchema = true, Action<NpgsqlConnection> additionalConnectionSetup = null)
+
+        public PostgreSqlEventStore(IConfigurationRoot configuration, string connectionStringOrConnectionStringName, string tableName, bool automaticallyCreateSchema = true, Action<NpgsqlConnection> additionalConnectionSetup = null)
         {
             _tableName = tableName;
-            _connectionString = SqlHelper.GetConnectionString(connectionStringOrConnectionStringName);
+            _connectionString = configuration.GetConnectionString(connectionStringOrConnectionStringName);
+            //_connectionString = SqlHelper.GetConnectionString(connectionStringOrConnectionStringName);
+
             _additionalConnectionSetup = additionalConnectionSetup;
 
             if (automaticallyCreateSchema)
@@ -123,8 +127,8 @@ INSERT INTO ""{0}"" (
 
                             cmd.Parameters.AddWithValue("batchId", batchId);
                             cmd.Parameters.AddWithValue("aggId", e.GetAggregateRootId());
-                            cmd.Parameters.AddWithValue("seqNo", NpgsqlDbType.Bigint, e.Meta[DomainEvent.MetadataKeys.SequenceNumber]);
-                            cmd.Parameters.AddWithValue("globSeqNo", NpgsqlDbType.Bigint, e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber]);
+                            cmd.Parameters.AddWithValue("seqNo", NpgsqlDbType.Bigint, long.Parse(e.Meta[DomainEvent.MetadataKeys.SequenceNumber]));
+                            cmd.Parameters.AddWithValue("globSeqNo", NpgsqlDbType.Bigint, long.Parse(e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber]));
                             cmd.Parameters.AddWithValue("data", e.Data);
                             cmd.Parameters.AddWithValue("meta", Encoding.UTF8.GetBytes(_metadataSerializer.Serialize(e.Meta)));
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using d60.Cirqus.MsSql;
+using Microsoft.Extensions.Configuration;
 using Npgsql;
 
 namespace d60.Cirqus.Tests.PostgreSql
@@ -10,6 +11,11 @@ namespace d60.Cirqus.Tests.PostgreSql
     {
         static PostgreSqlTestHelper()
         {
+
+            _configuration = Configuration.Get();
+
+
+
             // sorry - this no longer seems to work
             return;
 
@@ -24,14 +30,35 @@ namespace d60.Cirqus.Tests.PostgreSql
             }
         }
 
-        public static void DropTable(string tableName)
-        {
+        //Brett
+        private static IConfigurationRoot _configuration;
+        public static string TestDbName = "postgresqltestdb";
+
+        //Brett - copied from MsSqlTestHelper.cs
+        public PostgreSqlTestHelper(IConfigurationRoot configuration) {
+            _configuration = configuration;
+        }
+
+        //Brett - made instance method
+        //public void DropTable(string tableName) {
+        //    Console.WriteLine("Dropping Postgres table '{0}'", tableName);
+
+        //    using (var connection = new NpgsqlConnection(PostgreSqlConnectionString)) {
+        //        using (var cmd = connection.CreateCommand()) {
+        //            connection.Open();
+
+        //            cmd.CommandText = string.Format(@"DROP TABLE IF EXISTS ""{0}"" CASCADE", tableName);
+
+        //            cmd.ExecuteNonQuery();
+        //        }
+        //    }
+        //}
+
+        public static void DropTable(string tableName) {
             Console.WriteLine("Dropping Postgres table '{0}'", tableName);
 
-            using (var connection = new NpgsqlConnection(PostgreSqlConnectionString))
-            {
-                using (var cmd = connection.CreateCommand())
-                {
+            using (var connection = new NpgsqlConnection(PostgreSqlConnectionString)) {
+                using (var cmd = connection.CreateCommand()) {
                     connection.Open();
 
                     cmd.CommandText = string.Format(@"DROP TABLE IF EXISTS ""{0}"" CASCADE", tableName);
@@ -96,7 +123,9 @@ namespace d60.Cirqus.Tests.PostgreSql
         {
             get
             {
-                var connectionString = GetConnectionString();
+                
+                //brett
+                var connectionString = _configuration.GetConnectionString(TestDbName);  //GetConnectionString();
 
                 var databaseName = GetDatabaseName();
 
@@ -113,7 +142,8 @@ namespace d60.Cirqus.Tests.PostgreSql
 
         static string GetDatabaseName()
         {
-            var connectionString = GetConnectionString();
+            //brett
+            var connectionString = _configuration.GetConnectionString(TestDbName);  //GetConnectionString();
 
             var databaseName = GetDatabaseName(connectionString);
 

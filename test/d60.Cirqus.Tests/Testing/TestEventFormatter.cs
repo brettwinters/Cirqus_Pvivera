@@ -1,3 +1,4 @@
+using System;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 using d60.Cirqus.Testing;
@@ -40,11 +41,16 @@ namespace d60.Cirqus.Tests.Testing
 
             eventFormatter.Format(null, @event);
             textFormatter.NewLine();
-            Assert.AreEqual(@"SomeEvent
-  NoHayBanda: llorando
-  OleOgLone: 2
-", 
-  writer.Buffer);
+
+            //Brett
+            var test = $"SomeEvent{Environment.NewLine}  NoHayBanda: llorando{Environment.NewLine}  OleOgLone: 2{Environment.NewLine}";
+            Assert.AreEqual(test, writer.Buffer);
+
+            //            Assert.AreEqual(@"SomeEvent
+            //  NoHayBanda: llorando
+            //  OleOgLone: 2
+            //", 
+            //  writer.Buffer);
         }
 
         [Test]

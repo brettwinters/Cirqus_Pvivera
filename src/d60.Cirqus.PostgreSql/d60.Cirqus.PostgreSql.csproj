@@ -6,15 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Npgsql" Version="4.0.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Configuration" />
   </ItemGroup>
 
 </Project>

@@ -2,12 +2,15 @@
 using d60.Cirqus.Events;
 using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.MsSql.Events;
+using d60.Cirqus.PostgreSql.Events;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Tests.MsSql;
+using d60.Cirqus.Tests.PostgreSql;
 using MongoDB.Driver;
+using d60.Cirqus.Tests.MsSql;
 
 namespace d60.Cirqus.Tests.Integration
 {
@@ -43,17 +46,24 @@ namespace d60.Cirqus.Tests.Integration
                     return new InMemoryEventStore();
 
                 case EventStoreOption.MongoDb:
+                    MongoHelper.InitializeTestDatabase(true);
                     return new MongoDbEventStore(GetMongoDb(), "Events");
 
                 //Brett MsSql
-                //case EventStoreOption.SqlServer:
-                //    MsSqlTestHelper.EnsureTestDatabaseExists();
-                //    MsSqlTestHelper.DropTable("Events");
-                //    return new MsSqlEventStore(MsSqlTestHelper.ConnectionString, "Events");
+                case EventStoreOption.SqlServer:
+                    MsSqlTestHelper.EnsureTestDatabaseExists();
+                    MsSqlTestHelper.DropTable("Events");
+                    return new MsSqlEventStore(Configuration.Get(), MsSqlTestHelper.ConnectionString, "Events");
+
+                //Brett
+                case EventStoreOption.Postgres:
+                    PostgreSqlTestHelper.DropTable("Events");
+                    return new PostgreSqlEventStore(Configuration.Get(), PostgreSqlTestHelper.PostgreSqlConnectionString, "Events");
 
                 //case EventStoreOption.Postgres:
                 //    PostgreSqlTestHelper.DropTable("Events");
                 //    return new PostgreSqlEventStore(PostgreSqlTestHelper.PostgreSqlConnectionString, "Events");
+
 
                 default:
                     throw new ArgumentOutOfRangeException("eventStoreOption", "Unknown event store option");

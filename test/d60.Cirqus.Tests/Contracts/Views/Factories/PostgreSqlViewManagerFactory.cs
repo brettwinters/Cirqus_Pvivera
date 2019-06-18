@@ -17,6 +17,7 @@ namespace d60.Cirqus.Tests.Contracts.Views.Factories
         {
             var tableName = typeof(TViewInstance).Name;
 
+            //new PostgreSqlTestHelper(configuration.DropTable(tableName);
             PostgreSqlTestHelper.DropTable(tableName);
 
             return new PostgreSqlViewManager<TViewInstance>(_connectionString, tableName)

@@ -23,16 +23,14 @@ namespace d60.Cirqus.MongoDb.Events
         static readonly string GlobalSeqNoDocPath = string.Format("{0}.GlobalSequenceNumber", EventsDocPath);
         static readonly string AggregateRootIdDocPath = string.Format("{0}.AggregateRootId", EventsDocPath);
 
-        readonly IMongoCollection<MongoEventBatch> _eventBatches;
+        readonly MongoCollection<MongoEventBatch> _eventBatches;
 
-        public MongoDbEventStore(IMongoDatabase database, string eventCollectionName, bool automaticallyCreateIndexes = true)
+        public MongoDbEventStore(MongoDatabase database, string eventCollectionName, bool automaticallyCreateIndexes = true)
         {
             _eventBatches = database.GetCollection<MongoEventBatch>(eventCollectionName);
 
             if (automaticallyCreateIndexes)
             {
-                _eventBatches.Indexes.CreateOne(IndexKeys.Ascending(GlobalSeqNoDocPath));
-
                 _eventBatches.CreateIndex(IndexKeys.Ascending(GlobalSeqNoDocPath), IndexOptions.SetUnique(true).SetName(GlobalSeqUniquenessIndexName));
                 _eventBatches.CreateIndex(IndexKeys.Ascending(AggregateRootIdDocPath, SeqNoDocPath), IndexOptions.SetUnique(true).SetName(SeqUniquenessIndexName));
             }

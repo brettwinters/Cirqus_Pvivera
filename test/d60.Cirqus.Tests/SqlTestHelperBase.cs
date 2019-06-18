@@ -5,6 +5,18 @@ namespace d60.Cirqus.Tests
 {
     class SqlTestHelperBase
     {
+
+        //Brett copied from cirqus git
+        protected static string PossiblyAppendTeamcityAgentNumber(string databaseName) {
+            var teamCityAgentNumber = Environment.GetEnvironmentVariable("tcagent");
+            int number;
+
+            if (string.IsNullOrWhiteSpace(teamCityAgentNumber) || !int.TryParse(teamCityAgentNumber, out number))
+                return databaseName;
+
+            return $"{databaseName}_agent{number}";
+        }
+
         public static string GetDatabaseName(string connectionString)
         {
             var relevantSetting = connectionString

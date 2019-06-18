@@ -7,17 +7,22 @@ namespace d60.Cirqus.Tests.MsSql
 {
     class MsSqlTestHelper : SqlTestHelperBase
     {
-        private readonly IConfigurationRoot _configuration;
-        public static string TestDbName = "sqltestdb";
-
-        public MsSqlTestHelper(IConfigurationRoot configuration)
-        {
-            _configuration = configuration;
+        
+        static MsSqlTestHelper() {
+            _configuration = Configuration.Get();
         }
 
-        public string ConnectionString => _configuration.GetConnectionString(TestDbName);
+        private static IConfigurationRoot _configuration;
+        public static string TestDbName = "sqltestdb";
 
-        public void EnsureTestDatabaseExists()
+        //public MsSqlTestHelper(IConfigurationRoot configuration)
+        //{
+        //    _configuration = configuration;
+        //}
+
+        public static string ConnectionString => _configuration.GetConnectionString(TestDbName);
+
+        public static void EnsureTestDatabaseExists()
         {
             var databaseName = GetDatabaseName(ConnectionString);
             var masterConnectionString = ConnectionString.Replace(databaseName, "master");
@@ -51,7 +56,7 @@ END
             }
         }
 
-        public void DropTable(string tableName)
+        public static void DropTable(string tableName)
         {
             try
             {
@@ -81,5 +86,7 @@ END
                 throw;
             }
         }
+
+
     }
 }
