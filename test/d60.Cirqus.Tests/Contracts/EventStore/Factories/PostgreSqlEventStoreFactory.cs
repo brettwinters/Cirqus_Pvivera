@@ -21,7 +21,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore.Factories
             //_eventStore = new PostgreSqlEventStore(configuration, MsSqlTestHelper.TestDbName, "events");
             //_eventStore.DropEvents();
 
-            var helper = new PostgreSqlTestHelper(configuration);
+            //var helper = new PostgreSqlTestHelper(configuration);
             PostgreSqlTestHelper.DropTable("Events");
 
             //PostgreSqlTestHelper.DropTable("Events");

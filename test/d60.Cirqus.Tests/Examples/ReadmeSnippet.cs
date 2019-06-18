@@ -30,10 +30,10 @@ namespace d60.Cirqus.Tests.Examples
 
             var viewManager = new MsSqlViewManager<CounterView>(MsSqlTestHelper.ConnectionString, "counters", automaticallyCreateSchema: true);
 
-            var processor = CommandProcessor.With()
+            var processor = CreateCommandProcessor(config => config
                 .EventStore(e => e.UseSqlServer(MsSqlTestHelper.ConnectionString, "events", automaticallyCreateSchema: true))
                 .EventDispatcher(e => e.UseViewManagerEventDispatcher(viewManager))
-                .Create();
+            );
 
             RegisterForDisposal(processor);
 

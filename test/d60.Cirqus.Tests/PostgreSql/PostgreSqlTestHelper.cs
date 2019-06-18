@@ -35,9 +35,9 @@ namespace d60.Cirqus.Tests.PostgreSql
         public static string TestDbName = "postgresqltestdb";
 
         //Brett - copied from MsSqlTestHelper.cs
-        public PostgreSqlTestHelper(IConfigurationRoot configuration) {
-            _configuration = configuration;
-        }
+        //public PostgreSqlTestHelper(IConfigurationRoot configuration) {
+        //    _configuration = configuration;
+        //}
 
         //Brett - made instance method
         //public void DropTable(string tableName) {
@@ -112,9 +112,8 @@ namespace d60.Cirqus.Tests.PostgreSql
             }
         }
 
-        static string GetMasterConnectionString()
-        {
-            var connectionString = GetConnectionString();
+        static string GetMasterConnectionString() {
+            var connectionString = _configuration.GetConnectionString(TestDbName); // GetConnectionString();
 
             return GetConnectionStringForAnotherDatabase(connectionString, GetDatabaseName(connectionString), "postgres");
         }
@@ -152,9 +151,9 @@ namespace d60.Cirqus.Tests.PostgreSql
             return databaseNameToUse;
         }
 
-        static string GetConnectionString()
-        {
-            return SqlHelper.GetConnectionString("postgresqltestdb");
-        }
+        //static string GetConnectionString()
+        //{
+        //    return SqlHelper.GetConnectionString("postgresqltestdb");
+        //}
     }
 }

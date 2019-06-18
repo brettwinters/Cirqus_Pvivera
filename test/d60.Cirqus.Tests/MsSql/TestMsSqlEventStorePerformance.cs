@@ -24,9 +24,9 @@ namespace d60.Cirqus.Tests.MsSql
         {
             var configuration = Configuration.Get();
 
-            var helper = new MsSqlTestHelper(configuration);
+            //var helper = new MsSqlTestHelper(configuration);
 
-            helper.DropTable("Events");
+            MsSqlTestHelper.DropTable("Events");
 
             _eventStore = new MsSqlEventStore(configuration, MsSqlTestHelper.TestDbName, "Events");
 

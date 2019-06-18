@@ -7,13 +7,10 @@
 
   <ItemGroup>
     <Compile Remove="EntityFramework\**" />
-    <Compile Remove="Events\Ntfs\**" />
     <Compile Remove="MsSql\**" />
     <EmbeddedResource Remove="EntityFramework\**" />
-    <EmbeddedResource Remove="Events\Ntfs\**" />
     <EmbeddedResource Remove="MsSql\**" />
     <None Remove="EntityFramework\**" />
-    <None Remove="Events\Ntfs\**" />
     <None Remove="MsSql\**" />
   </ItemGroup>
 
@@ -21,11 +18,13 @@
     <Compile Remove="Contracts\EventStore\Factories\SQLiteEventStoreFactory .cs" />
     <Compile Remove="Contracts\Views\Factories\EntityFrameworkViewManagerFactory.cs" />
     <Compile Remove="Contracts\Views\Factories\HybridDbViewManagerFactory.cs" />
-    <Compile Remove="Examples\ReadmeSnippet.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="MsSql\MsSqlTestHelper.cs" />
+    <Compile Include="MsSql\TestMsSqlEventStorePerformance.cs" />
+    <Compile Include="MsSql\TestNewMsSqlViewManager.cs" />
+    <Compile Include="MsSql\TestNewMsSqlViewManager_AutomaticSchemaRegeneration.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,13 +44,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\d60.Cirqus.MongoDb\d60.Cirqus.MongoDb.csproj" />
+    <ProjectReference Include="..\..\src\d60.Cirqus.MSSql\d60.Cirqus.MSSql.csproj" />
+    <ProjectReference Include="..\..\src\d60.Cirqus.Ntfs\d60.Cirqus.Ntfs.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus.NUnit\d60.Cirqus.NUnit.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus.PostgreSql\d60.Cirqus.PostgreSql.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus\d60.Cirqus.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Examples\" />
   </ItemGroup>
 
   <ItemGroup>

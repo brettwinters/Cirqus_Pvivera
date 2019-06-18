@@ -23,15 +23,12 @@ namespace d60.Cirqus.Tests.MsSql
 
         protected override void DoSetUp()
         {
-            var configuration = Configuration.Get();
+            //var configuration = Configuration.Get();
 
-            var helper = new MsSqlTestHelper(configuration);
 
-            helper.EnsureTestDatabaseExists();
-
-            helper.DropTable("views");
-
-            _viewManager = new MsSqlViewManager<ViewInstanceWithManyPropertyTypes>(configuration, MsSqlTestHelper.TestDbName, "views");
+            MsSqlTestHelper.EnsureTestDatabaseExists();
+            MsSqlTestHelper.DropTable("views");
+            _viewManager = new MsSqlViewManager<ViewInstanceWithManyPropertyTypes>(MsSqlTestHelper.ConnectionString, MsSqlTestHelper.TestDbName, "views");
         }
 
         [Test]

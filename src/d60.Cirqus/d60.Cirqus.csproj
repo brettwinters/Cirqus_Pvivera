@@ -6,6 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MsSql\**" />
+    <Compile Remove="Ntfs\**" />
+    <EmbeddedResource Remove="MsSql\**" />
+    <EmbeddedResource Remove="Ntfs\**" />
+    <None Remove="MsSql\**" />
+    <None Remove="Ntfs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Config\Configurers\ViewManagerEventDispatcherConfiguationBuilder.cs" />
   </ItemGroup>
 
