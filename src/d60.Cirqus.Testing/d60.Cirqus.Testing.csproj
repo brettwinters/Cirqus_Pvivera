@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\d60.Cirqus.Identity\d60.Cirqus.Identity.csproj" />
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
   </ItemGroup>

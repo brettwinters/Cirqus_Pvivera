@@ -23,6 +23,20 @@ namespace d60.Cirqus.Views.ViewManagers
 
         long _position = -1;
 
+
+
+        public InMemoryViewManager() {
+            _views = new ConcurrentDictionary<string, TViewInstance>();
+        }
+
+        /// <summary>
+        /// Brett - Allow external store
+        /// </summary>
+        public InMemoryViewManager(ConcurrentDictionary<string, TViewInstance> viewStore) {
+            _views = viewStore;
+        }
+
+
         public override TViewInstance Load(string viewId)
         {
             TViewInstance instance;

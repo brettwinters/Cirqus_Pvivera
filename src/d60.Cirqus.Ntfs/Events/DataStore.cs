@@ -17,7 +17,7 @@ namespace d60.Cirqus.Ntfs.Events
     /// Enforces AggregateId/SequenceNumber uniqueness.
     /// Reading and writing can be done concurrently.
     /// </summary>
-    internal class DataStore
+    public class DataStore
     {
         readonly JsonSerializer _serializer;
         readonly string _dataDirectory;

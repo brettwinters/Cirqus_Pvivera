@@ -258,12 +258,15 @@ namespace d60.Cirqus.Tests.Testing
             var a = new InMemoryViewManager<ViewA>();
             var b = new InMemoryViewManager<ViewB>();
 
-            Configure(x => x.EventDispatcher(d => d
-                .UseSynchronousViewManangerEventDispatcher(a, b)
-                .WithViewContext(new Dictionary<string, object>
-                {
-                    {"Tag", new Tag()}
-                })));
+            Configure(x => x
+                .EventDispatcher(d => d
+                    .UseSynchronousViewManangerEventDispatcher(a, b)
+                    .WithViewContext(new Dictionary<string, object>
+                    {
+                        {"Tag", new Tag()}
+                    })
+                )
+            );
 
             Emit(NewId<RootA>(), new EventA1());
 

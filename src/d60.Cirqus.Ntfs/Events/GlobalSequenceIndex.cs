@@ -13,7 +13,7 @@ namespace d60.Cirqus.Ntfs.Events
     /// Writes a reference to each event with it's global sequence number and link to event file.
     /// Reading can be done concurrently. Writes/Recovers must be sequential.
     /// </summary>
-    internal class GlobalSequenceIndex : IDisposable
+    public class GlobalSequenceIndex : IDisposable
     {
         public const int SizeofSeqRecord = 8 + 1 + 255 + 8;
 

@@ -102,6 +102,7 @@ And we will repeat again here, at the bottom: There was never any problem. We we
                 .EventStore(e => e.Register(c => commandProcessingEventStore))
                 .EventDispatcher(ed => ed.UseViewManagerEventDispatcher(viewManagers))
                 
+                //Orig but my simple version also works..
                 //.EventDispatcher(e => e.Register(c => {
                 //    var aggregateRootRepository = (IAggregateRootRepository)c.GetService(typeof(IAggregateRootRepository));
                 //    var domainEventSerializer = (IDomainEventSerializer)c.GetService(typeof(IDomainEventSerializer));

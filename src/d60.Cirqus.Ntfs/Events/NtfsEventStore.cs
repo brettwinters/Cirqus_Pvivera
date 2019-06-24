@@ -20,7 +20,7 @@ namespace d60.Cirqus.Ntfs.Events
 
         public NtfsEventStore(string basePath) : this(basePath, dropEvents: false) {}
 
-        internal NtfsEventStore(string basePath, bool dropEvents)
+        public NtfsEventStore(string basePath, bool dropEvents)
         {
             Directory.CreateDirectory(basePath);
 
@@ -29,8 +29,8 @@ namespace d60.Cirqus.Ntfs.Events
             CommitLog = new CommitLog(basePath, dropEvents);
         }
 
-        internal GlobalSequenceIndex GlobalSequenceIndex { get; private set; }
-        internal DataStore DataStore { get; private set; }
+        public GlobalSequenceIndex GlobalSequenceIndex { get; private set; }
+        public DataStore DataStore { get; private set; }
         internal CommitLog CommitLog { get; private set; }
 
         public void Save(Guid batchId, IEnumerable<EventData> events)
@@ -81,7 +81,6 @@ namespace d60.Cirqus.Ntfs.Events
         
         public void Dispose()
         {
-
             GlobalSequenceIndex.Dispose();
             CommitLog.Dispose();
         }

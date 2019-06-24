@@ -37,6 +37,40 @@ namespace d60.Cirqus.Commands
         }
     }
 
+    /// <summary>
+    /// Composite command that allows for packing up multiple commands and have them executed in one single unit of work
+    /// </summary>
+    public class CompositeExecutableCommand : ExecutableCommand
+    {
+        public List<ExecutableCommand> Commands { get; set; }
+
+        public CompositeExecutableCommand(params ExecutableCommand[] commands) => Commands = commands.ToList();
+
+        public override void Execute(ICommandContext context) => Commands.ForEach(c => c.Execute(context));
+    }
+
+    //public class CompositeExecutableCommand<TAggregateRoot> : ExecutableCommand where TAggregateRoot : AggregateRoot, new()
+    //{
+    //    public List<ExecutableCommand> Commands { get; set; }
+
+    //    public CompositeExecutableCommand(params ExecutableCommand[] commands) {
+    //        Commands = commands.ToList();
+    //    }
+
+    //    public override void Execute(ICommandContext context) {
+    //        foreach (var command in Commands) {
+    //            switch (command) {
+    //                case Command<TAggregateRoot> aggregateCommand:
+    //                    aggregateCommand.Execute(context.Load<TAggregateRoot>(aggregateCommand.AggregateRootId));
+    //                    break;
+    //                case ExecutableCommand executable:
+    //                    executable.Execute(context);
+    //                    break;
+    //            }
+    //        }
+    //    }
+    //}
+
     public class CompositeCommand
     {
         public static CompositeCommandBuilder<TAggregateRoot> For<TAggregateRoot>()
@@ -60,5 +94,15 @@ namespace d60.Cirqus.Commands
         {
             return new CompositeCommand<TAggregateRoot>(builder._commands.ToArray());
         }
+    }
+
+    public class CompositeExecutableCommandBuilder
+    {
+        private readonly List<ExecutableCommand> _commands = new List<ExecutableCommand>();
+        public CompositeExecutableCommandBuilder With(ExecutableCommand command) {
+            _commands.Add(command);
+            return this;
+        }
+        public static implicit operator ExecutableCommand(CompositeExecutableCommandBuilder builder) => new CompositeExecutableCommand(builder._commands.ToArray());
     }
 }

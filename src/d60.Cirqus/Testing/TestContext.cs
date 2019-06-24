@@ -93,6 +93,9 @@ namespace d60.Cirqus.Testing
 
                 var result = new CommandProcessingResultWithEvents(eventsToReturn);
 
+                //brett
+                //_eventDispatcher.Dispatch(eventsToReturn);
+
                 if (!Asynchronous)
                 {
                     WaitForViewsToCatchUp();
