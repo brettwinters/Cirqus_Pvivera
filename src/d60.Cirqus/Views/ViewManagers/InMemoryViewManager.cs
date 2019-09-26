@@ -36,6 +36,10 @@ namespace d60.Cirqus.Views.ViewManagers
             _views = viewStore;
         }
 
+        //Brett
+        public IQueryable<TViewInstance> Views => _views.Values.AsQueryable();
+
+
 
         public override TViewInstance Load(string viewId)
         {

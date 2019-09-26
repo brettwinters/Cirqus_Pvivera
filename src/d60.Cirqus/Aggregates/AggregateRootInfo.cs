@@ -1,4 +1,5 @@
-﻿using d60.Cirqus.Events;
+﻿using d60.Cirqus.Commands;
+using d60.Cirqus.Events;
 using System.Collections.Generic;
 
 namespace d60.Cirqus.Aggregates
@@ -64,9 +65,13 @@ namespace d60.Cirqus.Aggregates
             Instance.UnitOfWork = unitOfWork;
         }
 
-        //Brett
-        public IUnitOfWork UnitOfWork => Instance.UnitOfWork;
+        
+        //public IUnitOfWork UnitOfWork => Instance.UnitOfWork;
 
+        /// <summary>
+        /// Brett : These are all the Committed Events which have been emitted for the for the Instance (AggregateRoot) and
+        /// have been retrieved from the EventStore
+        /// </summary>
         public IEnumerable<DomainEvent> GetEvents() {
             var uow = (Commands.RealUnitOfWork)Instance.UnitOfWork;
             return ((DefaultAggregateRootRepository)uow.Repository).GetEvents(Instance.Id);
@@ -77,8 +82,12 @@ namespace d60.Cirqus.Aggregates
             Instance.Emit<TAggregateRoot>(domainEvent);
         }
 
+        /// <summary>
+        /// Brett : These are all the Emitted Events for this Unit of Work. Multiple AggregateRoots may have emitted these events if a CompositeCommand is used which have 
+        /// not yet been committed to the event store.
+        /// </summary>
         public IEnumerable<DomainEvent> GetEmittedEvents() {
-            return ((Commands.RealUnitOfWork)Instance.UnitOfWork).EmittedEvents;
+            return ((RealUnitOfWork)Instance.UnitOfWork).EmittedEvents;
         }
 
 
