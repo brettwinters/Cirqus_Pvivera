@@ -77,7 +77,7 @@ namespace d60.Cirqus.Aggregates
             return ((DefaultAggregateRootRepository)uow.Repository).GetEvents(Instance.Id);
         }
 
-        //Brett
+        //Brett    
         public void Emit<TAggregateRoot>(DomainEvent<TAggregateRoot> domainEvent) where TAggregateRoot : AggregateRoot {
             Instance.Emit<TAggregateRoot>(domainEvent);
         }
