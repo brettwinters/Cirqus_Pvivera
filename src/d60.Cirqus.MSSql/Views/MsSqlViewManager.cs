@@ -12,7 +12,7 @@ using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
-using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.Configuration;
 
 namespace d60.Cirqus.MsSql.Views
 {
@@ -37,7 +37,11 @@ namespace d60.Cirqus.MsSql.Views
 
         long _cachedPosition;
 
-        public MsSqlViewManager(string connectionStringName,            string tableName, string positionTableName = null, bool automaticallyCreateSchema = true)
+        public MsSqlViewManager(
+            string connectionStringName,            
+            string tableName, 
+            string positionTableName = null, 
+            bool automaticallyCreateSchema = true)
         {
             _connectionString = connectionStringName; // configuration.GetConnectionString(connectionStringName);
             _tableName = tableName;

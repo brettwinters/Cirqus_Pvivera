@@ -2,7 +2,7 @@
 using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.PostgreSql.Events;
-using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.Configuration;
 using Npgsql;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,7 +27,7 @@ namespace d60.Cirqus.PostgreSql.Config
             //Brett
             builder.Register<IEventStore>(context =>
                 new PostgreSqlEventStore(
-                    configuration : context.GetService<IConfigurationRoot>(),
+                    //configuration : context.GetService<IConfigurationRoot>(),
                     connectionStringOrConnectionStringName,
                     tableName, 
                     automaticallyCreateSchema: automaticallyCreateSchema,

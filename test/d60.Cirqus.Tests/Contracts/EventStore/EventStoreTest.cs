@@ -24,8 +24,10 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
     [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     [TestFixture(typeof(NtfsEventStoreFactory))]
 //    [TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
-//    [TestFixture(typeof(CachedEventStoreFactory), Category = TestCategories.MongoDb, Description = "Uses MongoDB behind the scenes")]
-    public class EventStoreTest<TEventStoreFactory> : FixtureBase where TEventStoreFactory : IEventStoreFactory, new()
+    //[TestFixture(typeof(CachedEventStoreFactory), Category = TestCategories.MongoDb, Description = "Uses MongoDB behind the scenes")]
+    public class EventStoreTest<TEventStoreFactory> 
+        : FixtureBase where TEventStoreFactory 
+        : IEventStoreFactory, new()
     {
         TEventStoreFactory _eventStoreFactory;
         IEventStore _eventStore;
@@ -33,9 +35,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         protected override void DoSetUp()
         {
             _eventStoreFactory = new TEventStoreFactory();
-
             _eventStore = _eventStoreFactory.GetEventStore();
-
             if (_eventStore is IDisposable)
             {
                 RegisterForDisposal((IDisposable)_eventStore);

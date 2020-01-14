@@ -12,11 +12,13 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 {
     [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
     [TestFixture(typeof(InMemoryEventStoreFactory))]
-   // [TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     [TestFixture(typeof(NtfsEventStoreFactory))]
     //[TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
-    public class InsertPerfOverTime<TEventStoreFactory> : FixtureBase where TEventStoreFactory : IEventStoreFactory, new()
+    public class InsertPerfOverTime<TEventStoreFactory> 
+        : FixtureBase where TEventStoreFactory 
+        : IEventStoreFactory, new()
     {
         readonly Dictionary<Guid, long> _seqNoPerRoot = new Dictionary<Guid, long>();
         readonly Guid[] _aggregateRootIds = Enumerable.Range(0, 100).Select(n => Guid.NewGuid()).ToArray();
@@ -36,8 +38,10 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 
             _eventStore = _eventStoreFactory.GetEventStore();
 
-            if (_eventStore is IDisposable)
+            if(_eventStore is IDisposable)
+            {
                 RegisterForDisposal((IDisposable)_eventStore);
+            }
         }
 
         [TestCase(10, 10) ]

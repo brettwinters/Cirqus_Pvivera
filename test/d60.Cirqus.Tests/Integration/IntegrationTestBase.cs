@@ -51,11 +51,17 @@ namespace d60.Cirqus.Tests.Integration
                 case EventStoreOption.SqlServer:
                     MsSqlTestHelper.EnsureTestDatabaseExists();
                     MsSqlTestHelper.DropTable("Events");
-                    return new MsSqlEventStore(Configuration.Get(), MsSqlTestHelper.ConnectionString, "Events");
+                    return new MsSqlEventStore(
+                        //Configuration.Get(), 
+                        MsSqlTestHelper.ConnectionString, 
+                        "Events");
 
                 case EventStoreOption.Postgres:
                     PostgreSqlTestHelper.DropTable("Events");
-                    return new PostgreSqlEventStore(Configuration.Get(), PostgreSqlTestHelper.PostgreSqlConnectionString, "Events");
+                    return new PostgreSqlEventStore(
+                        //Configuration.Get(), 
+                        PostgreSqlTestHelper.PostgreSqlConnectionString, 
+                        "Events");
 
                 default:
                     throw new ArgumentOutOfRangeException("eventStoreOption", "Unknown event store option");

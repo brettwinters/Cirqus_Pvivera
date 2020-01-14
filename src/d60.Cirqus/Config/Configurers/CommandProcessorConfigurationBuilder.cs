@@ -90,7 +90,7 @@ namespace d60.Cirqus.Config.Configurers
             _services.AddScoped<IEventDispatcher, NullEventDispatcher>();
             _services.AddScoped<ICommandMapper, DefaultCommandMapper>();
             _services.AddScoped<IDomainTypeNameMapper, DefaultDomainTypeNameMapper>();
-            _services.AddScoped<IConnectionStringHelper, ConnectionStringHelper>();
+            //_services.AddScoped<IConnectionStringHelper, ConnectionStringHelper>();
         }
     }
 }

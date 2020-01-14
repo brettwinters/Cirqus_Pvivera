@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data;
 using System.Data.SqlClient;
@@ -22,11 +22,15 @@ namespace d60.Cirqus.MsSql.Events
         readonly Func<SqlConnection> _connectionProvider;
         readonly Action<SqlConnection> _cleanupAction;
 
-        public MsSqlEventStore(IConfigurationRoot configuration, string connectionStringOrConnectionStringName, string tableName, bool automaticallyCreateSchema = true)
+        public MsSqlEventStore(
+            //IConfigurationRoot configuration, 
+            string connectionStringOrConnectionStringName, 
+            string tableName,
+            bool automaticallyCreateSchema = true)
         {
             _tableName = tableName;
 
-            var connectionString = configuration.GetConnectionString(connectionStringOrConnectionStringName) ?? connectionStringOrConnectionStringName;
+            var connectionString = connectionStringOrConnectionStringName; // configuration.GetConnectionString(connectionStringOrConnectionStringName) ?? connectionStringOrConnectionStringName;
 
             _connectionProvider = () =>
             {

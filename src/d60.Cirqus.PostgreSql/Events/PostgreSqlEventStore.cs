@@ -8,7 +8,7 @@ using d60.Cirqus.Exceptions;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Numbers;
 using d60.Cirqus.Serialization;
-using Microsoft.Extensions.Configuration;
+//using Microsoft.Extensions.Configuration;
 using Npgsql;
 using NpgsqlTypes;
 
@@ -23,14 +23,14 @@ namespace d60.Cirqus.PostgreSql.Events
 
 
         public PostgreSqlEventStore(
-            IConfigurationRoot configuration, 
+            //IConfigurationRoot configuration, 
             string connectionStringOrConnectionStringName, 
             string tableName, 
             bool automaticallyCreateSchema = true, 
             Action<NpgsqlConnection> additionalConnectionSetup = null)
         {
             _tableName = tableName;
-            _connectionString = configuration.GetConnectionString(connectionStringOrConnectionStringName);
+            _connectionString = connectionStringOrConnectionStringName; // configuration.GetConnectionString(connectionStringOrConnectionStringName);
             //_connectionString = SqlHelper.GetConnectionString(connectionStringOrConnectionStringName);
 
             _additionalConnectionSetup = additionalConnectionSetup;
