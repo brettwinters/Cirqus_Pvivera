@@ -6,7 +6,9 @@ namespace d60.Cirqus.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddCirqus(this IServiceCollection services, Action<ILoggingAndEventStoreConfiguration> configure)
+        public static void AddCirqus(
+            this IServiceCollection services, 
+            Action<ILoggingAndEventStoreConfiguration> configure)
         {
             configure(new CommandProcessorConfigurationBuilder(services));
         }

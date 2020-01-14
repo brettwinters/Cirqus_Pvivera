@@ -22,7 +22,12 @@ namespace d60.Cirqus.PostgreSql.Events
         readonly MetadataSerializer _metadataSerializer = new MetadataSerializer();
 
 
-        public PostgreSqlEventStore(IConfigurationRoot configuration, string connectionStringOrConnectionStringName, string tableName, bool automaticallyCreateSchema = true, Action<NpgsqlConnection> additionalConnectionSetup = null)
+        public PostgreSqlEventStore(
+            IConfigurationRoot configuration, 
+            string connectionStringOrConnectionStringName, 
+            string tableName, 
+            bool automaticallyCreateSchema = true, 
+            Action<NpgsqlConnection> additionalConnectionSetup = null)
         {
             _tableName = tableName;
             _connectionString = configuration.GetConnectionString(connectionStringOrConnectionStringName);

@@ -56,7 +56,6 @@ namespace d60.Cirqus.Config.Configurers
         {
             Registrar.Register(serviceFactory);
         }
-
         /// <summary>
         /// Registers a specific instance (which by definition is not a decorator) for <typeparamref name="TService"/>
         /// </summary>

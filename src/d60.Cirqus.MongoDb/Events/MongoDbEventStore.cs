@@ -25,14 +25,19 @@ namespace d60.Cirqus.MongoDb.Events
 
         readonly MongoCollection<MongoEventBatch> _eventBatches;
 
-        public MongoDbEventStore(MongoDatabase database, string eventCollectionName, bool automaticallyCreateIndexes = true)
+        public MongoDbEventStore(
+            MongoDatabase database, 
+            string eventCollectionName, 
+            bool automaticallyCreateIndexes = true)
         {
             _eventBatches = database.GetCollection<MongoEventBatch>(eventCollectionName);
 
             if (automaticallyCreateIndexes)
             {
-                _eventBatches.CreateIndex(IndexKeys.Ascending(GlobalSeqNoDocPath), IndexOptions.SetUnique(true).SetName(GlobalSeqUniquenessIndexName));
-                _eventBatches.CreateIndex(IndexKeys.Ascending(AggregateRootIdDocPath, SeqNoDocPath), IndexOptions.SetUnique(true).SetName(SeqUniquenessIndexName));
+                _eventBatches.CreateIndex(IndexKeys.Ascending(GlobalSeqNoDocPath), 
+                    IndexOptions.SetUnique(true).SetName(GlobalSeqUniquenessIndexName));
+                _eventBatches.CreateIndex(IndexKeys.Ascending(AggregateRootIdDocPath, SeqNoDocPath), 
+                    IndexOptions.SetUnique(true).SetName(SeqUniquenessIndexName));
             }
         }
 

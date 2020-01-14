@@ -9,7 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Config.Configurers
 {
-    internal class CommandProcessorConfigurationBuilder : ILoggingAndEventStoreConfiguration, IOptionalConfiguration<ICommandProcessor>
+    internal class CommandProcessorConfigurationBuilder : 
+        ILoggingAndEventStoreConfiguration, 
+        IOptionalConfiguration<ICommandProcessor>
     {
         private readonly NewConfigurationContainer _newContainer;
         private readonly IServiceCollection _services;

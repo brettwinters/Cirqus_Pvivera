@@ -11,7 +11,10 @@ namespace d60.Cirqus.Tests.Extensions
 {
     public static class Helpful
     {
-        public static TAggregateRoot Get<TAggregateRoot>(this IAggregateRootRepository repo, string aggregateRootId) where TAggregateRoot : AggregateRoot, new()
+        public static TAggregateRoot Get<TAggregateRoot>(
+            this IAggregateRootRepository repo, 
+            string aggregateRootId) 
+            where TAggregateRoot : AggregateRoot, new()
         {
             var aggregateRoot = repo.Get<TAggregateRoot>(aggregateRootId, new InMemoryUnitOfWork(repo, new DefaultDomainTypeNameMapper()), createIfNotExists: true);
             return (TAggregateRoot)aggregateRoot;

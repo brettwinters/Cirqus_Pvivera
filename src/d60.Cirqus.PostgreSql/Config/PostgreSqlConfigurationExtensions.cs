@@ -4,7 +4,6 @@ using d60.Cirqus.Events;
 using d60.Cirqus.PostgreSql.Events;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.PostgreSql.Config
@@ -14,17 +13,27 @@ namespace d60.Cirqus.PostgreSql.Config
         /// <summary>
         /// Configures Cirqus to use Postgres as the event store
         /// </summary>
-        public static void UsePostgreSql(this EventStoreConfigurationBuilder builder, string connectionStringOrConnectionStringName, string tableName, bool automaticallyCreateSchema = true, Action<NpgsqlConnection> additionalConnectionSetup = null) {
+        public static void UsePostgreSql(
+            this EventStoreConfigurationBuilder builder, 
+            string connectionStringOrConnectionStringName, 
+            string tableName, 
+            bool automaticallyCreateSchema = true, 
+            Action<NpgsqlConnection> additionalConnectionSetup = null) 
+        {
             if (builder == null) throw new ArgumentNullException("builder");
             if (connectionStringOrConnectionStringName == null) throw new ArgumentNullException("connectionStringOrConnectionStringName");
             if (tableName == null) throw new ArgumentNullException("tableName");
 
             //Brett
-            builder.Register<IEventStore>(context => new PostgreSqlEventStore(
-                context.GetService<IConfigurationRoot>(),
-                connectionStringOrConnectionStringName,
-                tableName, automaticallyCreateSchema: automaticallyCreateSchema,
-                additionalConnectionSetup: additionalConnectionSetup));
+            builder.Register<IEventStore>(context =>
+                new PostgreSqlEventStore(
+                    configuration : context.GetService<IConfigurationRoot>(),
+                    connectionStringOrConnectionStringName,
+                    tableName, 
+                    automaticallyCreateSchema: automaticallyCreateSchema,
+                    additionalConnectionSetup: additionalConnectionSetup
+                )
+            );
 
             //builder.Register<IEventStore>(context => new PostgreSqlEventStore(connectionStringOrConnectionStringName, tableName, automaticallyCreateSchema: automaticallyCreateSchema, additionalConnectionSetup: additionalConnectionSetup));
         }
