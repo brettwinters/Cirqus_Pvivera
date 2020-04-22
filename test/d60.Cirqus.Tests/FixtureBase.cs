@@ -50,7 +50,8 @@ namespace d60.Cirqus.Tests
             return provider.GetService<ICommandProcessor>();
         }
 
-        protected Cirqus.Testing.TestContext CreateTestContext(Action<IOptionalConfiguration<Cirqus.Testing.TestContext>> configure = null)
+        protected Cirqus.Testing.TestContext CreateTestContext(
+            Action<IOptionalConfiguration<Cirqus.Testing.TestContext>> configure = null)
         {
             var services = new ServiceCollection();
             services.AddTestContext(configure);
@@ -93,7 +94,10 @@ namespace d60.Cirqus.Tests
 
         public delegate void TimerCallback(TimeSpan elapsedTotal);
 
-        protected void TakeTime(string description, Action action, TimerCallback periodicCallback = null)
+        protected void TakeTime(
+            string description, 
+            Action action, 
+            TimerCallback periodicCallback = null)
         {
             Console.WriteLine("Begin: {0}", description);
 

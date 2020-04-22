@@ -56,12 +56,12 @@ namespace d60.Cirqus.Views
         });
 
         /// <summary>
-        /// Use a concurrent queue to store views so that it's safe to traverse in the background even though new views may be added to it at runtime
+        /// Use a concurrent queue to store views so that it's safe to traverse in the background even though new views may 
+        /// be added to it at runtime
         /// </summary>
         readonly ConcurrentDictionary<IViewManager, object> _viewManagers = new ConcurrentDictionary<IViewManager, object>();
         readonly ConcurrentQueue<PieceOfWork> _work = new ConcurrentQueue<PieceOfWork>();
         readonly IDictionary<string, object> _viewContextItems = new Dictionary<string, object>();
-
         readonly IAggregateRootRepository _aggregateRootRepository;
         readonly IEventStore _eventStore;
         readonly IDomainEventSerializer _domainEventSerializer;
@@ -81,8 +81,12 @@ namespace d60.Cirqus.Views
         /// <summary>
         /// Constructs the event dispatcher
         /// </summary>
-        public ViewManagerEventDispatcher(IAggregateRootRepository aggregateRootRepository, IEventStore eventStore,
-            IDomainEventSerializer domainEventSerializer, IDomainTypeNameMapper domainTypeNameMapper, params IViewManager[] viewManagers)
+        public ViewManagerEventDispatcher(
+            IAggregateRootRepository aggregateRootRepository, 
+            IEventStore eventStore,
+            IDomainEventSerializer domainEventSerializer, 
+            IDomainTypeNameMapper domainTypeNameMapper, 
+            params IViewManager[] viewManagers)
         {
             if (aggregateRootRepository == null) throw new ArgumentNullException("aggregateRootRepository");
             if (eventStore == null) throw new ArgumentNullException("eventStore");

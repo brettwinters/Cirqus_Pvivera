@@ -17,7 +17,9 @@ namespace d60.Cirqus.Testing.Internals
 
         long _globalSequenceNumber;
 
-        public void Save(Guid batchId, IEnumerable<EventData> events)
+        public void Save(
+            Guid batchId, 
+            IEnumerable<EventData> events)
         {
             var batch = events.ToList();
 
@@ -65,7 +67,9 @@ namespace d60.Cirqus.Testing.Internals
             }
         }
 
-        public IEnumerable<EventData> Load(string aggregateRootId, long firstSeq = 0)
+        public IEnumerable<EventData> Load(
+            string aggregateRootId, 
+            long firstSeq = 0)
         {
             lock (_lock)
             {
@@ -85,7 +89,8 @@ namespace d60.Cirqus.Testing.Internals
             }
         }
 
-        public IEnumerable<EventData> Stream(long globalSequenceNumber = 0)
+        public IEnumerable<EventData> Stream(
+            long globalSequenceNumber = 0)
         {
             lock (_lock)
             {
@@ -108,7 +113,8 @@ namespace d60.Cirqus.Testing.Internals
             return _globalSequenceNumber;
         }
 
-        public long GetNextSeqNo(string aggregateRootId)
+        public long GetNextSeqNo(
+            string aggregateRootId)
         {
             lock (_lock)
             {

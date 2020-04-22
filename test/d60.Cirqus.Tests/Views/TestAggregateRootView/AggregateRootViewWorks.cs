@@ -25,10 +25,10 @@ namespace d60.Cirqus.Tests.Views.TestAggregateRootView
             _waitHandler = new ViewManagerWaitHandle();
 
             var services = new ServiceCollection();
-            services.AddCirqus(c =>
-                c.EventStore(e => e.UseInMemoryEventStore())
-                    .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager).WithWaitHandle(_waitHandler)));
-
+            services.AddCirqus(c =>                c
+                .EventStore(e => e.UseInMemoryEventStore())
+                .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager).WithWaitHandle(_waitHandler))
+            );
             var provider = services.BuildServiceProvider();
 
             _commandProcessor = provider.GetService<ICommandProcessor>();

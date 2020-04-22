@@ -14,7 +14,8 @@ namespace d60.Cirqus.Views.ViewManagers
     {
         readonly List<IAwaitableEventDispatcher> _dispatchers = new List<IAwaitableEventDispatcher>();
 
-        internal void Register(IAwaitableEventDispatcher dispatcher)
+        internal void Register(
+            IAwaitableEventDispatcher dispatcher)
         {
             _dispatchers.Add(dispatcher);
         }
@@ -24,7 +25,10 @@ namespace d60.Cirqus.Views.ViewManagers
         /// that generated the given <see cref="CommandProcessingResult"/>. If that does not happen before <seealso cref="timeout"/>
         /// has elapsed, a <see cref="TimeoutException"/> is thrown.
         /// </summary>
-        public async Task WaitFor<TViewInstance>(CommandProcessingResult result, TimeSpan timeout) where TViewInstance : IViewInstance
+        public async Task WaitFor<TViewInstance>(
+            CommandProcessingResult result, 
+            TimeSpan timeout) 
+            where TViewInstance : IViewInstance
         {
             var tasks = _dispatchers
                 .Select(d => d.WaitUntilProcessed<TViewInstance>(result, timeout))
@@ -38,7 +42,9 @@ namespace d60.Cirqus.Views.ViewManagers
         /// that generated the given <see cref="CommandProcessingResult"/>. If that does not happen before <seealso cref="timeout"/>
         /// has elapsed, a <see cref="TimeoutException"/> is thrown.
         /// </summary>
-        public async Task WaitForAll(CommandProcessingResult result, TimeSpan timeout)
+        public async Task WaitForAll(
+            CommandProcessingResult result, 
+            TimeSpan timeout)
         {
             var tasks = _dispatchers
                 .Select(d => d.WaitUntilProcessed(result, timeout))

@@ -15,12 +15,13 @@ namespace d60.Cirqus.Views.ViewManagers
     /// In-memory catch-up view manager that can be used when your command processing happens on multiple machines
     /// or if you want your in-mem views to be residing on another machine than the one that does the command processing.
     /// </summary>
-    public class InMemoryViewManager<TViewInstance> : AbstractViewManager<TViewInstance> where TViewInstance : class, IViewInstance, ISubscribeTo, new()
+    public class InMemoryViewManager<TViewInstance> 
+        : AbstractViewManager<TViewInstance> 
+            where TViewInstance : class, IViewInstance, ISubscribeTo, new()
     {
         readonly ConcurrentDictionary<string, TViewInstance> _views = new ConcurrentDictionary<string, TViewInstance>();
         readonly ViewDispatcherHelper<TViewInstance> _dispatcher = new ViewDispatcherHelper<TViewInstance>();
         readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
-
         long _position = -1;
 
 
@@ -30,15 +31,13 @@ namespace d60.Cirqus.Views.ViewManagers
         }
 
         /// <summary>
-        /// Brett - Allow external store
+        /// Use a ConcurrentDictionary<string, TViewInstance> as the store
         /// </summary>
-        public InMemoryViewManager(ConcurrentDictionary<string, TViewInstance> viewStore) {
+        public InMemoryViewManager(
+            ConcurrentDictionary<string, TViewInstance> viewStore)
+        {
             _views = viewStore;
         }
-
-        //Brett
-        public IQueryable<TViewInstance> Views => _views.Values.AsQueryable();
-
 
 
         public override TViewInstance Load(string viewId)
@@ -48,6 +47,11 @@ namespace d60.Cirqus.Views.ViewManagers
             return _views.TryGetValue(viewId, out instance)
                 ? instance
                 : null;
+        }
+
+        public ConcurrentDictionary<string, TViewInstance> LoadAll()
+        {
+            return _views;
         }
 
         public override void Delete(string viewId)

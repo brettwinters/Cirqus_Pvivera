@@ -14,20 +14,6 @@ namespace d60.Cirqus.Tests.PostgreSql
 
             _configuration = Configuration.Get();
 
-
-
-            // sorry - this no longer seems to work
-            return;
-
-            Console.WriteLine("Ensuring that Postgres test database exists");
-
-            var namesOfExistingDatabases = GetExistingDatabaseNames();
-            var nameOfTestDatabase = GetDatabaseName();
-
-            if (!namesOfExistingDatabases.Contains(nameOfTestDatabase))
-            {
-                CreateDatabase(nameOfTestDatabase);
-            }
         }
 
         //Brett

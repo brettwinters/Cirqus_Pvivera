@@ -33,7 +33,7 @@ namespace d60.Cirqus.PostgreSql.Views
             _tableName = tableName;
             _additionalConnectionSetup = additionalConnectionSetup;
             _positionTableName = positionTableName ?? _tableName + "_Position";
-            _connectionString = SqlHelper.GetConnectionString(connectionStringOrConnectionStringName);
+            _connectionString = connectionStringOrConnectionStringName; 
 
             if (automaticallyCreateSchema)
             {

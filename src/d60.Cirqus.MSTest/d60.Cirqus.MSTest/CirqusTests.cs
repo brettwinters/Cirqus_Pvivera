@@ -1,6 +1,7 @@
 ﻿using d60.Cirqus.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
+using System.Linq;
 using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace d60.Cirqus.MSTest
@@ -28,5 +29,13 @@ namespace d60.Cirqus.MSTest
 
         [DebuggerStepThrough]
         protected override void Fail() => Assert.Fail();
+
+        protected T FindAggregateRoot<T>(string id) where T : Aggregates.AggregateRoot
+        {
+            return Context.AggregateRoots.OfType<T>().SingleOrDefault(r => r.Id == id);
+        }
+
+
+
     }
 }

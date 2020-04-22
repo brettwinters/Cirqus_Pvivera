@@ -45,8 +45,12 @@ namespace d60.Cirqus
         readonly IDomainTypeNameMapper _domainTypeNameMapper;
 
         public CommandProcessor(
-            IEventStore eventStore, IAggregateRootRepository aggregateRootRepository, IEventDispatcher eventDispatcher,
-            IDomainEventSerializer domainEventSerializer, ICommandMapper commandMapper, IDomainTypeNameMapper domainTypeNameMapper,
+            IEventStore eventStore, 
+            IAggregateRootRepository aggregateRootRepository, 
+            IEventDispatcher eventDispatcher,
+            IDomainEventSerializer domainEventSerializer, 
+            ICommandMapper commandMapper, 
+            IDomainTypeNameMapper domainTypeNameMapper,
             Options options)
         {
             if (eventStore == null) throw new ArgumentNullException("eventStore");

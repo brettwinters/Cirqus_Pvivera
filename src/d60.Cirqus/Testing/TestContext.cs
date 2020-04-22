@@ -32,8 +32,13 @@ namespace d60.Cirqus.Testing
         DateTime _currentTime = DateTime.MinValue;
         bool _initialized;
 
-        internal TestContext(InMemoryEventStore eventStore, IAggregateRootRepository aggregateRootRepository, IEventDispatcher eventDispatcher,
-            IDomainEventSerializer domainEventSerializer, ICommandMapper commandMapper, IDomainTypeNameMapper domainTypeNameMapper)
+        internal TestContext(
+            InMemoryEventStore eventStore, 
+            IAggregateRootRepository aggregateRootRepository, 
+            IEventDispatcher eventDispatcher,
+            IDomainEventSerializer domainEventSerializer, 
+            ICommandMapper commandMapper, 
+            IDomainTypeNameMapper domainTypeNameMapper)
         {
             _eventStore = eventStore;
             _aggregateRootRepository = aggregateRootRepository;

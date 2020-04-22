@@ -27,7 +27,6 @@ namespace d60.Cirqus.PostgreSql.Config
             //Brett
             builder.Register<IEventStore>(context =>
                 new PostgreSqlEventStore(
-                    //configuration : context.GetService<IConfigurationRoot>(),
                     connectionStringOrConnectionStringName,
                     tableName, 
                     automaticallyCreateSchema: automaticallyCreateSchema,

@@ -24,7 +24,9 @@ namespace d60.Cirqus.Tests.Contracts.Views
     //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
     //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
-    public class DomainEventBatchDispatch<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
+    public class DomainEventBatchDispatch<TFactory> 
+        : FixtureBase where TFactory 
+        : AbstractViewManagerFactory, new()
     {
         TFactory _factory;
         ICommandProcessor _commandProcessor;

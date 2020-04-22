@@ -36,7 +36,8 @@ namespace d60.Cirqus.Config.Configurers
             return this;
         }
 
-        public IOptionalConfiguration<ICommandProcessor> AggregateRootRepository(Action<AggregateRootRepositoryConfigurationBuilder> configure)
+        public IOptionalConfiguration<ICommandProcessor> AggregateRootRepository(
+            Action<AggregateRootRepositoryConfigurationBuilder> configure)
         {
             configure(new AggregateRootRepositoryConfigurationBuilder(_newContainer));
             return this;
@@ -73,7 +74,14 @@ namespace d60.Cirqus.Config.Configurers
                     .ToList()
                     .ForEach(action => action(options));
 
-                var commandProcessor = new CommandProcessor(eventStore, aggregateRootRepository, eventDispatcher, serializer, commandMapper, domainTypeMapper, options);
+                var commandProcessor = new CommandProcessor(
+                    eventStore, 
+                    aggregateRootRepository, 
+                    eventDispatcher, 
+                    serializer, 
+                    commandMapper, 
+                    domainTypeMapper, 
+                    options);
 
                 commandProcessor.Initialize();
 
@@ -84,13 +92,13 @@ namespace d60.Cirqus.Config.Configurers
                 new DefaultAggregateRootRepository(
                     context.GetService<IEventStore>(),
                     context.GetService<IDomainEventSerializer>(),
-                    context.GetService<IDomainTypeNameMapper>()));
+                    context.GetService<IDomainTypeNameMapper>())
+            );
 
             _services.AddScoped<IDomainEventSerializer, JsonDomainEventSerializer>();
             _services.AddScoped<IEventDispatcher, NullEventDispatcher>();
             _services.AddScoped<ICommandMapper, DefaultCommandMapper>();
             _services.AddScoped<IDomainTypeNameMapper, DefaultDomainTypeNameMapper>();
-            //_services.AddScoped<IConnectionStringHelper, ConnectionStringHelper>();
         }
     }
 }

@@ -9,7 +9,9 @@ namespace d60.Cirqus.Views.ViewManagers
     /// <summary>
     /// Abstract base class with common functionality that has proven to be useful when you want to implement <see cref="IViewManager{TViewInstance}"/>
     /// </summary>
-    public abstract class AbstractViewManager<TViewInstance> : IViewManager<TViewInstance> where TViewInstance : class, IViewInstance, ISubscribeTo, new()
+    public abstract class AbstractViewManager<TViewInstance> 
+        : IViewManager<TViewInstance> 
+        where TViewInstance : class, IViewInstance, ISubscribeTo, new()
     {
         public async Task WaitUntilProcessed(CommandProcessingResult result, TimeSpan timeout)
         {
@@ -39,7 +41,10 @@ namespace d60.Cirqus.Views.ViewManagers
 
         public abstract Task<long> GetPosition(bool canGetFromCache = true);
 
-        public abstract void Dispatch(IViewContext viewContext, IEnumerable<DomainEvent> batch, IViewManagerProfiler viewManagerProfiler);
+        public abstract void Dispatch(
+            IViewContext viewContext, 
+            IEnumerable<DomainEvent> batch, 
+            IViewManagerProfiler viewManagerProfiler);
 
         public abstract void Purge();
 

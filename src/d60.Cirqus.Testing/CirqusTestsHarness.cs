@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.Testing
 {
+    [DebuggerStepThrough]
     public abstract class CirqusTestsHarness
     {
         protected const string checkmark = "\u221A";
@@ -38,7 +39,7 @@ namespace d60.Cirqus.Testing
             Configure();
         }
 
-        [DebuggerStepThrough]
+
         protected void End(bool isInExceptionalState) {
             // only if we are _not_ in an exceptional state
             if (!isInExceptionalState) {
@@ -59,7 +60,7 @@ namespace d60.Cirqus.Testing
 
         #region Given
 
-        [DebuggerStepThrough]
+
         protected void Given(params ExecutableCommand[] commands) {
             foreach (var command in commands) {
                 Context.ProcessCommand(command);
@@ -82,7 +83,7 @@ namespace d60.Cirqus.Testing
             }
         }
 
-        [DebuggerStepThrough]
+
         private void Emit<T>(string id, DomainEvent @event) {
             @event.Meta[DomainEvent.MetadataKeys.AggregateRootId] = id;
 
@@ -104,7 +105,7 @@ namespace d60.Cirqus.Testing
         }
         #endregion
 
-        [DebuggerStepThrough]
+
         protected void When(ExecutableCommand command) {
             BeforeExecute(command);
 
@@ -118,7 +119,7 @@ namespace d60.Cirqus.Testing
         #region Throws
 
         // ReSharper disable once InconsistentNaming
-        [DebuggerStepThrough]
+
         protected void Throws<T>(ExecutableCommand When) where T : Exception {
             Exception exceptionThrown = null;
             try {
@@ -148,7 +149,7 @@ namespace d60.Cirqus.Testing
         }
 
         // ReSharper disable once InconsistentNaming
-        [DebuggerStepThrough]
+
         protected void Throws<T>(string message, ExecutableCommand When) where T : Exception {
             Exception exceptionThrown = null;
 
@@ -182,7 +183,7 @@ namespace d60.Cirqus.Testing
         }
         #endregion
 
-        [DebuggerStepThrough]
+
         protected void Then<T>() where T : DomainEvent {
             if (results == null) {
                 results = Context.History.Where(x => !arrangedEvents.Contains(x.GetGlobalSequenceNumber()));
@@ -201,13 +202,13 @@ namespace d60.Cirqus.Testing
             results = results.Skip(1);
         }
 
-        [DebuggerStepThrough]
+
         protected void Then<T>(params DomainEvent[] events) where T : class => Then(Latest<T>(), events);
 
-        [DebuggerStepThrough]
+
         protected void Then<T>(Id<T> id, params DomainEvent[] events) => Then((string)id, events);
 
-        [DebuggerStepThrough]
+
         protected void Then(string id, params DomainEvent[] events) {
             if (events.Length == 0) return;
 
@@ -269,17 +270,17 @@ namespace d60.Cirqus.Testing
         /// Only matches the properties that are provided, otherwise just compares the default values. At the moment the writer
         /// does not ignore. We should adjust the writer later
         /// </summary>
-        [DebuggerStepThrough]
+
         protected void Then(string id, bool exactMatch, params DomainEvent[] events) => ThenAssert(id, exactMatch, events);
 
         /// <summary>
         /// Only matches the properties that are provided, otherwise just compares the default values. At the moment the writer
         /// does not ignore. We should adjust the writer later
         /// </summary>
-        [DebuggerStepThrough]
+
         protected void Then<T>(bool exactMatch, params DomainEvent[] events) where T : class => ThenAssert(Latest<T>(), exactMatch, events);
 
-        [DebuggerStepThrough]
+
         private void ThenAssert(string id, bool matchExact = true, params DomainEvent[] events) {
             if (events.Length == 0) return;
 
@@ -400,10 +401,10 @@ namespace d60.Cirqus.Testing
 
         #endregion
 
-        [DebuggerStepThrough]
+
         protected void ThenNothing() => ThenNo<DomainEvent>();
 
-        [DebuggerStepThrough]
+
         protected void ThenNo<T>() where T : DomainEvent {
             formatter.Block("Then:");
 
@@ -424,17 +425,17 @@ namespace d60.Cirqus.Testing
             results = Enumerable.Empty<DomainEvent>();
         }
 
-        [DebuggerStepThrough]
+
         protected Id<T> NewId<T>(params object[] args) where T : class {
             var id = GenerateId<T>(args);
             TryRegisterId<T>(id);
             return id;
         }
 
-        [DebuggerStepThrough]
+
         protected Id<T> Id<T>() where T : class => Id<T>(1);
 
-        [DebuggerStepThrough]
+
         protected Id<T> Id<T>(int index) where T : class {
             var array = ids.Where(x => x.Item1 == typeof(T)).Reverse().ToArray();
             if (array.Length < index) {
@@ -444,15 +445,17 @@ namespace d60.Cirqus.Testing
             return Identity.Id<T>.Parse(array[index - 1].Item2);
         }
 
-        [DebuggerStepThrough]
+
         protected Id<T> Latest<T>() where T : class {
             if (!TryGetLatest(out Id<T> id))
+            {
                 throw new InvalidOperationException(string.Format("Can not get latest {0} id, since none exists.", typeof(T).Name));
+            }
 
             return id;
         }
 
-        [DebuggerStepThrough]
+
         protected bool TryGetLatest<T>(out Id<T> latest) where T : class {
             var lastestOfType = ids.FirstOrDefault(x => x.Item1 == typeof(T));
 
@@ -465,10 +468,10 @@ namespace d60.Cirqus.Testing
             return true;
         }
 
-        [DebuggerStepThrough]
+
         protected virtual Id<T> GenerateId<T>(params object[] args) where T : class => Identity.Id<T>.New(args);
 
-        [DebuggerStepThrough]
+
         private void TryRegisterId<T>(string id) {
             var candidate = ids.SingleOrDefault(x => x.Item1.IsAssignableFrom(typeof(T)) && x.Item2 == id);
 
@@ -486,7 +489,7 @@ namespace d60.Cirqus.Testing
             }
         }
 
-        [DebuggerStepThrough]
+
         private void AssertAllEventsExpected() {
             if (results != null && results.Any()) {
                 Assert(false, () => formatter.Write("Expects no more events").NewLine(), () => {
@@ -499,7 +502,7 @@ namespace d60.Cirqus.Testing
             }
         }
 
-        [DebuggerStepThrough]
+
         private void Assert(bool condition, Action writeExpected, Action onFail) {
             if (condition) {
                 formatter.Write(checkmark + " ").Indent();

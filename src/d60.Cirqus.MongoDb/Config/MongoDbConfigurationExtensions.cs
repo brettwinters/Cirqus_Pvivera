@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.Logging;
@@ -155,8 +154,9 @@ namespace d60.Cirqus.MongoDb.Config
 
             if (string.IsNullOrEmpty(mongoUrl.DatabaseName))
             {
-                throw new ConfigurationErrorsException(
-                    "Please supply a database name as part of the MongoDB connection string!");
+                throw new MongoException("Please supply a database name as part of the MongoDB connection string!");
+                //throw new ConfigurationErrorsException(
+                //    "Please supply a database name as part of the MongoDB connection string!");
             }
 
             return mongoUrl;

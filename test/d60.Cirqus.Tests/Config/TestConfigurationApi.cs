@@ -188,7 +188,7 @@ namespace d60.Cirqus.Tests.Config
 
         [Test]
         public void CanDecorateAggregateRootRepositoryForTestContext() {
-            var decorated = true;
+            var decorated = false;
 
             //Brett
             CreateTestContext(config => config

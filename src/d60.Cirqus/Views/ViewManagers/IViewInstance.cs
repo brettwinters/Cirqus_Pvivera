@@ -17,7 +17,7 @@ namespace d60.Cirqus.Views.ViewManagers
         
         /// <summary>
         /// Holds the last global sequence number of the most recent <see cref="DomainEvent"/> that this view instance has handled. This
-        /// is used to make each view instance idempotent, so that event dispatch to individual views ise guaranteed to happen exactly
+        /// is used to make each view instance idempotent, so that event dispatch to individual views is guaranteed to happen exactly
         /// once
         /// </summary>
         long LastGlobalSequenceNumber { get; set; }
