@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 

@@ -9,7 +9,6 @@ using d60.Cirqus.Logging;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers;
-using d60.Cirqus.Views.ViewManagers.Locators;
 
 namespace d60.Cirqus.Testing
 {

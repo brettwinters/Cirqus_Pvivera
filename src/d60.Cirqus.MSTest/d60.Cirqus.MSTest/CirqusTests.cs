@@ -6,6 +6,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace d60.Cirqus.MSTest
 {
+	[DebuggerStepThrough]
     public class CirqusTests : CirqusTestsHarness
     {
         public TestContext TestContext { get; protected set; }
@@ -16,7 +17,7 @@ namespace d60.Cirqus.MSTest
             Setup();
         }
 
-        [DebuggerStepThrough]
+        
         protected virtual void Setup() { }
 
         [TestCleanup]
@@ -27,15 +28,12 @@ namespace d60.Cirqus.MSTest
 
         protected virtual void Teardown() {        }
 
-        [DebuggerStepThrough]
+        [DebuggerHidden]
         protected override void Fail() => Assert.Fail();
 
         protected T FindAggregateRoot<T>(string id) where T : Aggregates.AggregateRoot
         {
             return Context.AggregateRoots.OfType<T>().SingleOrDefault(r => r.Id == id);
         }
-
-
-
     }
 }

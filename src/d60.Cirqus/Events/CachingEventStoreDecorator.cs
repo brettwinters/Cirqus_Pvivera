@@ -142,7 +142,7 @@ namespace d60.Cirqus.Events
                 _currentlyTrimmingCache = true;
             }
 
-            // _currentlyTrimmingCache is set to false again in the finally clause
+            // _currentlyTrimmingCache is set to false again in the finally snippet
             try
             {
                 if (_eventsPerGlobalSequenceNumber.Count <= _maxCacheEntries) return;

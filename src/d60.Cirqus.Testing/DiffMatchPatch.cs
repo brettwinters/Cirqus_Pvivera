@@ -49,7 +49,7 @@ namespace EnergyProjects.Tests.Utils
         }
     }
 
-    /**-
+    /*-
      * The data structure representing a diff is a List of Diff objects:
      * {Diff(Operation.DELETE, "Hello"), Diff(Operation.INSERT, "Goodbye"),
      *  Diff(Operation.EQUAL, " world.")}
@@ -61,7 +61,7 @@ namespace EnergyProjects.Tests.Utils
     }
 
 
-    /**
+    /*
      * Class representing one diff operation.
      */
     public class Diff
@@ -71,7 +71,7 @@ namespace EnergyProjects.Tests.Utils
         public string text;
         // The text associated with this diff operation.
 
-        /**
+        /*
          * Constructor.  Initializes the diff with the provided values.
          * @param operation One of INSERT, DELETE or EQUAL.
          * @param text The text being applied.
@@ -83,7 +83,7 @@ namespace EnergyProjects.Tests.Utils
             this.text = text;
         }
 
-        /**
+        /*
          * Display a human-readable version of this Diff.
          * @return text version.
          */
@@ -93,7 +93,7 @@ namespace EnergyProjects.Tests.Utils
             return "Diff(" + this.operation + ",\"" + prettyText + "\")";
         }
 
-        /**
+        /*
          * Is this Diff equivalent to another Diff?
          * @param d Another Diff to compare against.
          * @return true or false.
@@ -136,7 +136,7 @@ namespace EnergyProjects.Tests.Utils
     }
 
 
-    /**
+    /*
      * Class representing one patch operation.
      */
     public class Patch
@@ -147,7 +147,7 @@ namespace EnergyProjects.Tests.Utils
         public int length1;
         public int length2;
 
-        /**
+        /*
          * Emmulate GNU diff's format.
          * Header: @@ -382,8 +481,9 @@
          * Indicies are printed as 1-based, not 0-based.
@@ -209,7 +209,7 @@ namespace EnergyProjects.Tests.Utils
     }
 
 
-    /**
+    /*
      * Class containing the diff, match and patch methods.
      * Also Contains the behaviour settings.
      */
@@ -243,7 +243,7 @@ namespace EnergyProjects.Tests.Utils
         //  DIFF FUNCTIONS
 
 
-        /**
+        /*
          * Find the differences between two texts.
          * Run a faster, slightly less optimal diff.
          * This method allows the 'checklines' of diff_main() to be optional.
@@ -257,7 +257,7 @@ namespace EnergyProjects.Tests.Utils
             return diff_main(text1, text2, true);
         }
 
-        /**
+        /*
          * Find the differences between two texts.
          * @param text1 Old string to be diffed.
          * @param text2 New string to be diffed.
@@ -282,7 +282,7 @@ namespace EnergyProjects.Tests.Utils
             return diff_main(text1, text2, checklines, deadline);
         }
 
-        /**
+        /*
          * Find the differences between two texts.  Simplifies the problem by
          * stripping any common prefix or suffix off the texts before diffing.
          * @param text1 Old string to be diffed.
@@ -341,7 +341,7 @@ namespace EnergyProjects.Tests.Utils
             return diffs;
         }
 
-        /**
+        /*
          * Find the differences between two texts.  Assumes that the texts do not
          * have any common prefix or suffix.
          * @param text1 Old string to be diffed.
@@ -422,7 +422,7 @@ namespace EnergyProjects.Tests.Utils
             return diff_bisect(text1, text2, deadline);
         }
 
-        /**
+        /*
          * Do a quick line-level diff on both strings, then rediff the parts for
          * greater accuracy.
          * This speedup can produce non-minimal diffs.
@@ -493,7 +493,7 @@ namespace EnergyProjects.Tests.Utils
             return diffs;
         }
 
-        /**
+        /*
          * Find the 'middle snake' of a diff, split the problem in two
          * and return the recursively constructed diff.
          * See Myers 1986 paper: An O(ND) Difference Algorithm and Its Variations.
@@ -643,7 +643,7 @@ namespace EnergyProjects.Tests.Utils
             return diffs;
         }
 
-        /**
+        /*
          * Given the location of the 'middle snake', split the diff in two parts
          * and recurse.
          * @param text1 Old string to be diffed.
@@ -669,7 +669,7 @@ namespace EnergyProjects.Tests.Utils
             return diffs;
         }
 
-        /**
+        /*
          * Split two texts into a list of strings.  Reduce the texts to a string of
          * hashes where each Unicode character represents one line.
          * @param text1 First string.
@@ -694,7 +694,7 @@ namespace EnergyProjects.Tests.Utils
             return new Object[] { chars1, chars2, lineArray };
         }
 
-        /**
+        /*
          * Split a text into a list of strings.  Reduce the texts to a string of
          * hashes where each Unicode character represents one line.
          * @param text String to encode.
@@ -736,7 +736,7 @@ namespace EnergyProjects.Tests.Utils
             return chars.ToString();
         }
 
-        /**
+        /*
          * Rehydrate the text in a diff from a string of line hashes to real lines
          * of text.
          * @param diffs List of Diff objects.
@@ -757,7 +757,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Determine the common prefix of two strings.
          * @param text1 First string.
          * @param text2 Second string.
@@ -777,7 +777,7 @@ namespace EnergyProjects.Tests.Utils
             return n;
         }
 
-        /**
+        /*
          * Determine the common suffix of two strings.
          * @param text1 First string.
          * @param text2 Second string.
@@ -799,7 +799,7 @@ namespace EnergyProjects.Tests.Utils
             return n;
         }
 
-        /**
+        /*
          * Determine if the suffix of one string is the prefix of another.
          * @param text1 First string.
          * @param text2 Second string.
@@ -855,7 +855,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Do the two texts share a Substring which is at least half the length of
          * the longer text?
          * This speedup can produce non-minimal diffs.
@@ -917,7 +917,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Does a Substring of shorttext exist within longtext such that the
          * Substring is at least half the length of longtext?
          * @param longtext Longer string.
@@ -963,7 +963,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Reduce the number of edits by eliminating semantically trivial
          * equalities.
          * @param diffs List of Diff objects.
@@ -1094,7 +1094,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Look for single edits surrounded on both sides by equalities
          * which can be shifted sideways to align the edit to a word boundary.
          * e.g: The c<ins>at c</ins>ame. -> The <ins>cat </ins>came.
@@ -1178,7 +1178,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Given two strings, comAdde a score representing whether the internal
          * boundary falls on logical boundaries.
          * Scores range from 6 (best) to 0 (worst).
@@ -1242,7 +1242,7 @@ namespace EnergyProjects.Tests.Utils
         private Regex BLANKLINEEND = new Regex("\\n\\r?\\n\\Z");
         private Regex BLANKLINESTART = new Regex("\\A\\r?\\n\\r?\\n");
 
-        /**
+        /*
          * Reduce the number of edits by eliminating operationally trivial
          * equalities.
          * @param diffs List of Diff objects.
@@ -1343,7 +1343,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Reorder and merge like edit sections.  Merge equalities.
          * Any edit section can move as long as it doesn't cross an equality.
          * @param diffs List of Diff objects.
@@ -1501,7 +1501,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * loc is a location in text1, comAdde and return the equivalent location in
          * text2.
          * e.g. "The cat" vs "The big cat", 1->1, 5->8
@@ -1546,7 +1546,7 @@ namespace EnergyProjects.Tests.Utils
             return last_chars2 + (loc - last_chars1);
         }
 
-        /**
+        /*
          * Convert a Diff list into a pretty HTML report.
          * @param diffs List of Diff objects.
          * @return HTML representation.
@@ -1576,7 +1576,7 @@ namespace EnergyProjects.Tests.Utils
             return html.ToString();
         }
 
-        /**
+        /*
          * Compute and return the source text (all equalities and deletions).
          * @param diffs List of Diff objects.
          * @return Source text.
@@ -1594,7 +1594,7 @@ namespace EnergyProjects.Tests.Utils
             return text.ToString();
         }
 
-        /**
+        /*
          * Compute and return the destination text (all equalities and insertions).
          * @param diffs List of Diff objects.
          * @return Destination text.
@@ -1612,7 +1612,7 @@ namespace EnergyProjects.Tests.Utils
             return text.ToString();
         }
 
-        /**
+        /*
          * Compute the Levenshtein distance; the number of inserted, deleted or
          * substituted characters.
          * @param diffs List of Diff objects.
@@ -1645,7 +1645,7 @@ namespace EnergyProjects.Tests.Utils
             return levenshtein;
         }
 
-        /**
+        /*
          * Crush the diff into an encoded string which describes the operations
          * required to transform text1 into text2.
          * E.g. =3\t-2\t+ing  -> Keep 3 chars, delete 2 chars, insert 'ing'.
@@ -1683,7 +1683,7 @@ namespace EnergyProjects.Tests.Utils
             return delta;
         }
 
-        /**
+        /*
          * Given the original text1, and an encoded string which describes the
          * operations required to transform text1 into text2, comAdde the full diff.
          * @param text1 Source string for the diff.
@@ -1781,7 +1781,7 @@ namespace EnergyProjects.Tests.Utils
         //  MATCH FUNCTIONS
 
 
-        /**
+        /*
          * Locate the best instance of 'pattern' in 'text' near 'loc'.
          * Returns -1 if no match found.
          * @param text The text to search.
@@ -1817,7 +1817,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Locate the best instance of 'pattern' in 'text' near 'loc' using the
          * Bitap algorithm.  Returns -1 if no match found.
          * @param text The text to search.
@@ -1943,7 +1943,7 @@ namespace EnergyProjects.Tests.Utils
             return best_loc;
         }
 
-        /**
+        /*
          * Compute and return the score for a match with e errors and x location.
          * @param e Number of errors in match.
          * @param x Location of match.
@@ -1963,7 +1963,7 @@ namespace EnergyProjects.Tests.Utils
             return accuracy + (proximity / (float)Match_Distance);
         }
 
-        /**
+        /*
          * Initialise the alphabet for the Bitap algorithm.
          * @param pattern The text to encode.
          * @return Hash of character locations.
@@ -1993,7 +1993,7 @@ namespace EnergyProjects.Tests.Utils
         //  PATCH FUNCTIONS
 
 
-        /**
+        /*
          * Increase the context until it is unique,
          * but don't let the pattern expand beyond Match_MaxBits.
          * @param patch The patch to grow.
@@ -2044,7 +2044,7 @@ namespace EnergyProjects.Tests.Utils
             patch.length2 += prefix.Length + suffix.Length;
         }
 
-        /**
+        /*
          * Compute a list of patches to turn text1 into text2.
          * A set of diffs will be computed.
          * @param text1 Old text.
@@ -2064,7 +2064,7 @@ namespace EnergyProjects.Tests.Utils
             return patch_make(text1, diffs);
         }
 
-        /**
+        /*
          * Compute a list of patches to turn text1 into text2.
          * text1 will be derived from the provided diffs.
          * @param diffs Array of Diff objects for text1 to text2.
@@ -2078,7 +2078,7 @@ namespace EnergyProjects.Tests.Utils
             return patch_make(text1, diffs);
         }
 
-        /**
+        /*
          * Compute a list of patches to turn text1 into text2.
          * text2 is ignored, diffs are the delta between text1 and text2.
          * @param text1 Old text
@@ -2093,7 +2093,7 @@ namespace EnergyProjects.Tests.Utils
             return patch_make(text1, diffs);
         }
 
-        /**
+        /*
          * Compute a list of patches to turn text1 into text2.
          * text2 is not provided, diffs are the delta between text1 and text2.
          * @param text1 Old text.
@@ -2187,7 +2187,7 @@ namespace EnergyProjects.Tests.Utils
             return patches;
         }
 
-        /**
+        /*
          * Given an array of patches, return another array that is identical.
          * @param patches Array of Patch objects.
          * @return Array of Patch objects.
@@ -2212,7 +2212,7 @@ namespace EnergyProjects.Tests.Utils
             return patchesCopy;
         }
 
-        /**
+        /*
          * Merge a set of patches onto the text.  Return a patched text, as well
          * as an array of true/false values indicating which patches were applied.
          * @param patches Array of Patch objects
@@ -2347,7 +2347,7 @@ namespace EnergyProjects.Tests.Utils
             return new Object[] { text, results };
         }
 
-        /**
+        /*
          * Add some padding on text start and end so that edges can match something.
          * Intended to be called only from within patch_apply.
          * @param patches Array of Patch objects.
@@ -2417,7 +2417,7 @@ namespace EnergyProjects.Tests.Utils
             return nullPadding;
         }
 
-        /**
+        /*
          * Look through the patches and break up any which are longer than the
          * maximum limit of the match algorithm.
          * Intended to be called only from within patch_apply.
@@ -2543,7 +2543,7 @@ namespace EnergyProjects.Tests.Utils
             }
         }
 
-        /**
+        /*
          * Take a list of patches and return a textual representation.
          * @param patches List of Patch objects.
          * @return Text representation of patches.
@@ -2558,7 +2558,7 @@ namespace EnergyProjects.Tests.Utils
             return text.ToString();
         }
 
-        /**
+        /*
          * Parse a textual representation of patches and return a List of Patch
          * objects.
          * @param textline Text representation of patches.
@@ -2670,7 +2670,7 @@ namespace EnergyProjects.Tests.Utils
             return patches;
         }
 
-        /**
+        /*
          * Unescape selected chars for compatability with JavaScript's encodeURI.
          * In speed critical applications this could be dropped since the
          * receiving application will certainly decode these fine.

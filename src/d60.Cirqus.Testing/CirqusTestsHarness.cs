@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -29,7 +30,8 @@ namespace d60.Cirqus.Testing
         protected Action<DomainEvent> AfterEmit = x => { };
         protected Action<Command> BeforeExecute = x => { };
 
-        protected void Begin(IWriter writer) {
+        protected void Begin(IWriter writer)
+        {
             ids = new Stack<Tuple<Type, string>>();
             arrangedEvents = new List<long>();
             results = null;
@@ -40,14 +42,18 @@ namespace d60.Cirqus.Testing
         }
 
 
-        protected void End(bool isInExceptionalState) {
+        protected void End(bool isInExceptionalState)
+        {
             // only if we are _not_ in an exceptional state
-            if (!isInExceptionalState) {
+            if (!isInExceptionalState)
+            {
                 AssertAllEventsExpected();
             }
         }
 
-        protected void Configure(Action<IOptionalConfiguration<TestContext>> configurator = null) {
+        protected void Configure(
+            Action<IOptionalConfiguration<TestContext>> configurator = null)
+        {
             var services = new ServiceCollection();
             services.AddTestContext(configurator);
 
@@ -61,8 +67,10 @@ namespace d60.Cirqus.Testing
         #region Given
 
 
-        protected void Given(params ExecutableCommand[] commands) {
-            foreach (var command in commands) {
+        protected void Given(params ExecutableCommand[] commands)
+        {
+            foreach (var command in commands)
+            {
                 Context.ProcessCommand(command);
 
                 //formatter
@@ -77,14 +85,17 @@ namespace d60.Cirqus.Testing
 
         protected void Emit<T>(Id<T> id, params DomainEvent[] events) => Emit<T>((string)id, events);
 
-        protected void Emit<T>(string id, params DomainEvent[] events) {
-            foreach (var @event in events) {
+        protected void Emit<T>(string id, params DomainEvent[] events)
+        {
+            foreach (var @event in events)
+            {
                 Emit<T>(id, @event);
             }
         }
 
 
-        private void Emit<T>(string id, DomainEvent @event) {
+        private void Emit<T>(string id, DomainEvent @event)
+        {
             @event.Meta[DomainEvent.MetadataKeys.AggregateRootId] = id;
 
             BeforeEmit(@event);
@@ -106,7 +117,8 @@ namespace d60.Cirqus.Testing
         #endregion
 
 
-        protected void When(ExecutableCommand command) {
+        protected void When(ExecutableCommand command)
+        {
             BeforeExecute(command);
 
             formatter
@@ -120,12 +132,15 @@ namespace d60.Cirqus.Testing
 
         // ReSharper disable once InconsistentNaming
 
-        protected void Throws<T>(ExecutableCommand When) where T : Exception {
+        protected void Throws<T>(ExecutableCommand When) where T : Exception
+        {
             Exception exceptionThrown = null;
-            try {
+            try
+            {
                 this.When(When);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 exceptionThrown = e;
             }
 
@@ -134,8 +149,10 @@ namespace d60.Cirqus.Testing
             Assert(
                 exceptionThrown is T,
                 () => formatter.Write("It throws " + typeof(T).Name).NewLine(),
-                () => {
-                    if (exceptionThrown == null) {
+                () =>
+                {
+                    if (exceptionThrown == null)
+                    {
                         formatter.Write("But it did not.");
                         return;
                     }
@@ -150,13 +167,16 @@ namespace d60.Cirqus.Testing
 
         // ReSharper disable once InconsistentNaming
 
-        protected void Throws<T>(string message, ExecutableCommand When) where T : Exception {
+        protected void Throws<T>(string message, ExecutableCommand When) where T : Exception
+        {
             Exception exceptionThrown = null;
 
-            try {
+            try
+            {
                 this.When(When);
             }
-            catch (Exception e) {
+            catch (Exception e)
+            {
                 exceptionThrown = e;
             }
 
@@ -168,8 +188,10 @@ namespace d60.Cirqus.Testing
                     .Write("It throws " + typeof(T).Name).NewLine()
                     .Indent().Write("Message: \"" + message + "\"").Unindent()
                     .NewLine(),
-                () => {
-                    if (exceptionThrown == null) {
+                () =>
+                {
+                    if (exceptionThrown == null)
+                    {
                         formatter.Write("But it did not.");
                         return;
                     }
@@ -184,8 +206,10 @@ namespace d60.Cirqus.Testing
         #endregion
 
 
-        protected void Then<T>() where T : DomainEvent {
-            if (results == null) {
+        protected void Then<T>() where T : DomainEvent
+        {
+            if (results == null)
+            {
                 results = Context.History.Where(x => !arrangedEvents.Contains(x.GetGlobalSequenceNumber()));
             }
 
@@ -209,19 +233,23 @@ namespace d60.Cirqus.Testing
         protected void Then<T>(Id<T> id, params DomainEvent[] events) => Then((string)id, events);
 
 
-        protected void Then(string id, params DomainEvent[] events) {
+        protected void Then(string id, params DomainEvent[] events)
+        {
             if (events.Length == 0) return;
 
             formatter.Block("Then:");
 
-            foreach (var expected in events) {
-                if (results == null) {
+            foreach (var expected in events)
+            {
+                if (results == null)
+                {
                     results = Context.History.Where(x => !arrangedEvents.Contains(x.GetGlobalSequenceNumber()));
                 }
 
                 var actual = results.FirstOrDefault();
 
-                if (actual == null) {
+                if (actual == null)
+                {
                     Assert(false,
                         () => formatter.Write(expected, new EventFormatter(formatter)).NewLine(),
                         () => formatter.Block("But we got nothing."));
@@ -239,7 +267,8 @@ namespace d60.Cirqus.Testing
                     actual.GetType() == expected.GetType() &&
                     jActual.Data.SequenceEqual(jExpected.Data),
                     () => formatter.Write(expected, new EventFormatter(formatter)).NewLine(),
-                    () => {
+                    () =>
+                    {
                         formatter.Block("But we got this:")
                             .Indent().Write(actual, new EventFormatter(formatter)).Unindent()
                             .EndBlock();
@@ -281,19 +310,23 @@ namespace d60.Cirqus.Testing
         protected void Then<T>(bool exactMatch, params DomainEvent[] events) where T : class => ThenAssert(Latest<T>(), exactMatch, events);
 
 
-        private void ThenAssert(string id, bool matchExact = true, params DomainEvent[] events) {
+        private void ThenAssert(string id, bool matchExact = true, params DomainEvent[] events)
+        {
             if (events.Length == 0) return;
 
             formatter.Block("Then:");
 
-            foreach (var expected in events) {
-                if (results == null) {
+            foreach (var expected in events)
+            {
+                if (results == null)
+                {
                     results = Context.History.Where(x => !arrangedEvents.Contains(x.GetGlobalSequenceNumber()));
                 }
 
                 var actual = results.FirstOrDefault();
 
-                if (actual == null) {
+                if (actual == null)
+                {
                     Assert(false,
                         () => formatter.Write(expected, new EventFormatter(formatter)).NewLine(),
                         () => formatter.Block("But we got nothing."));
@@ -303,27 +336,36 @@ namespace d60.Cirqus.Testing
 
                 expected.Meta[DomainEvent.MetadataKeys.AggregateRootId] = id;
 
-                if (!matchExact) {
-                    RemoveNotProvidedPropertiesInExpectedFromActual();
+                // hack to workaround an ignore functionality since i have no idea how the SequenceEqual of the 
+                // binary data works
+                //var ignoredValues = Enumerable.Empty<string>();
+                if (!matchExact)
+                {
+                    var ignoredValues = OverwriteExpectedWithActualValueIfNotSpecified();
+                    if (ignoredValues.Any())
+                    {
+                        formatter.Indent().Block($"Ignored : {string.Join(", ", ignoredValues)}").Unindent();
+                    }
                 }
 
                 var jActual = Context.EventSerializer.Serialize(actual);
                 var jExpected = Context.EventSerializer.Serialize(expected);
 
                 Assert(
-                    actual.GetAggregateRootId().Equals(id) && actual.GetType() == expected.GetType() && jActual.Data.SequenceEqual(jExpected.Data),
-                    () => formatter.Write(expected, new EventFormatter(formatter)).NewLine(),
-                    () => {
+                    condition: actual.GetAggregateRootId().Equals(id) && actual.GetType() == expected.GetType() && jActual.Data.SequenceEqual(jExpected.Data),
+                    writeExpected: () => formatter.Write(obj: expected, formatter: new EventFormatter(formatter)).NewLine(),
+                    onFail: () =>
+                    {
                         formatter.Block("But we got this:")
-                            .Indent().Write(actual, new EventFormatter(formatter)).Unindent()
+                            .Indent().Write(obj: actual, formatter: new EventFormatter(formatter)).Unindent()
                             .EndBlock();
 
                         if (!jActual.IsJson() || !jExpected.IsJson()) return;
 
                         var differ = new Differ();
                         var diffs = differ.LineByLine(
-                            Encoding.UTF8.GetString(jActual.Data),
-                            Encoding.UTF8.GetString(jExpected.Data));
+                            text1: Encoding.UTF8.GetString(jActual.Data),
+                            text2: Encoding.UTF8.GetString(jExpected.Data));
 
                         var diff = differ.PrettyLineByLine(diffs);
 
@@ -331,35 +373,69 @@ namespace d60.Cirqus.Testing
                             .NewLine().NewLine()
                             .Write("Diff:").NewLine()
                             .Write(diff).NewLine();
-                    });
+                    }
+                );
 
                 // consume events
                 results = results.Skip(1);
+                
 
+                #region
+                
+                // When the expected is not specified, then it's equal to the default value.
+                // and then its not specified, we set the expected equal to the actual value
+                // (as though it was set)
+                IEnumerable<string> OverwriteExpectedWithActualValueIfNotSpecified()
+                {
+                    var ignored = new List<string>();
+                    foreach (var expectedProperty in expected.GetType().GetProperties())
+                    {
+                        if (IsExpectedNotSetByUser())
+                        {
+                            var actualProperty = TypeDescriptor.GetProperties(actual)[expectedProperty.Name];
 
-
-                #region Local Functions
-
-                void RemoveNotProvidedPropertiesInExpectedFromActual() {
-                    var expectedProperties = expected.GetType().GetProperties();
-                    foreach (var expectedProperty in expectedProperties) {
-                        if (IsExpectedValueIgnored(out var defaultValue)) {
-                            SetActualValueToDefaultValue();
-                        }
-
-                        bool IsExpectedValueIgnored(out object dv) {
-                            dv = GetDefault(expectedProperty.PropertyType);
-                            var actualExpectedValue = expectedProperty.GetValue(expected);
-                            return object.Equals(actualExpectedValue, dv);
-                        }
-
-                        void SetActualValueToDefaultValue() {
-                            var test = System.ComponentModel.TypeDescriptor.GetProperties(actual)[expectedProperty.Name];
-                            if (test != null) { //if types not same
-                                test.SetValue(actual, defaultValue);
+                            // If the actual property is not found in the expected object then no need
+                            // to ignore. Just skip
+                            if (actualProperty != null)
+                            {
+	                             actualProperty.SetValue(expected, actualProperty.GetValue(actual));
+	                             ignored.Add(expectedProperty.Name);
                             }
+                           
                         }
+                        
+                        #region
+
+                        // The expected value is not set by the user when its value equals the default value
+                        bool IsExpectedNotSetByUser()
+                        {
+                            var defaultValue = GetDefault(expectedProperty.PropertyType);
+                            var actualValue = expectedProperty.GetValue(expected);
+
+                            // we need to handle strings a bit differently because default(string) == null, but 
+                            // the Event might have a non-nullable string (in this case default == "")
+                            if (expectedProperty.PropertyType == typeof(string))
+                            {
+                                if (string.IsNullOrEmpty(defaultValue?.ToString()) && string.IsNullOrEmpty(actualValue?.ToString()))
+                                {
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                if (object.Equals(actualValue, defaultValue))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                        
+                        #endregion
                     }
+
+                    return ignored;
                 }
 
                 #endregion
@@ -368,7 +444,15 @@ namespace d60.Cirqus.Testing
 
         private static T GetDefault<T>() => (T)GetDefault(typeof(T));
 
-        private static object GetDefault(Type type) {
+
+
+
+        private static object GetDefault(Type type)
+        {
+
+
+
+
             // If no Type was supplied, if the Type was a reference type, or if the Type was a System.Void, return null
             if (type == null || !type.IsValueType || type == typeof(void))
                 return null;
@@ -381,11 +465,14 @@ namespace d60.Cirqus.Testing
 
             // If the Type is a primitive type, or if it is another publicly-visible value type (i.e. struct), return a 
             //  default instance of the value type
-            if (type.IsPrimitive || !type.IsNotPublic) {
-                try {
+            if (type.IsPrimitive || !type.IsNotPublic)
+            {
+                try
+                {
                     return Activator.CreateInstance(type);
                 }
-                catch (Exception e) {
+                catch (Exception e)
+                {
                     throw new ArgumentException(
                         "{" + MethodInfo.GetCurrentMethod() + "} Error:\n\nThe Activator.CreateInstance method could not " +
                         "create a default instance of the supplied value type <" + type +
@@ -401,11 +488,11 @@ namespace d60.Cirqus.Testing
 
         #endregion
 
-
         protected void ThenNothing() => ThenNo<DomainEvent>();
 
 
-        protected void ThenNo<T>() where T : DomainEvent {
+        protected void ThenNo<T>() where T : DomainEvent
+        {
             formatter.Block("Then:");
 
             var eventsOfType = results.OfType<T>().ToList();
@@ -413,9 +500,11 @@ namespace d60.Cirqus.Testing
             Assert(
                 !eventsOfType.Any(),
                 () => formatter.Write(string.Format("No {0} is emitted", typeof(T).Name)),
-                () => {
+                () =>
+                {
                     formatter.Block("But we got this:");
-                    foreach (var @event in eventsOfType) {
+                    foreach (var @event in eventsOfType)
+                    {
                         formatter.Write(@event, new EventFormatter(formatter)).NewLine();
                     }
                     formatter.EndBlock();
@@ -425,28 +514,28 @@ namespace d60.Cirqus.Testing
             results = Enumerable.Empty<DomainEvent>();
         }
 
-
-        protected Id<T> NewId<T>(params object[] args) where T : class {
+        protected Id<T> NewId<T>(params object[] args) where T : class
+        {
             var id = GenerateId<T>(args);
             TryRegisterId<T>(id);
             return id;
         }
 
-
         protected Id<T> Id<T>() where T : class => Id<T>(1);
 
-
-        protected Id<T> Id<T>(int index) where T : class {
+        protected Id<T> Id<T>(int index) where T : class
+        {
             var array = ids.Where(x => x.Item1 == typeof(T)).Reverse().ToArray();
-            if (array.Length < index) {
+            if (array.Length < index)
+            {
                 throw new IndexOutOfRangeException(string.Format("Could not find Id<{0}> with index {1}", typeof(T).Name, index));
             }
 
             return Identity.Id<T>.Parse(array[index - 1].Item2);
         }
 
-
-        protected Id<T> Latest<T>() where T : class {
+        protected Id<T> Latest<T>() where T : class
+        {
             if (!TryGetLatest(out Id<T> id))
             {
                 throw new InvalidOperationException(string.Format("Can not get latest {0} id, since none exists.", typeof(T).Name));
@@ -455,11 +544,12 @@ namespace d60.Cirqus.Testing
             return id;
         }
 
-
-        protected bool TryGetLatest<T>(out Id<T> latest) where T : class {
+        protected bool TryGetLatest<T>(out Id<T> latest) where T : class
+        {
             var lastestOfType = ids.FirstOrDefault(x => x.Item1 == typeof(T));
 
-            if (lastestOfType == null) {
+            if (lastestOfType == null)
+            {
                 latest = default(Id<T>);
                 return false;
             }
@@ -468,33 +558,37 @@ namespace d60.Cirqus.Testing
             return true;
         }
 
-
         protected virtual Id<T> GenerateId<T>(params object[] args) where T : class => Identity.Id<T>.New(args);
 
-
-        private void TryRegisterId<T>(string id) {
+        private void TryRegisterId<T>(string id)
+        {
             var candidate = ids.SingleOrDefault(x => x.Item1.IsAssignableFrom(typeof(T)) && x.Item2 == id);
 
             var newId = Tuple.Create(typeof(T), id);
 
-            if (candidate == null) {
+            if (candidate == null)
+            {
                 ids.Push(newId);
                 return;
             }
 
-            if (!newId.Item1.IsAssignableFrom(candidate.Item1)) {
+            if (!newId.Item1.IsAssignableFrom(candidate.Item1))
+            {
                 throw new InvalidOperationException(string.Format(
                     "You tried to register a new id '{0}' for type '{1}', but the id already exist and is for non-compatible type '{2}'",
                     id, newId.Item1, candidate.Item1));
             }
         }
 
-
-        private void AssertAllEventsExpected() {
-            if (results != null && results.Any()) {
-                Assert(false, () => formatter.Write("Expects no more events").NewLine(), () => {
+        private void AssertAllEventsExpected()
+        {
+            if (results != null && results.Any())
+            {
+                Assert(false, () => formatter.Write("Expects no more events").NewLine(), () =>
+                {
                     formatter.Write("But found:").NewLine().Indent();
-                    foreach (var @event in results) {
+                    foreach (var @event in results)
+                    {
                         formatter.Write(@event, new EventFormatter(formatter));
                     }
                     formatter.Unindent();
@@ -502,14 +596,17 @@ namespace d60.Cirqus.Testing
             }
         }
 
-
-        private void Assert(bool condition, Action writeExpected, Action onFail) {
-            if (condition) {
+        [DebuggerHidden]
+        private void Assert(bool condition, Action writeExpected, Action onFail)
+        {
+            if (condition)
+            {
                 formatter.Write(checkmark + " ").Indent();
                 writeExpected();
                 formatter.Unindent().NewLine();
             }
-            else {
+            else
+            {
                 formatter.Write(cross + " ").Indent();
                 writeExpected();
                 formatter.Unindent().NewLine();
