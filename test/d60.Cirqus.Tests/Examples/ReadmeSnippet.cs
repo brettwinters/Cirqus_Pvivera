@@ -7,33 +7,41 @@ using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.MsSql.Config;
 using d60.Cirqus.MsSql.Views;
+using d60.Cirqus.Tests.Contracts.EventStore.Factories;
+using d60.Cirqus.Tests.Contracts.Views.Factories;
+using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.MsSql;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Examples
-{
-    [TestFixture]
-    public class ReadmeSnippet : FixtureBase
+{    
+    [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
+    [TestFixture(typeof(InMemoryViewManagerFactory))]
+    //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    [TestFixture(typeof(NtfsEventStoreFactory))]
+    public class ViewProfiling<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
+        TFactory _factory;
+
         protected override void DoSetUp()
         {
-            MsSqlTestHelper.EnsureTestDatabaseExists();
+            _factory = new TFactory();
         }
 
         [Test]
         public void TheSnippet()
         {
-            MsSqlTestHelper.DropTable("events");
-            MsSqlTestHelper.DropTable("counters");
 
-            var viewManager = new MsSqlViewManager<CounterView>(MsSqlTestHelper.ConnectionString, "counters", automaticallyCreateSchema: true);
+            var viewManager = _factory.GetViewManager<CounterView>();
 
             var processor = CreateCommandProcessor(config => config
-                .EventStore(e => e.UseSqlServer(MsSqlTestHelper.ConnectionString, "events", automaticallyCreateSchema: true))
-                .EventDispatcher(e => e.UseViewManagerEventDispatcher(viewManager))
-            );
+                           .EventStore(e => e.UseInMemoryEventStore())
+                           .EventDispatcher(e => e.UseViewManagerEventDispatcher(viewManager)));
 
             RegisterForDisposal(processor);
 
@@ -130,5 +138,4 @@ namespace d60.Cirqus.Tests.Examples
             }
         }
     }
-
 }

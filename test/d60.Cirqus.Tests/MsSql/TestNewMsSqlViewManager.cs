@@ -6,6 +6,7 @@ using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.MsSql.Views;
 using d60.Cirqus.Numbers;
+using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Stubs;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers;
@@ -14,21 +15,24 @@ using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.MsSql
 {
-    [TestFixture]
-    public class TestNewMsSqlViewManager : FixtureBase
+    [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    [TestFixture(typeof(InMemoryViewManagerFactory))]
+    //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql, Ignore = true, IgnoreReason = "The contained HashSet<string> cannot be persisted by EF")]
+    //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    public class TestNewViewManager<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
+        TFactory _factory;
+        private IViewManager<ViewInstanceWithManyPropertyTypes> _viewManager;
         static readonly Guid SomeKnownGuid = new Guid("2EBD4883-7DC9-44B0-9D6A-49581315404D");
-
-        MsSqlViewManager<ViewInstanceWithManyPropertyTypes> _viewManager;
 
         protected override void DoSetUp()
         {
-            //var configuration = Configuration.Get();
+            
+            _factory = RegisterForDisposal(new TFactory());
 
-
-            MsSqlTestHelper.EnsureTestDatabaseExists();
-            MsSqlTestHelper.DropTable("views");
-            _viewManager = new MsSqlViewManager<ViewInstanceWithManyPropertyTypes>(MsSqlTestHelper.ConnectionString, MsSqlTestHelper.TestDbName, "views");
+            _viewManager = _factory.GetViewManager<ViewInstanceWithManyPropertyTypes>();
         }
 
         [Test]

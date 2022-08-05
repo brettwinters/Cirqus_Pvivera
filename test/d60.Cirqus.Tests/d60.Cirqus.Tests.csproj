@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Contracts\EventStore\CachedEventStoreFactory.cs" />
     <Compile Include="Contracts\EventStore\EventStoreTest.cs" />
     <Compile Include="Contracts\EventStore\Factories\InMemoryEventStoreFactory.cs" />
     <Compile Include="Contracts\EventStore\Factories\MongoDbEventStoreFactory.cs" />

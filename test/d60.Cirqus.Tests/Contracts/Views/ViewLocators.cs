@@ -1,5 +1,6 @@
 ﻿using System;
 using d60.Cirqus.Testing;
+using d60.Cirqus.Tests.Contracts.EventStore.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Models.ViewLocators;
 using d60.Cirqus.Views.ViewManagers;
@@ -10,11 +11,12 @@ using TestContext = d60.Cirqus.Testing.TestContext;
 namespace d60.Cirqus.Tests.Contracts.Views
 {
     [TestFixture(typeof(MongoDbViewManagerFactory), Category = TestCategories.MongoDb)]
-    [TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlViewManagerFactory), Category = TestCategories.PostgreSql)]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
     //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
+    [TestFixture(typeof(NtfsEventStoreFactory))]
     public class ViewLocators<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         TFactory _factory;

@@ -7,28 +7,39 @@ using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.MsSql.Events;
 using d60.Cirqus.Numbers;
+using d60.Cirqus.Tests.Contracts.EventStore;
+using d60.Cirqus.Tests.Contracts.EventStore.Factories;
+using d60.Cirqus.Tests.Contracts.Views.Factories;
 //using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
-namespace d60.Cirqus.Tests.MsSql
+namespace d60.Cirqus.Tests.Contracts.EventStore
 {
-    [TestFixture]
-    public class TestMsSqlEventStorePerformance : FixtureBase
+    [TestFixture(typeof(MongoDbEventStoreFactory), Category = TestCategories.MongoDb)]
+    [TestFixture(typeof(InMemoryEventStoreFactory))]
+    //[TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
+    //[TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
+    [TestFixture(typeof(NtfsEventStoreFactory))]
+    //[TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
+    //[TestFixture(typeof(CachedEventStoreFactory), Category = TestCategories.MongoDb, Description = "Uses MongoDB behind the scenes")]
+    public class TestEventStorePerformance<TEventStoreFactory>
+        : FixtureBase where TEventStoreFactory
+        : IEventStoreFactory, new()
     {
-        MsSqlEventStore _eventStore;
-
         readonly Random _random = new Random(DateTime.Now.GetHashCode());
         int _globalSequenceNumber;
+        private IEventStore _eventStore;
 
         protected override void DoSetUp()
         {
-            var configuration = Configuration.Get();
-            var connectionString = MsSqlTestHelper.ConnectionString;
+            var eventStoreFactory = new TEventStoreFactory();
 
-            MsSqlTestHelper.DropTable("Events");
+            _eventStore = eventStoreFactory.GetEventStore();
 
-            _eventStore = new MsSqlEventStore(connectionString, "Events");
-            _globalSequenceNumber = 0;
+            if (_eventStore is IDisposable)
+            {
+                RegisterForDisposal((IDisposable)_eventStore);
+            }
         }
 
         [TestCase(10000)]
