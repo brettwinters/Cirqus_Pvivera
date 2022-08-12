@@ -394,12 +394,20 @@ namespace d60.Cirqus.Testing
                         {
                             var actualProperty = TypeDescriptor.GetProperties(actual)[expectedProperty.Name];
 
-                            // If the actual property is not found in the expected object then no need
-                            // to ignore. Just skip
+                            // If the actual property is not found in the expected object or we can't
+                            // set the actual property value then just skip
                             if (actualProperty != null)
                             {
-	                             actualProperty.SetValue(expected, actualProperty.GetValue(actual));
-	                             ignored.Add(expectedProperty.Name);
+	                            try
+	                            {
+		                            actualProperty.SetValue(expected, actualProperty.GetValue(actual));
+		                            ignored.Add(expectedProperty.Name);
+	                            }
+	                            catch
+	                            {
+		                           //ignore
+	                            }
+	                             
                             }
                            
                         }
