@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+<!--    <TargetFramework>netstandard2.0</TargetFramework>-->
+    <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
@@ -13,15 +14,13 @@
     <None Remove="MsSql\**" />
     <None Remove="Ntfs\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="Config\Configurers\ViewManagerEventDispatcherConfiguationBuilder.cs" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Scrutor" Version="3.2.1" />
+    <PackageReference Include="Scrutor" Version="4.2.0" />
   </ItemGroup>
 
 </Project>

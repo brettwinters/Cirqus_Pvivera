@@ -34,7 +34,7 @@ namespace d60.Cirqus.Tests.Aggregates
                 
             RegisterForDisposal(_commandProcessor);
         }
-
+ 
         [Test]
         public void CanLoadAggregateRootAsInterfaceWhenItExistsAlready()
         {

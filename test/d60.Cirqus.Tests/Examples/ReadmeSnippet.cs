@@ -23,7 +23,7 @@ namespace d60.Cirqus.Tests.Examples
     //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     [TestFixture(typeof(InMemoryViewManagerFactory))]
     //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(NtfsEventStoreFactory))]
+    //[TestFixture(typeof(NtfsEventStoreFactory))]
     public class ViewProfiling<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
         TFactory _factory;

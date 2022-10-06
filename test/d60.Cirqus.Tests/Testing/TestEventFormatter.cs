@@ -43,7 +43,7 @@ namespace d60.Cirqus.Tests.Testing
             textFormatter.NewLine();
 
             //Brett
-            var test = $"SomeEvent{Environment.NewLine}  NoHayBanda: llorando{Environment.NewLine}  OleOgLone: 2{Environment.NewLine}";
+            var test = $"SomeEvent\r\n  NoHayBanda: llorando\r\n  OleOgLone: 2\r\n";
             Assert.AreEqual(test, writer.Buffer);
 
             //            Assert.AreEqual(@"SomeEvent

@@ -14,7 +14,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
     [TestFixture(typeof(InMemoryViewManagerFactory))]
     //[TestFixture(typeof(EntityFrameworkViewManagerFactory), Category = TestCategories.MsSql)]
     //[TestFixture(typeof(HybridDbViewManagerFactory), Category = TestCategories.MsSql)]
-    [TestFixture(typeof(NtfsEventStoreFactory))]
+    //[TestFixture(typeof(NtfsEventStoreFactory))]
     [Description("View managers must raise the Updated event whenever a view instance is updated")]
     public class UpdatedEvent<TFactory> : FixtureBase where TFactory : AbstractViewManagerFactory, new()
     {
