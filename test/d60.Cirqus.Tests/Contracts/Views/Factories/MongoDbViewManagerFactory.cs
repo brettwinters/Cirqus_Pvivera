@@ -7,7 +7,7 @@ namespace d60.Cirqus.Tests.Contracts.Views.Factories
 {
     public class MongoDbViewManagerFactory : AbstractViewManagerFactory
     {
-        readonly MongoDatabase _database;
+        readonly IMongoDatabase _database;
 
         public MongoDbViewManagerFactory()
         {

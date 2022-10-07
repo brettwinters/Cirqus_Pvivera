@@ -12,7 +12,6 @@ using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.MongoDb.Views;
 using d60.Cirqus.Numbers;
 using d60.Cirqus.Serialization;
-using d60.Cirqus.Snapshotting;
 using d60.Cirqus.Snapshotting.New;
 using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Tests.Snapshotting.Models;
@@ -25,7 +24,7 @@ namespace d60.Cirqus.Tests.Snapshotting
     [TestFixture, Category(TestCategories.MongoDb)]
     public class TestNewNewSnapshotting : FixtureBase
     {
-        MongoDatabase _database;
+        IMongoDatabase _database;
 
         protected override void DoSetUp()
         {
@@ -35,7 +34,9 @@ namespace d60.Cirqus.Tests.Snapshotting
 
         [TestCase(false, 1000)]
         [TestCase(true, 1000)]
-        public void RunCommandProcessingTest(bool enableSnapshotting, int numberOfCommandsToProcess)
+        public void RunCommandProcessingTest(
+	        bool enableSnapshotting, 
+	        int numberOfCommandsToProcess)
         {
             var handleTimes = new ConcurrentQueue<DispatchStats>();
             var viewManager = CreateViewManager();
@@ -195,8 +196,7 @@ namespace d60.Cirqus.Tests.Snapshotting
                 .EventDispatcher(e => {
                     var items = new Dictionary<string, object> { { "stats", handleTimes } };
 
-                    e.UseViewManagerEventDispatcher(viewManager)
-                        .WithViewContext(items);
+                    e.UseViewManagerEventDispatcher(viewManager).WithViewContext(items);
                 })
                 .Options(o => {
                     if (enableSnapshotting) {

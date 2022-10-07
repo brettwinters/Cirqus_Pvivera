@@ -3,20 +3,18 @@ using d60.Cirqus.Events;
 using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.MsSql.Events;
 using d60.Cirqus.PostgreSql.Events;
-using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Tests.MsSql;
 using d60.Cirqus.Tests.PostgreSql;
 using MongoDB.Driver;
-using d60.Cirqus.Tests.MsSql;
 
 namespace d60.Cirqus.Tests.Integration
 {
     public abstract class IntegrationTestBase : FixtureBase
     {
-        MongoDatabase _mongoDatabase;
+        IMongoDatabase _mongoDatabase;
 
         protected override void DoSetUp() {
         }
@@ -68,7 +66,7 @@ namespace d60.Cirqus.Tests.Integration
             }
         }
 
-        MongoDatabase GetMongoDb() {
+        IMongoDatabase GetMongoDb() {
             if (_mongoDatabase != null) {
                 return _mongoDatabase;
             }

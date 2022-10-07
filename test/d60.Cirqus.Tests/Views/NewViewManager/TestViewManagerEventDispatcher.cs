@@ -26,7 +26,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
         ViewManagerEventDispatcher _dispatcher;
 
         ICommandProcessor _commandProcessor;
-        MongoDatabase _mongoDatabase;
+        IMongoDatabase _mongoDatabase;
 
         protected override void DoSetUp()
         {
@@ -73,7 +73,8 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
         [TestCase(10)]
         [TestCase(100)]
         [TestCase(1000)]
-        public void AutomaticallyReplaysEventsIfViewIsPurged(int numberOfCommands)
+        public void AutomaticallyReplaysEventsIfViewIsPurged(
+	        int numberOfCommands)
         {
             var allPotatoesView = new MongoDbViewManager<AllPotatoesView>(_mongoDatabase);
             _dispatcher.AddViewManager(allPotatoesView);
@@ -110,7 +111,8 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
             BlockOnEventDispatcher,
         }
 
-        [TestCase(BlockOption.NoBlock)]
+        
+        [TestCase(BlockOption.NoBlock)] // Not working with new MongoDB
         [TestCase(BlockOption.BlockOnViewManager)]
         [TestCase(BlockOption.BlockOnEventDispatcher)]
         public void CanBlockUntilViewIsUpdated(BlockOption blockOption)

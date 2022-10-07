@@ -7,36 +7,35 @@ using d60.Cirqus.Serialization;
 using d60.Cirqus.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace d60.Cirqus.Testing
+namespace d60.Cirqus.Testing;
+
+public static class TestingConfigurationExtensions
 {
-    public static class TestingConfigurationExtensions
-    {
-        public static SynchronousViewManagerEventDispatcherConfiguationBuilder UseSynchronousViewManangerEventDispatcher(
-            this EventDispatcherConfigurationBuilder builder, params IViewManager[] viewManagers)
-        {
-            var viewManagerConfigurationContainer = builder.Clone();
+	public static SynchronousViewManagerEventDispatcherConfiguationBuilder UseSynchronousViewManangerEventDispatcher(
+		this EventDispatcherConfigurationBuilder builder, params IViewManager[] viewManagers)
+	{
+		var viewManagerConfigurationContainer = builder.Clone();
 
-            builder.UseEventDispatcher(context =>
-            {
-                var scope = context.CreateScope();
+		builder.UseEventDispatcher(context =>
+		{
+			var scope = context.CreateScope();
 
-                var eventDispatcher = new SynchronousViewManagerEventDispatcher(
-                    context.GetService<IEventStore>(),
-                    context.GetService<IAggregateRootRepository>(),
-                    context.GetService<IDomainEventSerializer>(),
-                    context.GetService<IDomainTypeNameMapper>(),
-                    viewManagers);
+			var eventDispatcher = new SynchronousViewManagerEventDispatcher(
+				context.GetService<IEventStore>(),
+				context.GetService<IAggregateRootRepository>(),
+				context.GetService<IDomainEventSerializer>(),
+				context.GetService<IDomainTypeNameMapper>(),
+				viewManagers);
 
-                var contextItems = scope.ServiceProvider.GetService<IDictionary<string, object>>();
-                if (contextItems != null)
-                {
-                    eventDispatcher.SetContextItems(contextItems);
-                }
+			var contextItems = scope.ServiceProvider.GetService<IDictionary<string, object>>();
+			if (contextItems != null)
+			{
+				eventDispatcher.SetContextItems(contextItems);
+			}
 
-                return eventDispatcher;
-            });
+			return eventDispatcher;
+		});
 
-            return new SynchronousViewManagerEventDispatcherConfiguationBuilder(viewManagerConfigurationContainer);
-        }
-    }
+		return new SynchronousViewManagerEventDispatcherConfiguationBuilder(viewManagerConfigurationContainer);
+	}
 }

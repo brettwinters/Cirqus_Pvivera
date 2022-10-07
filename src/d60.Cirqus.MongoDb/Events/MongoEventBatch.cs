@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace d60.Cirqus.MongoDb.Events
-{
-    class MongoEventBatch
-    {
-        [BsonId]
-        public string BatchId { get; set; }
+namespace d60.Cirqus.MongoDb.Events;
 
-        public List<MongoEvent> Events { get; set; }
-    }
+class MongoEventBatch
+{
+	[BsonId]
+	public string BatchId { get; set; }
+
+	public List<MongoEvent> Events { get; set; }
 }

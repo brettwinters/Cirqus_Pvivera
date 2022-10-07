@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Tests.Extensions;

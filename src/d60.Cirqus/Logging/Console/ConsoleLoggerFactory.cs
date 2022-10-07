@@ -1,25 +1,24 @@
 ﻿using System;
 
-namespace d60.Cirqus.Logging.Console
+namespace d60.Cirqus.Logging.Console;
+
+/// <summary>
+/// <see cref="CirqusLoggerFactory"/> that logs to standard output
+/// </summary>
+public class ConsoleLoggerFactory : CirqusLoggerFactory
 {
-    /// <summary>
-    /// <see cref="CirqusLoggerFactory"/> that logs to standard output
-    /// </summary>
-    public class ConsoleLoggerFactory : CirqusLoggerFactory
-    {
-        readonly Logger.Level _minLevel;
+	readonly Logger.Level _minLevel;
 
-        /// <summary>
-        /// Constructs the factory
-        /// </summary>
-        public ConsoleLoggerFactory(Logger.Level minLevel = Logger.Level.Info)
-        {
-            _minLevel = minLevel;
-        }
+	/// <summary>
+	/// Constructs the factory
+	/// </summary>
+	public ConsoleLoggerFactory(Logger.Level minLevel = Logger.Level.Info)
+	{
+		_minLevel = minLevel;
+	}
 
-        public override Logger GetLogger(Type ownerType)
-        {
-            return new ConsoleLogger(ownerType, _minLevel);
-        }
-    }
+	public override Logger GetLogger(Type ownerType)
+	{
+		return new ConsoleLogger(ownerType, _minLevel);
+	}
 }

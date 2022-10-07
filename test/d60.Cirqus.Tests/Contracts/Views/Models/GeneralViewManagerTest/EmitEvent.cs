@@ -1,7 +1,4 @@
-﻿using System;
-using d60.Cirqus.Commands;
-
-namespace d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest
+﻿namespace d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest
 {
     public class EmitEvent : d60.Cirqus.Commands.Command<EventEmitter>
     {

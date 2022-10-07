@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
@@ -13,7 +12,7 @@ using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
-using MongoDB.Driver.Linq;
+using MongoDB.Driver;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Views
@@ -53,8 +52,8 @@ namespace d60.Cirqus.Tests.Views
                         .DependentOn(firstView, secondView)
                         .WithViewContext(new Dictionary<string, object>
                         {
-                            {"heys", mongoDatabase.GetCollection<HeyCounter>(typeof (HeyCounter).Name).AsQueryable()},
-                            {"words", mongoDatabase.GetCollection<WordCounter>(typeof (WordCounter).Name).AsQueryable()},
+                            {"heys", mongoDatabase.GetCollection<HeyCounter>(nameof(HeyCounter)).AsQueryable()},
+                            {"words", mongoDatabase.GetCollection<WordCounter>(nameof(WordCounter)).AsQueryable()},
                         });
                 }));
 
@@ -83,22 +82,29 @@ namespace d60.Cirqus.Tests.Views
             RegisterForDisposal(commandProcessor);
 
             //Brett
-            CommandProcessingResult result = null;
-            Enumerable.Range(0, 100).ToList().ForEach(i => result = commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)));
+            List<CommandProcessingResult> results = new();
+            for (int i = 0; i < 100; i++)
+            {
+	            results.Add(commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)));
+            }
 
             //orig
-            //result = Enumerable.Range(0, 100)
-            //    .Select(i => commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)))
-            //    .Last();
+            // var result  = Enumerable
+	           //  .Range(0, 100)
+            //     .Select(i => commandProcessor.ProcessCommand(new DoStuff("test", "hej meddig min ven " + i)))
+            //     .Last();
+
+            var result = results.Last();
 
             await waitHandle.WaitForAll(result, TimeSpan.FromSeconds(5));
 
             var viewId = InstancePerAggregateRootLocator.GetViewIdFromAggregateRootId("test");
-
+            
             var firstViewInstance = firstView.Load(viewId);
             var secondViewInstance = secondView.Load(viewId);
 
-            Assert.That(firstViewInstance.Count, Is.EqualTo(100));
+            // This always only counts 99 and 99 x 5 = 495
+	        Assert.That(firstViewInstance.Count, Is.EqualTo(100));
             Assert.That(secondViewInstance.Count, Is.EqualTo(500));
 
             Console.WriteLine("Waiting for dependent views to catch up...");

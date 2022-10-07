@@ -2,18 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Logging.Console;
-using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Extensions;
-using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
-using MongoDB.Driver;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Contracts.Views

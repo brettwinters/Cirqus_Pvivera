@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
@@ -25,7 +24,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
         ViewManagerEventDispatcher _dispatcher;
 
         ICommandProcessor _commandProcessor;
-        MongoDatabase _mongoDatabase;
+        IMongoDatabase _mongoDatabase;
         ThrowingEventStore _thisBadBoyEnsuresThatTheEventStoreIsNotUsed;
 
         protected override void DoSetUp()

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Serialization;

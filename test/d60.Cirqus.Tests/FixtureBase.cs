@@ -41,7 +41,8 @@ namespace d60.Cirqus.Tests
             DoSetUp();
         }
 
-        protected ICommandProcessor CreateCommandProcessor(Action<ILoggingAndEventStoreConfiguration> configure)
+        protected ICommandProcessor CreateCommandProcessor(
+	        Action<ILoggingAndEventStoreConfiguration> configure)
         {
             var services = new ServiceCollection();
             services.AddCirqus(configure.Invoke);

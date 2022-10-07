@@ -24,7 +24,7 @@ namespace d60.Cirqus.Tests.Snapshotting
     {
         readonly DefaultDomainTypeNameMapper _domainTypeNameMapper = new DefaultDomainTypeNameMapper();
         readonly DefaultCommandMapper _commandMapper = new DefaultCommandMapper();
-        MongoDatabase _database;
+        IMongoDatabase _database;
         TimeTaker _timeTaker;
 
         protected override void DoSetUp()

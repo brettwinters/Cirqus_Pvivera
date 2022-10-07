@@ -5,29 +5,28 @@ using d60.Cirqus.Commands;
 using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 
-namespace d60.Cirqus.Testing.Internals
+namespace d60.Cirqus.Testing.Internals;
+
+public class InMemoryUnitOfWork : RealUnitOfWork, IEnumerable<DomainEvent>
 {
-    public class InMemoryUnitOfWork : RealUnitOfWork, IEnumerable<DomainEvent>
-    {
-        public InMemoryUnitOfWork(IAggregateRootRepository aggregateRootRepository, IDomainTypeNameMapper domainTypeNameMapper)
-            : base(aggregateRootRepository, domainTypeNameMapper)
-        {
-        }
+	public InMemoryUnitOfWork(IAggregateRootRepository aggregateRootRepository, IDomainTypeNameMapper domainTypeNameMapper)
+		: base(aggregateRootRepository, domainTypeNameMapper)
+	{
+	}
 
-        public void Clear()
-        {
-            Events.Clear();
-            CachedAggregateRoots.Clear();
-        }
+	public void Clear()
+	{
+		Events.Clear();
+		CachedAggregateRoots.Clear();
+	}
 
-        public IEnumerator<DomainEvent> GetEnumerator()
-        {
-            return Events.GetEnumerator();
-        }
+	public IEnumerator<DomainEvent> GetEnumerator()
+	{
+		return Events.GetEnumerator();
+	}
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return GetEnumerator();
+	}
 }

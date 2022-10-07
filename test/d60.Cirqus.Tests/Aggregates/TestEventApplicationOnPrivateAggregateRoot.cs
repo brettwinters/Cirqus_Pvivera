@@ -1,8 +1,6 @@
 ﻿using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using NUnit.Framework;
-using TestContext = d60.Cirqus.Testing.TestContext;
 
 namespace d60.Cirqus.Tests.Aggregates
 {

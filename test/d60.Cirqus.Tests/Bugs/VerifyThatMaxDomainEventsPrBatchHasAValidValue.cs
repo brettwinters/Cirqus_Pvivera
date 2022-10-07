@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using d60.Cirqus.Aggregates;
+﻿using d60.Cirqus.Aggregates;
 using d60.Cirqus.Config;
-using d60.Cirqus.Events;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Views;
-using d60.Cirqus.Views.ViewManagers;
 using Moq;
 using NUnit.Framework;
 

@@ -3,7 +3,6 @@ using d60.Cirqus.Events;
 using d60.Cirqus.NUnit;
 using d60.Cirqus.Serialization;
 using NUnit.Framework;
-using TestContext = d60.Cirqus.Testing.TestContext;
 
 namespace d60.Cirqus.Tests.Testing
 {

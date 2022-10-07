@@ -4,10 +4,8 @@ using System.Linq;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
-using d60.Cirqus.Extensions;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Testing.Internals;
-using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 

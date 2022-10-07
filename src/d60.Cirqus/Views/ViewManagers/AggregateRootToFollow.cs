@@ -1,10 +1,9 @@
-﻿namespace d60.Cirqus.Views.ViewManagers
+﻿namespace d60.Cirqus.Views.ViewManagers;
+
+public class AggregateRootToFollow
 {
-    public class AggregateRootToFollow
-    {
-        public void Follow(string aggregateRootId)
-        {
+	public void Follow(string aggregateRootId)
+	{
             
-        }
-    }
+	}
 }

@@ -30,9 +30,9 @@ namespace d60.Cirqus.Tests.Testing
             Emit(NewId<RootA>(), new EventA3 { Content = "megaoksen" });
 
             //Brett
-            Assert.AreEqual($"Given that:{Environment.NewLine}  EventA3 ({Id<RootA>()}){Environment.NewLine}    Content: megaoksen{Environment.NewLine}{Environment.NewLine}", writer.Buffer);
+            Assert.AreEqual($"Given that:\r\n  EventA3 ({Id<RootA>()})\r\n    Content: megaoksen\r\n\r\n", writer.Buffer);
 
-            //            Assert.AreEqual(string.Format(
+            //Assert.AreEqual(string.Format(
             //@"Given that:
             //  EventA3 ({0})
             //    Content: megaoksen
@@ -49,7 +49,7 @@ namespace d60.Cirqus.Tests.Testing
             Then(Id<RootA>(), new EventA2());
 
             Assert.AreEqual(
-                $"Given that:{Environment.NewLine}  EventA1 ({Id<RootA>()}){Environment.NewLine}{Environment.NewLine}When users:{Environment.NewLine}  CommandResultingInOneEvent{Environment.NewLine}    Id: {Id<RootA>()}{Environment.NewLine}{Environment.NewLine}Then:{Environment.NewLine}  √ EventA2 ({Id<RootA>()}){Environment.NewLine}{Environment.NewLine}", 
+                $"Given that:\r\n  EventA1 ({Id<RootA>()})\r\n\r\nWhen users:\r\n  CommandResultingInOneEvent\r\n    Id: {Id<RootA>()}\r\n\r\nThen:\r\n  √ EventA2 ({Id<RootA>()})\r\n\r\n", 
                 writer.Buffer
             );
 
@@ -83,19 +83,18 @@ namespace d60.Cirqus.Tests.Testing
             When(new CommandResultingInA3 { Id = Id<RootA>() });
 
             Should.Throw<AssertionException>(() =>
-                Then(NewId<RootA>(), new EventA3 {
-                    Content = "asger"
-                }));
+                Then(NewId<RootA>(), new EventA3 { Content = "asger" })
+            );
 
             //Brett
-            writer.Buffer.Trim().ShouldContain($"{Environment.NewLine}-   \"Content\": null{Environment.NewLine}+   \"Content\": \"asger\"");
+            writer.Buffer.Trim().ShouldContain($"\n\n-   \"Content\": null\n\n+   \"Content\": \"asger\"");
 
-//            writer.Buffer.Trim().ShouldContain(
-//@"
-//-   ""Content"": null
-//+   ""Content"": ""asger""
-//");
-        }
+//             writer.Buffer.Trim().ShouldContain(
+// @"
+// -   ""Content"": null
+// +   ""Content"": ""asger""
+// ");
+         }
 
         [Test]
         public void GivenWithImplicitId() {

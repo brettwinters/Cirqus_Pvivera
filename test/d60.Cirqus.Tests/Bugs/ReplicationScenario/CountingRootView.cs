@@ -10,7 +10,10 @@ namespace d60.Cirqus.Tests.Bugs.ReplicationScenario
         public string Id { get; set; }
         public long LastGlobalSequenceNumber { get; set; }
         public int Number { get; set; }
-        public void Handle(IViewContext context, CountingRootIncremented domainEvent)
+        
+        public void Handle(
+	        IViewContext context, 
+	        CountingRootIncremented domainEvent)
         {
             Console.WriteLine("Loading aggregate root");
             var root = context.Load<CountingRoot>(domainEvent.GetAggregateRootId());

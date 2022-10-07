@@ -1,12 +1,11 @@
 using System;
 
-namespace d60.Cirqus.Testing
+namespace d60.Cirqus.Testing;
+
+public class ConsoleWriter : IWriter 
 {
-    public class ConsoleWriter : IWriter 
-    {
-        public void WriteLine(string text)
-        {
-            Console.WriteLine(text);
-        }
-    }
+	public void WriteLine(string text)
+	{
+		Console.WriteLine(text);
+	}
 }

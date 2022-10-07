@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using d60.Cirqus.MongoDb.Config;
+using d60.Cirqus.MongoDb.Logging;
+using d60.Cirqus.Testing;
 using MongoDB.Driver;
 using NUnit.Framework;
 
@@ -8,29 +10,30 @@ namespace d60.Cirqus.Tests.MongoDb
 {
     public class TestMongoDbLoggerFactory : FixtureBase
     {
-        MongoDatabase _database;
+        IMongoDatabase _database;
         ICommandProcessor _commandProcessor;
 
         protected override void DoSetUp()
         {
             _database = MongoHelper.InitializeTestDatabase();
 
-            //_commandProcessor = CommandProcessor.With()
-            //    .Logging(l => l.UseMongoDb(_database, "lost"))
-            //    .EventStore(e => e.UseMongoDb(_database, "events"))
-            //    //.EventDispatcher(ed => ed.UseEventDispatcher()
-            //    .Create();
+            _commandProcessor = CreateCommandProcessor(configure => configure
+	            .Logging(l => l.UseMongoDb(_database, "lost"))
+	            .EventStore(e => e.UseMongoDb(_database, "events"))
+	            .EventDispatcher(ed => ed.UseSynchronousViewManangerEventDispatcher())
+	        );
 
-            //RegisterForDisposal(_commandProcessor);
+            RegisterForDisposal(_commandProcessor);
         }
 
         [Test]
         public void DoStuff()
         {
-            var logStatements = _database.GetCollection("logs").FindAll().ToList();
+            var logStatements = _database.GetCollection<LogStatement>("logs").Find(_ => true).ToList();
 
             Console.WriteLine("---------------------------------------------------------------------------------------");
-            Console.WriteLine(string.Join(Environment.NewLine, logStatements.Select(s => s["text"])));
+            //Console.WriteLine(string.Join(Environment.NewLine, logStatements.Select(s => s["text"])));
+            Console.WriteLine(string.Join(Environment.NewLine, logStatements.Select(s => s.text)));
             Console.WriteLine("---------------------------------------------------------------------------------------");
         }
     }

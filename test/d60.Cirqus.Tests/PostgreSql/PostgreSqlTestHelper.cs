@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using d60.Cirqus.MsSql;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using d60.Cirqus.Extensions;
+﻿using d60.Cirqus.Extensions;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
 

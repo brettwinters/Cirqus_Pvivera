@@ -4,7 +4,6 @@ using d60.Cirqus.Events;
 using d60.Cirqus.PostgreSql.Events;
 //using Microsoft.Extensions.Configuration;
 using Npgsql;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.PostgreSql.Config
 {

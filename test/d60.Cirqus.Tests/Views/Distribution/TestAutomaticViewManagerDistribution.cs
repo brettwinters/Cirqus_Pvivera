@@ -20,7 +20,7 @@ namespace d60.Cirqus.Tests.Views.Distribution
     [TestFixture, Description("let's see if we can make view managers be distributed evently among several machines when running e.g. as an auto-scaled Azure web site")]
     public class TestAutomaticViewManagerDistribution : FixtureBase
     {
-        MongoDatabase _mongoDatabase;
+        IMongoDatabase _mongoDatabase;
 
         protected override void DoSetUp()
         {

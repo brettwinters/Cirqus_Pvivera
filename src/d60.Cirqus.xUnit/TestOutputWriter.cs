@@ -1,20 +1,19 @@
 ﻿using d60.Cirqus.Testing;
 using Xunit.Abstractions;
 
-namespace d60.Cirqus.xUnit
+namespace d60.Cirqus.xUnit;
+
+public class TestOutputWriter : IWriter
 {
-    public class TestOutputWriter : IWriter
-    {
-        private readonly ITestOutputHelper output;
+	private readonly ITestOutputHelper output;
 
-        public TestOutputWriter(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
+	public TestOutputWriter(ITestOutputHelper output)
+	{
+		this.output = output;
+	}
 
-        public void WriteLine(string text)
-        {
-            output.WriteLine(text);
-        }
-    }
+	public void WriteLine(string text)
+	{
+		output.WriteLine(text);
+	}
 }

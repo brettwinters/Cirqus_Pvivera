@@ -3,14 +3,11 @@ using System.Threading.Tasks;
 using d60.Cirqus.Events;
 using d60.Cirqus.Logging;
 using d60.Cirqus.Logging.Console;
-using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.Testing;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest;
-using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
-using MongoDB.Driver;
 using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 

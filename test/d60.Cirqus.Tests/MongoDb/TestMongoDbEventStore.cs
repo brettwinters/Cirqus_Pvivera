@@ -18,7 +18,7 @@ namespace d60.Cirqus.Tests.MongoDb
     public class TestMongoDbEventStore : FixtureBase
     {
         MongoDbEventStore _eventStore;
-        MongoDatabase _mongoDatabase;
+        IMongoDatabase _mongoDatabase;
 
         protected override void DoSetUp()
         {
@@ -26,11 +26,11 @@ namespace d60.Cirqus.Tests.MongoDb
             _eventStore = new MongoDbEventStore(_mongoDatabase, "Events");
         }
 
-        //[TestCase(1000)]
-        //[TestCase(10000)]
+        [TestCase(1000)]
+        [TestCase(10000)]
         [TestCase(100000)]
-        //[TestCase(1000000, Ignore = TestCategories.IgnoreLongRunning)]
-        //[TestCase(10000000, Ignore = TestCategories.IgnoreLongRunning)]
+        // [TestCase(1000000, Ignore = TestCategories.IgnoreLongRunning)]
+        // [TestCase(10000000, Ignore = TestCategories.IgnoreLongRunning)]
         public void VerifyLazinessOfStreamingApi(int eventCount)
         {
             Console.Write("Generating {0} events... ", eventCount);
@@ -167,7 +167,7 @@ namespace d60.Cirqus.Tests.MongoDb
 
             var collection = _mongoDatabase.GetCollection<MongoEventBatch>("Events");
 
-            collection.InsertBatch(events);
+            collection.InsertMany(events);
         }
 
         class MongoEventBatch

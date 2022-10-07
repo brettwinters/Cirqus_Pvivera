@@ -67,10 +67,10 @@ And we will repeat again here, at the bottom: There was never any problem. We we
             var aalborgEventStore = new MongoDbEventStore(mongoDatabase, "AalborgEvents");
             var hongKongEventStore = new MongoDbEventStore(mongoDatabase, "HongKongEvents");
 
-            CreateCommandProcessor(aalborgEventStore, aalborgEventStore);
+            CreateCommandProcessor2(aalborgEventStore, aalborgEventStore);
 
-            _hongKongViewManager = new MongoDbViewManager<CountingRootView>(mongoDatabase);
-            _hongKongCommandProcessor = CreateCommandProcessor(aalborgEventStore, hongKongEventStore, _hongKongViewManager);
+            _hongKongViewManager = new MongoDbViewManager<CountingRootView>(mongoDatabase, "HongKongView");
+            _hongKongCommandProcessor = CreateCommandProcessor2(aalborgEventStore, hongKongEventStore, _hongKongViewManager);
 
             var replicationDelay = TimeSpan.FromSeconds(5);
 
@@ -80,40 +80,42 @@ And we will repeat again here, at the bottom: There was never any problem. We we
         [Test]
         public void CheckIt()
         {
-            Console.WriteLine("Processing command");
-            var result = _hongKongCommandProcessor.ProcessCommand(new IncrementCountingRoot("root1"));
+	        Console.WriteLine("Processing command");
+	        var result = _hongKongCommandProcessor.ProcessCommand(new IncrementCountingRoot("root1"));
 
-            Console.WriteLine("Waiting for view to process event");
-            _hongKongViewManager
-                .WaitUntilProcessed(result, TimeSpan.FromSeconds(30))
-                .Wait();
+	        Console.WriteLine("Waiting for view to process event");
+	        _hongKongViewManager
+		        .WaitUntilProcessed(result, TimeSpan.FromSeconds(20))
+		        .Wait();
 
-            Console.WriteLine("Loading view instance");
-            var instance = _hongKongViewManager.Load("root1");
+	        Console.WriteLine("Loading view instance");
+	        var instance = _hongKongViewManager.Load("root1");
 
-            Console.WriteLine("Checking it");
-            Assert.That(instance.Number, Is.EqualTo(1));
+	        Console.WriteLine("Checking it");
+	        Assert.That(instance.Number, Is.EqualTo(1));
         }
 
-        ICommandProcessor CreateCommandProcessor(IEventStore commandProcessingEventStore, IEventStore eventProcessingEventStore, params IViewManager[] viewManagers)
+        ICommandProcessor CreateCommandProcessor2(
+	        IEventStore commandProcessingEventStore, 
+	        IEventStore eventProcessingEventStore, 
+	        params IViewManager[] viewManagers)
         {
             //Brett
             var commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.Register(c => commandProcessingEventStore))
                 .EventDispatcher(ed => ed.UseViewManagerEventDispatcher(viewManagers))
-                
                 //Orig but my simple version also works..
-                //.EventDispatcher(e => e.Register(c => {
-                //    var aggregateRootRepository = (IAggregateRootRepository)c.GetService(typeof(IAggregateRootRepository));
-                //    var domainEventSerializer = (IDomainEventSerializer)c.GetService(typeof(IDomainEventSerializer));
-                //    var domainTypeNameMapper = (IDomainTypeNameMapper)c.GetService(typeof(IDomainTypeNameMapper));
-                //    return new ViewManagerEventDispatcher(
-                //        aggregateRootRepository,
-                //        eventProcessingEventStore,
-                //        domainEventSerializer,
-                //        domainTypeNameMapper,
-                //        viewManagers);
-                //}))
+                // .EventDispatcher(e => e.Register(c => {
+                //     var aggregateRootRepository = (IAggregateRootRepository)c.GetService(typeof(IAggregateRootRepository));
+                //     var domainEventSerializer = (IDomainEventSerializer)c.GetService(typeof(IDomainEventSerializer));
+                //     var domainTypeNameMapper = (IDomainTypeNameMapper)c.GetService(typeof(IDomainTypeNameMapper));
+                //     return new ViewManagerEventDispatcher(
+                //         aggregateRootRepository,
+                //         eventProcessingEventStore,
+                //         domainEventSerializer,
+                //         domainTypeNameMapper,
+                //         viewManagers);
+                // }))
            );
 
             //Orig
@@ -138,9 +140,15 @@ And we will repeat again here, at the bottom: There was never any problem. We we
             return commandProcessor;
         }
 
-        EventReplicator CreateAndStartReplication(IEventStore aalborgEventStore, IEventStore hongKongEventStore, TimeSpan replicationDelay)
+        EventReplicator CreateAndStartReplication(
+	        IEventStore aalborgEventStore,
+	        IEventStore hongKongEventStore, 
+	        TimeSpan replicationDelay)
         {
-            var replicator = new EventReplicator(aalborgEventStore, new EventReplicatorDelayer(hongKongEventStore, replicationDelay));
+            var replicator = new EventReplicator(
+	            aalborgEventStore, 
+	            new EventReplicatorDelayer(hongKongEventStore, replicationDelay)
+	        );
             RegisterForDisposal(replicator);
             replicator.Start();
             return replicator;

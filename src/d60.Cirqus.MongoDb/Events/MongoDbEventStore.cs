@@ -8,274 +8,368 @@ using d60.Cirqus.Extensions;
 using d60.Cirqus.Numbers;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using MongoDB.Driver.Builders;
 
-namespace d60.Cirqus.MongoDb.Events
+namespace d60.Cirqus.MongoDb.Events;
+
+public class MongoDbEventStore : IEventStore
 {
-    public class MongoDbEventStore : IEventStore
-    {
-        const string GlobalSeqUniquenessIndexName = "EnsureGlobalSeqUniqueness";
-        const string SeqUniquenessIndexName = "EnsureSeqUniqueness";
-        const string EventsDocPath = "Events";
-        const string MetaDocPath = "Meta";
+	const string GlobalSeqUniquenessIndexName = "EnsureGlobalSeqUniqueness";
+	const string SeqUniquenessIndexName = "EnsureSeqUniqueness";
+	const string EventsDocPath = "Events";
+	const string MetaDocPath = "Meta";
 
-        static readonly string SeqNoDocPath = string.Format("{0}.SequenceNumber", EventsDocPath);
-        static readonly string GlobalSeqNoDocPath = string.Format("{0}.GlobalSequenceNumber", EventsDocPath);
-        static readonly string AggregateRootIdDocPath = string.Format("{0}.AggregateRootId", EventsDocPath);
+	static readonly string SeqNoDocPath = string.Format("{0}.SequenceNumber", EventsDocPath);
+	static readonly string GlobalSeqNoDocPath = $"{EventsDocPath}.GlobalSequenceNumber";
+	static readonly string AggregateRootIdDocPath = string.Format("{0}.AggregateRootId", EventsDocPath);
 
-        readonly MongoCollection<MongoEventBatch> _eventBatches;
+	readonly IMongoCollection<MongoEventBatch> _eventBatches;
+	//readonly MongoCollection<MongoEventBatch> _eventBatches;
 
-        public MongoDbEventStore(
-            MongoDatabase database, 
-            string eventCollectionName, 
-            bool automaticallyCreateIndexes = true)
-        {
-            _eventBatches = database.GetCollection<MongoEventBatch>(eventCollectionName);
+	public MongoDbEventStore(
+		IMongoDatabase database, 
+		string eventCollectionName, 
+		bool automaticallyCreateIndexes = true)
+	{
+		_eventBatches = database.GetCollection<MongoEventBatch>(eventCollectionName);
 
-            if (automaticallyCreateIndexes)
-            {
-                _eventBatches.CreateIndex(IndexKeys.Ascending(GlobalSeqNoDocPath), 
-                    IndexOptions.SetUnique(true).SetName(GlobalSeqUniquenessIndexName));
-                _eventBatches.CreateIndex(IndexKeys.Ascending(AggregateRootIdDocPath, SeqNoDocPath), 
-                    IndexOptions.SetUnique(true).SetName(SeqUniquenessIndexName));
-            }
-        }
+		if (automaticallyCreateIndexes)
+		{
+			// _eventBatches.CreateIndex(
+			// 	IndexKeys.Ascending(GlobalSeqNoDocPath), 
+			// 	IndexOptions.SetUnique(true).SetName(GlobalSeqUniquenessIndexName)
+			// );
+			_eventBatches.Indexes.CreateOne(
+				new CreateIndexModel<MongoEventBatch>(
+					Builders<MongoEventBatch>.IndexKeys.Ascending(GlobalSeqNoDocPath),
+					new CreateIndexOptions
+					{
+						Name = GlobalSeqUniquenessIndexName,
+						Unique = true
+					} 
+				)
+			);
 
-        public IEnumerable<EventData> Stream(long globalSequenceNumber = 0)
-        {
-            var lowerGlobalSequenceNumber = globalSequenceNumber;
+			// _eventBatches.CreateIndex(IndexKeys.Ascending(AggregateRootIdDocPath, SeqNoDocPath), 
+			// 	IndexOptions.SetUnique(true).SetName(SeqUniquenessIndexName));
 
-            while (true)
-            {
-                var lowerGlobalSequenceNumberInQuery = lowerGlobalSequenceNumber; //< avoid "access to modified closure"
-                var criteria = Query.GTE(GlobalSeqNoDocPath, lowerGlobalSequenceNumber);
+			_eventBatches.Indexes.CreateOne(
+				new CreateIndexModel<MongoEventBatch>(
+					Builders<MongoEventBatch>.IndexKeys.Combine(
+						Builders<MongoEventBatch>.IndexKeys.Ascending(AggregateRootIdDocPath),
+						Builders<MongoEventBatch>.IndexKeys.Ascending(SeqNoDocPath)),
+					new CreateIndexOptions
+					{
+						Name = SeqUniquenessIndexName,
+						Unique = true
+					} 
+				)
+			);
+		}
+	}
 
-                var eventBatch = _eventBatches.Find(criteria)
-                    .SetSortOrder(SortBy.Ascending(GlobalSeqNoDocPath))
-                    .SetLimit(1000)
-                    .SelectMany(b => b.Events.OrderBy(e => e.GlobalSequenceNumber))
-                    .Where(e => e.GlobalSequenceNumber >= lowerGlobalSequenceNumberInQuery)
-                    .Select(MongoEventToEvent);
+	public IEnumerable<EventData> Stream(
+		long globalSequenceNumber = 0)
+	{
+		var lowerGlobalSequenceNumber = globalSequenceNumber;
 
-                var hadEvents = false;
-                var maxGlobalSequenceNumberInBatch = -1L;
+		while (true)
+		{
+			var lowerGlobalSequenceNumberInQuery = lowerGlobalSequenceNumber; //< avoid "access to modified closure"
+			// var criteria = Query.GTE(GlobalSeqNoDocPath, lowerGlobalSequenceNumber);
+			// var eventBatch = _eventBatches.Find(criteria)
+			// 	.SetSortOrder(SortBy.Ascending(GlobalSeqNoDocPath))
+			// 	.SetLimit(1000)
+			// 	.SelectMany(b => b.Events.OrderBy(e => e.GlobalSequenceNumber))
+			// 	.Where(e => e.GlobalSequenceNumber >= lowerGlobalSequenceNumberInQuery)
+			// 	.Select(MongoEventToEvent);
+			
+			var filter = new FilterDefinitionBuilder<MongoEventBatch>().Gte(GlobalSeqNoDocPath, lowerGlobalSequenceNumber);
+			var eventBatch = _eventBatches.Find(filter)
+				.Sort(Builders<MongoEventBatch>.Sort.Ascending(GlobalSeqNoDocPath))
+				.Limit(1000)
+				.ToList()
+				.SelectMany(b => b.Events.OrderBy(e => e.GlobalSequenceNumber))
+				.Where(e => e.GlobalSequenceNumber >= lowerGlobalSequenceNumberInQuery)
+				.Select(MongoEventToEvent);
+			
+			var hadEvents = false;
+			var maxGlobalSequenceNumberInBatch = -1L;
 
-                foreach (var e in eventBatch)
-                {
-                    hadEvents = true;
-                    yield return e;
-                    maxGlobalSequenceNumberInBatch = e.GetGlobalSequenceNumber();
-                }
+			foreach (var e in eventBatch)
+			{
+				hadEvents = true;
+				yield return e;
+				maxGlobalSequenceNumberInBatch = e.GetGlobalSequenceNumber();
+			}
 
-                if (!hadEvents) break;
+			if (!hadEvents) break;
 
-                lowerGlobalSequenceNumber = maxGlobalSequenceNumberInBatch + 1;
-            }
-        }
+			lowerGlobalSequenceNumber = maxGlobalSequenceNumberInBatch + 1;
+		}
+	}
 
-        public IEnumerable<EventData> Load(string aggregateRootId, long firstSeq = 0)
-        {
-            // aggregation framework is extremely slow - don't use it (for this)
-            //var args = new AggregateArgs
-            //{
-            //    Pipeline = new[]
-            //    {
-            //        new BsonDocument {{"$unwind", "$Events"}},
-            //        new BsonDocument
-            //        {
-            //            {
-            //                "$match", new BsonDocument
-            //                {
-            //                    {"Events.AggregateRootId", aggregateRootId},
-            //                    {"Events.SequenceNumber", new BsonDocument {{"$gte", firstSeq}}},
-            //                }
-            //            }
-            //        },
-            //        new BsonDocument {{"$sort", new BsonDocument {{"Events.SequenceNumber", 1}}}}
-            //    }
-            //};
+	public IEnumerable<EventData> Load(
+		string aggregateRootId, 
+		long firstSeq = 0)
+	{
+		// aggregation framework is extremely slow - don't use it (for this)
+		//var args = new AggregateArgs
+		//{
+		//    Pipeline = new[]
+		//    {
+		//        new BsonDocument {{"$unwind", "$Events"}},
+		//        new BsonDocument
+		//        {
+		//            {
+		//                "$match", new BsonDocument
+		//                {
+		//                    {"Events.AggregateRootId", aggregateRootId},
+		//                    {"Events.SequenceNumber", new BsonDocument {{"$gte", firstSeq}}},
+		//                }
+		//            }
+		//        },
+		//        new BsonDocument {{"$sort", new BsonDocument {{"Events.SequenceNumber", 1}}}}
+		//    }
+		//};
 
-            //return _eventBatches.Aggregate(args)
-            //    .Select(result =>
-            //    {
-            //        var bsonValue = result["Events"];
-            //        var asBsonDocument = bsonValue.AsBsonDocument;
-            //        return BsonSerializer.Deserialize<MongoEvent>(asBsonDocument);
-            //    })
-            //    .Select(MongoEventToEvent);
+		//return _eventBatches.Aggregate(args)
+		//    .Select(result =>
+		//    {
+		//        var bsonValue = result["Events"];
+		//        var asBsonDocument = bsonValue.AsBsonDocument;
+		//        return BsonSerializer.Deserialize<MongoEvent>(asBsonDocument);
+		//    })
+		//    .Select(MongoEventToEvent);
 
-            var lowerSequenceNumber = firstSeq;
+		var lowerSequenceNumber = firstSeq;
+		while (true)
+		{
+			// var eventCriteria = Query.And(Query.EQ("AggregateRootId", aggregateRootId),
+			// 	Query.GTE("SequenceNumber", lowerSequenceNumber));
+			//
+			// var criteria = Query.ElemMatch("Events", eventCriteria);
+			//
+			// var lowerSequenceNumberInQuery = lowerSequenceNumber;
+			// var eventBatch = _eventBatches.Find(criteria)
+			// 	.SetSortOrder(SortBy.Ascending(GlobalSeqNoDocPath))
+			// 	.SetLimit(1000)
+			// 	.SelectMany(b => b.Events
+			// 		.Where(e => e.AggregateRootId == aggregateRootId)
+			// 		.OrderBy(e => e.SequenceNumber))
+			// 	.Where(e => e.SequenceNumber >= lowerSequenceNumberInQuery)
+			// 	.Select(MongoEventToEvent);
+			
+			var eventFilter = new FilterDefinitionBuilder<MongoEvent>().And(
+				new FilterDefinitionBuilder<MongoEvent>().Eq(e => e.AggregateRootId, aggregateRootId),
+				//new FilterDefinitionBuilder<MongoEvent>().Eq("AggregateRootId", aggregateRootId),
+				new FilterDefinitionBuilder<MongoEvent>().Gte(e => e.SequenceNumber, lowerSequenceNumber)
+				//new FilterDefinitionBuilder<MongoEvent>().Gte("SequenceNumber", lowerSequenceNumber)
+			);
 
-            while (true)
-            {
-                var eventCriteria = Query.And(Query.EQ("AggregateRootId", aggregateRootId),
-                    Query.GTE("SequenceNumber", lowerSequenceNumber));
+			//var filter = new FilterDefinitionBuilder<MongoEventBatch>().ElemMatch("Events", eventFilter);
+			var filter = new FilterDefinitionBuilder<MongoEventBatch>().ElemMatch(e => e.Events, eventFilter);
 
-                var criteria = Query.ElemMatch("Events", eventCriteria);
+			var lowerSequenceNumberInQuery = lowerSequenceNumber;
+			
+			var eventBatch = _eventBatches
+				.Find(filter)
+				.Sort(Builders<MongoEventBatch>.Sort.Ascending(GlobalSeqNoDocPath))
+				.Limit(1000)
+				.ToList()
+				.SelectMany(b => b.Events
+					.Where(e => e.AggregateRootId == aggregateRootId)
+					.OrderBy(e => e.SequenceNumber))
+				.Where(e => e.SequenceNumber >= lowerSequenceNumberInQuery)
+				.Select(MongoEventToEvent);
+			
+			var hadEvents = false;
+			var maxSequenceNumberInBatch = -1L;
 
-                var lowerSequenceNumberInQuery = lowerSequenceNumber;
-                var eventBatch = _eventBatches.Find(criteria)
-                    .SetSortOrder(SortBy.Ascending(GlobalSeqNoDocPath))
-                    .SetLimit(1000)
-                    .SelectMany(b => b.Events
-                        .Where(e => e.AggregateRootId == aggregateRootId)
-                        .OrderBy(e => e.SequenceNumber))
-                    .Where(e => e.SequenceNumber >= lowerSequenceNumberInQuery)
-                    .Select(MongoEventToEvent);
+			foreach (var e in eventBatch)
+			{
+				hadEvents = true;
+				yield return e;
+				maxSequenceNumberInBatch = e.GetSequenceNumber();
+			}
 
-                var hadEvents = false;
-                var maxSequenceNumberInBatch = -1L;
+			if (!hadEvents) break;
 
-                foreach (var e in eventBatch)
-                {
-                    hadEvents = true;
-                    yield return e;
-                    maxSequenceNumberInBatch = e.GetSequenceNumber();
-                }
+			lowerSequenceNumber = maxSequenceNumberInBatch + 1;
+		}
+	}
 
-                if (!hadEvents) break;
+	public long GetNextGlobalSequenceNumber()
+	{
+		// var doc = _eventBatches
+		// 	.FindAllAs<BsonDocument>()
+		// 	.SetSortOrder(SortBy.Descending(GlobalSeqNoDocPath))
+		// 	.SetLimit(1)
+		// 	.SingleOrDefault();
+		var doc = _eventBatches
+			.Find(_ => true)
+			.As<BsonDocument>()
+			.Sort(Builders<MongoEventBatch>.Sort.Descending(GlobalSeqNoDocPath))
+			.Limit(1)
+			.SingleOrDefault();
 
-                lowerSequenceNumber = maxSequenceNumberInBatch + 1;
-            }
-        }
+		return doc == null
+			? 0
+			: doc[EventsDocPath].AsBsonArray
+				.Select(e => e[MetaDocPath][DomainEvent.MetadataKeys.GlobalSequenceNumber].ToInt64())
+				.Max() + 1;
+	}
 
-        public long GetNextGlobalSequenceNumber()
-        {
-            var doc = _eventBatches
-                .FindAllAs<BsonDocument>()
-                .SetSortOrder(SortBy.Descending(GlobalSeqNoDocPath))
-                .SetLimit(1)
-                .SingleOrDefault();
+	public void Save(
+		Guid batchId, 
+		IEnumerable<EventData> events)
+	{
+		var batch = events.ToList();
 
-            return doc == null
-                ? 0
-                : doc[EventsDocPath].AsBsonArray
-                    .Select(e => e[MetaDocPath][DomainEvent.MetadataKeys.GlobalSequenceNumber].ToInt64())
-                    .Max() + 1;
-        }
+		if (!batch.Any())
+		{
+			throw new InvalidOperationException($"Attempted to save batch {batchId}, but the batch of events was empty!");
+		}
 
-        public void Save(Guid batchId, IEnumerable<EventData> events)
-        {
-            var batch = events.ToList();
+		var nextGlobalSeqNo = GetNextGlobalSequenceNumber();
 
-            if (!batch.Any())
-            {
-                throw new InvalidOperationException(string.Format("Attempted to save batch {0}, but the batch of events was empty!", batchId));
-            }
+		foreach (var e in batch)
+		{
+			e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextGlobalSeqNo++).ToString(Metadata.NumberCulture);
+			e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
+		}
 
-            var nextGlobalSeqNo = GetNextGlobalSequenceNumber();
+		EventValidation.ValidateBatchIntegrity(batchId, batch);
 
-            foreach (var e in batch)
-            {
-                e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextGlobalSeqNo++).ToString(Metadata.NumberCulture);
-                e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
-            }
+		try
+		{
+			// _eventBatches.Save(new MongoEventBatch
+			// {
+			// 	BatchId = batchId.ToString(),
+			// 	Events = batch
+			// 		.Select(b =>
+			// 		{
+			// 			var isJson = b.IsJson();
+			//
+			// 			return new MongoEvent
+			// 			{
+			// 				Meta = GetMetadataAsDictionary(b.Meta),
+			// 				Bin = isJson ? null : b.Data,
+			// 				Body = isJson ? GetBsonValue(b.Data) : null,
+			// 				SequenceNumber = b.GetSequenceNumber(),
+			// 				GlobalSequenceNumber = b.GetGlobalSequenceNumber(),
+			// 				AggregateRootId = b.GetAggregateRootId()
+			// 			};
+			// 		})
+			// 		.ToList()
+			// });
+			
+			_eventBatches.InsertOne(
+				new MongoEventBatch
+				{
+					BatchId = batchId.ToString(),
+					Events = batch
+						.Select(b =>
+						{
+							var isJson = b.IsJson();
 
-            EventValidation.ValidateBatchIntegrity(batchId, batch);
+							return new MongoEvent
+							{
+								Meta = GetMetadataAsDictionary(b.Meta),
+								Bin = isJson ? null : b.Data,
+								Body = isJson ? GetBsonValue(b.Data) : null,
+								SequenceNumber = b.GetSequenceNumber(),
+								GlobalSequenceNumber = b.GetGlobalSequenceNumber(),
+								AggregateRootId = b.GetAggregateRootId()
+							};
+						})
+						.ToList()
+				}
+			);
+		}
+		catch (MongoWriteException ex) when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
+		{
+			throw new ConcurrencyException(batchId, batch, ex);
+		}
+		// catch (MongoDuplicateKeyException exception)
+		// {
+		// 	throw new ConcurrencyException(batchId, batch, exception);
+		// }
+	}
 
-            try
-            {
-                _eventBatches.Save(new MongoEventBatch
-                {
-                    BatchId = batchId.ToString(),
-                    Events = batch
-                        .Select(b =>
-                        {
-                            var isJson = b.IsJson();
+	BsonValue GetBsonValue(byte[] data)
+	{
+		var json = Encoding.UTF8.GetString(data);
+		var doc = BsonDocument.Parse(json);
 
-                            return new MongoEvent
-                            {
-                                Meta = GetMetadataAsDictionary(b.Meta),
-                                Bin = isJson ? null : b.Data,
-                                Body = isJson ? GetBsonValue(b.Data) : null,
-                                SequenceNumber = b.GetSequenceNumber(),
-                                GlobalSequenceNumber = b.GetGlobalSequenceNumber(),
-                                AggregateRootId = b.GetAggregateRootId()
-                            };
-                        })
-                        .ToList()
-                });
-            }
-            catch (MongoDuplicateKeyException exception)
-            {
-                throw new ConcurrencyException(batchId, batch, exception);
-            }
-        }
+		// recursively replace property names that begin with a $ - deep inside, we know that
+		// it's probably only a matter of avoiding JSON.NET's $type properties
+		ReplacePropertyPrefixes(doc, "$", "¤");
 
-        BsonValue GetBsonValue(byte[] data)
-        {
-            var json = Encoding.UTF8.GetString(data);
-            var doc = BsonDocument.Parse(json);
+		return doc;
+	}
 
-            // recursively replace property names that begin with a $ - deep inside, we know that
-            // it's probably only a matter of avoiding JSON.NET's $type properties
-            ReplacePropertyPrefixes(doc, "$", "¤");
+	void ReplacePropertyPrefixes(BsonDocument doc, string prefixToReplace, string replacement)
+	{
+		foreach (var property in doc.ToList())
+		{
+			if (property.Name.StartsWith(prefixToReplace))
+			{
+				doc.Remove(property.Name);
 
-            return doc;
-        }
+				// since we know that it's most likely just about JSON.NET's $type property, we ensure that the replaced element gets to be first (which is required by JSON.NET)
+				doc.InsertAt(0, new BsonElement(replacement + property.Name.Substring(prefixToReplace.Length), property.Value));
+			}
 
-        void ReplacePropertyPrefixes(BsonDocument doc, string prefixToReplace, string replacement)
-        {
-            foreach (var property in doc.ToList())
-            {
-                if (property.Name.StartsWith(prefixToReplace))
-                {
-                    doc.Remove(property.Name);
+			if (property.Value.IsBsonDocument)
+			{
+				ReplacePropertyPrefixes(property.Value.AsBsonDocument, prefixToReplace, replacement);
+				continue;
+			}
 
-                    // since we know that it's most likely just about JSON.NET's $type property, we ensure that the replaced element gets to be first (which is required by JSON.NET)
-                    doc.InsertAt(0, new BsonElement(replacement + property.Name.Substring(prefixToReplace.Length), property.Value));
-                }
+			if (property.Value.IsBsonArray)
+			{
+				foreach (var bsonValue in property.Value.AsBsonArray)
+				{
+					if (bsonValue.IsBsonDocument)
+					{
+						ReplacePropertyPrefixes(bsonValue.AsBsonDocument, prefixToReplace, replacement);
+					}
+				}
+			}
+		}
+	}
 
-                if (property.Value.IsBsonDocument)
-                {
-                    ReplacePropertyPrefixes(property.Value.AsBsonDocument, prefixToReplace, replacement);
-                    continue;
-                }
+	Dictionary<string, string> GetMetadataAsDictionary(Metadata meta)
+	{
+		return meta.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+	}
 
-                if (property.Value.IsBsonArray)
-                {
-                    foreach (var bsonValue in property.Value.AsBsonArray)
-                    {
-                        if (bsonValue.IsBsonDocument)
-                        {
-                            ReplacePropertyPrefixes(bsonValue.AsBsonDocument, prefixToReplace, replacement);
-                        }
-                    }
-                }
-            }
-        }
+	Metadata GetDictionaryAsMetadata(Dictionary<string, string> dictionary)
+	{
+		var metadata = new Metadata();
+		foreach (var kvp in dictionary)
+		{
+			metadata[kvp.Key] = kvp.Value;
+		}
+		return metadata;
+	}
 
-        Dictionary<string, string> GetMetadataAsDictionary(Metadata meta)
-        {
-            return meta.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        }
+	EventData MongoEventToEvent(
+		MongoEvent e)
+	{
+		var meta = GetDictionaryAsMetadata(e.Meta);
+		var data = e.Bin ?? GetBytesFromBsonValue(e.Body);
 
-        Metadata GetDictionaryAsMetadata(Dictionary<string, string> dictionary)
-        {
-            var metadata = new Metadata();
-            foreach (var kvp in dictionary)
-            {
-                metadata[kvp.Key] = kvp.Value;
-            }
-            return metadata;
-        }
+		return EventData.FromMetadata(meta, data);
+	}
 
-        EventData MongoEventToEvent(MongoEvent e)
-        {
-            var meta = GetDictionaryAsMetadata(e.Meta);
-            var data = e.Bin ?? GetBytesFromBsonValue(e.Body);
+	byte[] GetBytesFromBsonValue(BsonValue body)
+	{
+		var doc = body.AsBsonDocument;
 
-            return EventData.FromMetadata(meta, data);
-        }
+		// make sure to replace ¤ with $ again
+		ReplacePropertyPrefixes(doc, "¤", "$");
 
-        byte[] GetBytesFromBsonValue(BsonValue body)
-        {
-            var doc = body.AsBsonDocument;
-
-            // make sure to replace ¤ with $ again
-            ReplacePropertyPrefixes(doc, "¤", "$");
-
-            return Encoding.UTF8.GetBytes(doc.ToString());
-        }
-    }
+		return Encoding.UTF8.GetBytes(doc.ToString());
+	}
 }

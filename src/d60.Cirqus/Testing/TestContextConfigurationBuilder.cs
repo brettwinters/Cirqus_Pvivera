@@ -11,126 +11,125 @@ using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Views;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace d60.Cirqus.Testing
+namespace d60.Cirqus.Testing;
+
+public class TestContextConfigurationBuilder : IOptionalConfiguration<TestContext>
 {
-    public class TestContextConfigurationBuilder : IOptionalConfiguration<TestContext>
-    {
-        private readonly IServiceCollection _services;
-        static Logger _logger;
+	private readonly IServiceCollection _services;
+	static Logger _logger;
 
-        readonly ConfigurationContainer _container = new ConfigurationContainer();
+	readonly ConfigurationContainer _container = new ConfigurationContainer();
 
-        private readonly NewConfigurationContainer _newContainer;
+	private readonly NewConfigurationContainer _newContainer;
 
-        public TestContextConfigurationBuilder(IServiceCollection services)
-        {
-            _services = services;
-            _newContainer = new NewConfigurationContainer(services);
+	public TestContextConfigurationBuilder(IServiceCollection services)
+	{
+		_services = services;
+		_newContainer = new NewConfigurationContainer(services);
 
-            FillInDefaults();
+		FillInDefaults();
 
-            CirqusLoggerFactory.Changed += f => _logger = f.GetCurrentClassLogger();
-        }
+		CirqusLoggerFactory.Changed += f => _logger = f.GetCurrentClassLogger();
+	}
 
-        public IOptionalConfiguration<TestContext> AggregateRootRepository(Action<AggregateRootRepositoryConfigurationBuilder> configure)
-        {
-            configure(new AggregateRootRepositoryConfigurationBuilder(_newContainer));
-            return this;
-        }
+	public IOptionalConfiguration<TestContext> AggregateRootRepository(Action<AggregateRootRepositoryConfigurationBuilder> configure)
+	{
+		configure(new AggregateRootRepositoryConfigurationBuilder(_newContainer));
+		return this;
+	}
 
-        public IOptionalConfiguration<TestContext> EventDispatcher(Action<EventDispatcherConfigurationBuilder> configure)
-        {
-            configure(new EventDispatcherConfigurationBuilder(_services));
-            return this;
-        }
+	public IOptionalConfiguration<TestContext> EventDispatcher(Action<EventDispatcherConfigurationBuilder> configure)
+	{
+		configure(new EventDispatcherConfigurationBuilder(_services));
+		return this;
+	}
 
-        public IOptionalConfiguration<TestContext> Options(Action<OptionsConfigurationBuilder> configure)
-        {
-            configure(new OptionsConfigurationBuilder(_newContainer));
-            return this;
-        }
+	public IOptionalConfiguration<TestContext> Options(Action<OptionsConfigurationBuilder> configure)
+	{
+		configure(new OptionsConfigurationBuilder(_newContainer));
+		return this;
+	}
 
-        public TestContext Create()
-        {
-            FillInDefaults();
+	public TestContext Create()
+	{
+		FillInDefaults();
 
-            var resolutionContext = _container.CreateContext();
+		var resolutionContext = _container.CreateContext();
 
-            var eventStore = resolutionContext.Get<InMemoryEventStore>();
-            var aggregateRootRepository = resolutionContext.Get<IAggregateRootRepository>();
-            var eventDispatcher = resolutionContext.Get<IEventDispatcher>();
-            var serializer = resolutionContext.Get<IDomainEventSerializer>();
-            var commandMapper = resolutionContext.Get<ICommandMapper>();
-            var domainTypeMapper = resolutionContext.Get<IDomainTypeNameMapper>();
+		var eventStore = resolutionContext.Get<InMemoryEventStore>();
+		var aggregateRootRepository = resolutionContext.Get<IAggregateRootRepository>();
+		var eventDispatcher = resolutionContext.Get<IEventDispatcher>();
+		var serializer = resolutionContext.Get<IDomainEventSerializer>();
+		var commandMapper = resolutionContext.Get<ICommandMapper>();
+		var domainTypeMapper = resolutionContext.Get<IDomainTypeNameMapper>();
 
-            var testContext = new TestContext(eventStore, aggregateRootRepository, eventDispatcher, serializer, commandMapper, domainTypeMapper);
+		var testContext = new TestContext(eventStore, aggregateRootRepository, eventDispatcher, serializer, commandMapper, domainTypeMapper);
 
-            testContext.Disposed += resolutionContext.Dispose;
+		testContext.Disposed += resolutionContext.Dispose;
 
-            resolutionContext
-                .GetAll<Action<TestContext>>().ToList()
-                .ForEach(action => action(testContext)); 
+		resolutionContext
+			.GetAll<Action<TestContext>>().ToList()
+			.ForEach(action => action(testContext)); 
 
-            testContext.Initialize();
+		testContext.Initialize();
 
-            return testContext;
-        }
+		return testContext;
+	}
 
-        void FillInDefaults()
-        {
-            _services.AddScoped(context =>
-            {
-                var eventStore = context.GetService<InMemoryEventStore>();
-                var aggregateRootRepository = context.GetService<IAggregateRootRepository>();
-                var eventDispatcher = context.GetService<IEventDispatcher>();
-                var serializer = context.GetService<IDomainEventSerializer>();
-                var commandMapper = context.GetService<ICommandMapper>();
-                var domainTypeMapper = context.GetService<IDomainTypeNameMapper>();
+	void FillInDefaults()
+	{
+		_services.AddScoped(context =>
+		{
+			var eventStore = context.GetService<InMemoryEventStore>();
+			var aggregateRootRepository = context.GetService<IAggregateRootRepository>();
+			var eventDispatcher = context.GetService<IEventDispatcher>();
+			var serializer = context.GetService<IDomainEventSerializer>();
+			var commandMapper = context.GetService<ICommandMapper>();
+			var domainTypeMapper = context.GetService<IDomainTypeNameMapper>();
 
-                var testContext = new TestContext(eventStore, aggregateRootRepository, eventDispatcher, serializer, commandMapper, domainTypeMapper);
+			var testContext = new TestContext(eventStore, aggregateRootRepository, eventDispatcher, serializer, commandMapper, domainTypeMapper);
 
-                context
-                    .GetServices<Action<TestContext>>().ToList()
-                    .ForEach(action => action(testContext));
+			context
+				.GetServices<Action<TestContext>>().ToList()
+				.ForEach(action => action(testContext));
 
-                testContext.Initialize();
+			testContext.Initialize();
 
-                return testContext;
-            });
+			return testContext;
+		});
 
-            var memoryEventStore = new InMemoryEventStore();
+		var memoryEventStore = new InMemoryEventStore();
 
-            _services.AddScoped(x => memoryEventStore);
-            _services.AddScoped<IEventStore>(x => memoryEventStore);
+		_services.AddScoped(x => memoryEventStore);
+		_services.AddScoped<IEventStore>(x => memoryEventStore);
 
-            _services.AddScoped<IEventDispatcher>(x =>
-                    new ViewManagerEventDispatcher(
-                        x.GetService<IAggregateRootRepository>(),
-                        x.GetService<InMemoryEventStore>(),
-                        x.GetService<IDomainEventSerializer>(),
-                        x.GetService<IDomainTypeNameMapper>()));
+		_services.AddScoped<IEventDispatcher>(x =>
+			new ViewManagerEventDispatcher(
+				x.GetService<IAggregateRootRepository>(),
+				x.GetService<InMemoryEventStore>(),
+				x.GetService<IDomainEventSerializer>(),
+				x.GetService<IDomainTypeNameMapper>()));
 
-            _services.AddScoped<IAggregateRootRepository>(context =>
-                    new DefaultAggregateRootRepository(
-                        context.GetService<InMemoryEventStore>(),
-                        context.GetService<IDomainEventSerializer>(),
-                        context.GetService<IDomainTypeNameMapper>()));
+		_services.AddScoped<IAggregateRootRepository>(context =>
+			new DefaultAggregateRootRepository(
+				context.GetService<InMemoryEventStore>(),
+				context.GetService<IDomainEventSerializer>(),
+				context.GetService<IDomainTypeNameMapper>()));
 
-            _services.AddScoped<IDomainEventSerializer>(context => new JsonDomainEventSerializer("<events>"));
-            _services.AddScoped<ICommandMapper>(context => new DefaultCommandMapper());
-            _services.AddScoped<IDomainTypeNameMapper>(context => new DefaultDomainTypeNameMapper());
-        }
-    }
+		_services.AddScoped<IDomainEventSerializer>(context => new JsonDomainEventSerializer("<events>"));
+		_services.AddScoped<ICommandMapper>(context => new DefaultCommandMapper());
+		_services.AddScoped<IDomainTypeNameMapper>(context => new DefaultDomainTypeNameMapper());
+	}
+}
 
-    public static class ServiceCollectionExtensions
-    {
-        public static void AddTestContext(this IServiceCollection services,
-            Action<IOptionalConfiguration<TestContext>> configure = null)
-        {
-            if (configure != null)
-                configure(new TestContextConfigurationBuilder(services));
-            else
-                new TestContextConfigurationBuilder(services);
-        }
-    }
+public static class ServiceCollectionExtensions
+{
+	public static void AddTestContext(this IServiceCollection services,
+		Action<IOptionalConfiguration<TestContext>> configure = null)
+	{
+		if (configure != null)
+			configure(new TestContextConfigurationBuilder(services));
+		else
+			new TestContextConfigurationBuilder(services);
+	}
 }

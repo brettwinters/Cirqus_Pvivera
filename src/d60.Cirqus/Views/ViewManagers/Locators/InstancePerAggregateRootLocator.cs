@@ -2,26 +2,26 @@
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 
-namespace d60.Cirqus.Views.ViewManagers.Locators
+namespace d60.Cirqus.Views.ViewManagers.Locators;
+
+/// <summary>
+/// Scopes the view instance to the aggregate root
+/// </summary>
+public class InstancePerAggregateRootLocator : ViewLocator
 {
-    /// <summary>
-    /// Scopes the view instance to the aggregate root
-    /// </summary>
-    public class InstancePerAggregateRootLocator : ViewLocator
-    {
-        protected override IEnumerable<string> GetViewIds(IViewContext context, DomainEvent e)
-        {
-            return new[] {e.Meta[DomainEvent.MetadataKeys.AggregateRootId]};
-        }
+	protected override IEnumerable<string> GetViewIds(IViewContext context, DomainEvent e)
+	{
+		return new[] {e.Meta[DomainEvent.MetadataKeys.AggregateRootId]};
+	}
 
-        public static string GetViewIdFromAggregateRoot(AggregateRoot aggregateRoot)
-        {
-            return GetViewIdFromAggregateRootId(aggregateRoot.Id);
-        }
+	public static string GetViewIdFromAggregateRoot(AggregateRoot aggregateRoot)
+	{
+		return GetViewIdFromAggregateRootId(aggregateRoot.Id);
+	}
 
-        public static string GetViewIdFromAggregateRootId(string id)
-        {
-            return id;
-        }
-    }
+	public static string GetViewIdFromAggregateRootId(
+		string id)
+	{
+		return id;
+	}
 }

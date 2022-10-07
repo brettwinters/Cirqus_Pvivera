@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Commands;
-using d60.Cirqus.Config;
 using d60.Cirqus.Diagnostics;
 using d60.Cirqus.Events;
 using d60.Cirqus.Logging;

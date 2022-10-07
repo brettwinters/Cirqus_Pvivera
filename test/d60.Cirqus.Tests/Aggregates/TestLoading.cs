@@ -1,5 +1,4 @@
-﻿using System;
-using d60.Cirqus.Aggregates;
+﻿using d60.Cirqus.Aggregates;
 using d60.Cirqus.Config;
 using d60.Cirqus.Exceptions;
 using d60.Cirqus.Serialization;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 namespace d60.Cirqus.Ntfs.Events
 {

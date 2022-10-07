@@ -1,6 +1,3 @@
-using System;
-using d60.Cirqus.Commands;
-
 namespace d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest
 {
     public class GenerateNewId : d60.Cirqus.Commands.Command<IdGenerator>

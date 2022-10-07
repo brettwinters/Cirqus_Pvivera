@@ -26,7 +26,6 @@ namespace d60.Cirqus.Tests.MongoDb
             try
             {
                 var database = MongoHelper.InitializeTestDatabase();
-                database.Drop();
                 var eventStore = new MongoDbEventStore(database, "events", automaticallyCreateIndexes: useIndexes);
 
                 var random = new Random(DateTime.Now.GetHashCode());

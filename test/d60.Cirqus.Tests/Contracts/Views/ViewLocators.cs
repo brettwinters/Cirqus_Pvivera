@@ -1,6 +1,4 @@
-﻿using System;
-using d60.Cirqus.Testing;
-using d60.Cirqus.Tests.Contracts.EventStore.Factories;
+﻿using d60.Cirqus.Testing;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Models.ViewLocators;
 using d60.Cirqus.Views.ViewManagers;

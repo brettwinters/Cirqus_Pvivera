@@ -1,10 +1,8 @@
 ﻿using System;
-using d60.Cirqus.Config;
 using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.MsSql.Events;
 //using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace d60.Cirqus.MsSql.Config
 {

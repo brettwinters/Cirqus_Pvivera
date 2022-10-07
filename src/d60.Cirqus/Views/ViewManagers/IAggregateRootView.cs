@@ -1,7 +1,6 @@
-﻿namespace d60.Cirqus.Views.ViewManagers
+﻿namespace d60.Cirqus.Views.ViewManagers;
+
+public interface IAggregateRootView
 {
-    public interface IAggregateRootView
-    {
-        AggregateRootToFollow AggregateRoots { get; set; }
-    }
+	AggregateRootToFollow AggregateRoots { get; set; }
 }

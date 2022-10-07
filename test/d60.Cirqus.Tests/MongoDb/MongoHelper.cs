@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Configuration;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
@@ -10,7 +9,8 @@ namespace d60.Cirqus.Tests.MongoDb
 
         public static string TestDbName = "mongotestdb";
 
-        public static MongoDatabase InitializeTestDatabase(bool dropExistingDatabase = true)
+        public static IMongoDatabase InitializeTestDatabase(
+	        bool dropExistingDatabase = true)
         {
 
             var config = Configuration.Get();
@@ -26,13 +26,14 @@ namespace d60.Cirqus.Tests.MongoDb
             //var url = new MongoUrl(connectionStringSettings.ConnectionString);
 
             var databaseName = GetDatabaseName(url);
-            var database = new MongoClient(url).GetServer().GetDatabase(databaseName);
+            var client = new MongoClient(url);
+	        var database = client.GetDatabase(databaseName);
 
             Console.WriteLine("Using Mongo database '{0}'", databaseName);
             if (dropExistingDatabase)
             {
                 Console.WriteLine("Dropping Mongo database '{0}'", databaseName);
-                database.Drop();
+                client.DropDatabase(databaseName);
             }
 
             return database;

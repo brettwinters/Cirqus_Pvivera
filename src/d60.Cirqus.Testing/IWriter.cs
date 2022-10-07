@@ -1,7 +1,6 @@
-namespace d60.Cirqus.Testing
+namespace d60.Cirqus.Testing;
+
+public interface IWriter
 {
-    public interface IWriter
-    {
-        void WriteLine(string text);
-    }
+	void WriteLine(string text);
 }

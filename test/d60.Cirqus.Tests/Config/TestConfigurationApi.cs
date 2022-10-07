@@ -8,16 +8,13 @@ using d60.Cirqus.Commands;
 using d60.Cirqus.Config.Configurers;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
-using d60.Cirqus.Logging;
 using d60.Cirqus.MongoDb.Config;
 using d60.Cirqus.MongoDb.Views;
 using d60.Cirqus.Tests.MongoDb;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
-using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver.Builders;
+using MongoDB.Driver;
 using NUnit.Framework;
-using TestContext = d60.Cirqus.Testing.TestContext;
 
 namespace d60.Cirqus.Tests.Config
 {
@@ -32,7 +29,7 @@ namespace d60.Cirqus.Tests.Config
 
 
             //Brett new
-            var commandProcessor = base.CreateCommandProcessor(config => config
+            var commandProcessor = CreateCommandProcessor(config => config
                  .EventStore(es => { es.UseMongoDb(database, "Events"); es.EnableCaching(10); })
                  .EventDispatcher(ed => {
                      ed.UseViewManagerEventDispatcher(new MongoDbViewManager<ConfigTestView>(database, "view1")).WithWaitHandle(waiter).WithConfiguration(new ViewManagerEventDispatcherConfiguration(200));
@@ -82,17 +79,36 @@ namespace d60.Cirqus.Tests.Config
             Console.WriteLine("Done - checking collections");
             var expectedViewCollectionNames = new[] { "view1", "view2", "view3", "view4" };
 
-            var viewCollectionNames = database.GetCollectionNames()
+            var viewCollectionNames = database
+	            .ListCollectionNames()
+	            .ToList()
                 .OrderBy(n => n)
                 .Where(c => c.StartsWith("view") && !c.EndsWith("Position"))
                 .ToArray();
 
             Assert.That(viewCollectionNames, Is.EqualTo(expectedViewCollectionNames));
 
+            // expectedViewCollectionNames.ToList()
+            //     .ForEach(name => {
+            //         var doc = database.GetCollection<ConfigTestView>(name)
+            //             .FindOne(Query.EQ("_id", GlobalInstanceLocator.GetViewInstanceId()));
+            //
+            //         Assert.That(doc.ProcessedEventNumbers, Is.EqualTo(Enumerable.Range(0, 200).ToArray()));
+            //         Assert.That(doc.CountsByRootId["id1"], Is.EqualTo(100));
+            //         Assert.That(doc.CountsByRootId["id2"], Is.EqualTo(100));
+            //     });
+
+            var filter = new FilterDefinitionBuilder<ConfigTestView>().Eq(
+	            "_id",
+	            GlobalInstanceLocator.GetViewInstanceId()
+            );
+            
             expectedViewCollectionNames.ToList()
                 .ForEach(name => {
-                    var doc = database.GetCollection<ConfigTestView>(name)
-                        .FindOne(Query.EQ("_id", GlobalInstanceLocator.GetViewInstanceId()));
+                    var doc = database
+	                    .GetCollection<ConfigTestView>(name)
+                        .Find(filter)
+	                    .Single();
 
                     Assert.That(doc.ProcessedEventNumbers, Is.EqualTo(Enumerable.Range(0, 200).ToArray()));
                     Assert.That(doc.CountsByRootId["id1"], Is.EqualTo(100));

@@ -1,9 +1,8 @@
-namespace d60.Cirqus.Aggregates
+namespace d60.Cirqus.Aggregates;
+
+internal enum ReplayState
 {
-    internal enum ReplayState
-    {
-        None,
-        EmitApply,
-        ReplayApply,
-    }
+	None,
+	EmitApply,
+	ReplayApply,
 }

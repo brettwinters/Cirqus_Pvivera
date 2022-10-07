@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-using d60.Cirqus.Tests.Contracts.EventStore.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Factories;
 using d60.Cirqus.Tests.Contracts.Views.Models.UpdatedEvent;
-using d60.Cirqus.Tests.MongoDb;
 using NUnit.Framework;
 using TestContext = d60.Cirqus.Testing.TestContext;
 

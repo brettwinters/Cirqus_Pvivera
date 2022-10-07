@@ -2,7 +2,6 @@
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 using d60.Cirqus.Serialization;
-using d60.Cirqus.Tests.Diagnostics;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Serialization

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using d60.Cirqus.Aggregates;
-using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Exceptions;
 using d60.Cirqus.Extensions;
@@ -42,6 +41,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             }
         }
 
+        // Fails for new mongodb
         [Test]
         public void CanLoadFromWithinEventBatch()
         {
@@ -114,7 +114,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             Assert.That(batches[0].Count(), Is.EqualTo(2));
             Assert.That(batches[1].Count(), Is.EqualTo(3));
         }
-
+        
         [Test]
         public void EventAreAutomaticallyGivenGlobalSequenceNumbers()
         {
@@ -251,7 +251,9 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 
             var batchWithAlreadyUsedSequenceNumber = new[] { Event(2, "id") };
 
-            var ex = Assert.Throws<ConcurrencyException>(() => _eventStore.Save(Guid.NewGuid(), batchWithAlreadyUsedSequenceNumber));
+            var ex = Assert.Throws<ConcurrencyException>(() => 
+	            _eventStore.Save(Guid.NewGuid(), batchWithAlreadyUsedSequenceNumber)
+	        );
 
             Console.WriteLine(ex);
         }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.MsSql.Views;
 using d60.Cirqus.Numbers;

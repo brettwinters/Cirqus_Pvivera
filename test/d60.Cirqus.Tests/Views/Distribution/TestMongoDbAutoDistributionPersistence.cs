@@ -14,7 +14,10 @@ namespace d60.Cirqus.Tests.Views.Distribution
 
         protected override void DoSetUp()
         {
-            _state = new MongoDbAutoDistributionState(MongoHelper.InitializeTestDatabase(), "AutoDistribution");
+            _state = new MongoDbAutoDistributionState(
+	            mongoDatabase: MongoHelper.InitializeTestDatabase(), 
+	            collectionName: "AutoDistribution"
+	        );
         }
 
         [Test]

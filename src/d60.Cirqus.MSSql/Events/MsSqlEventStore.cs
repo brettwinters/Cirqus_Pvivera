@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 //using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.Exceptions;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Numbers;
 
 using Newtonsoft.Json;
-using System.Configuration;
 
 namespace d60.Cirqus.MsSql.Events
 {

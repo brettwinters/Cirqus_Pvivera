@@ -9,116 +9,115 @@ using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Views.ViewManagers.Locators;
 
-namespace d60.Cirqus.Views.ViewManagers
+namespace d60.Cirqus.Views.ViewManagers;
+
+/// <summary>
+/// In-memory catch-up view manager that can be used when your command processing happens on multiple machines
+/// or if you want your in-mem views to be residing on another machine than the one that does the command processing.
+/// </summary>
+public class InMemoryViewManager<TViewInstance> 
+	: AbstractViewManager<TViewInstance> 
+	where TViewInstance : class, IViewInstance, ISubscribeTo, new()
 {
-    /// <summary>
-    /// In-memory catch-up view manager that can be used when your command processing happens on multiple machines
-    /// or if you want your in-mem views to be residing on another machine than the one that does the command processing.
-    /// </summary>
-    public class InMemoryViewManager<TViewInstance> 
-        : AbstractViewManager<TViewInstance> 
-            where TViewInstance : class, IViewInstance, ISubscribeTo, new()
-    {
-        readonly ConcurrentDictionary<string, TViewInstance> _views = new ConcurrentDictionary<string, TViewInstance>();
-        readonly ViewDispatcherHelper<TViewInstance> _dispatcher = new ViewDispatcherHelper<TViewInstance>();
-        readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
-        long _position = -1;
+	readonly ConcurrentDictionary<string, TViewInstance> _views = new ConcurrentDictionary<string, TViewInstance>();
+	readonly ViewDispatcherHelper<TViewInstance> _dispatcher = new ViewDispatcherHelper<TViewInstance>();
+	readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
+	long _position = -1;
 
 
 
-        public InMemoryViewManager() {
-            _views = new ConcurrentDictionary<string, TViewInstance>();
-        }
+	public InMemoryViewManager() {
+		_views = new ConcurrentDictionary<string, TViewInstance>();
+	}
 
-        /// <summary>
-        /// Use a ConcurrentDictionary<string, TViewInstance> as the store
-        /// </summary>
-        public InMemoryViewManager(
-            ConcurrentDictionary<string, TViewInstance> viewStore)
-        {
-            _views = viewStore;
-        }
+	/// <summary>
+	/// Use a ConcurrentDictionary<string, TViewInstance> as the store
+	/// </summary>
+	public InMemoryViewManager(
+		ConcurrentDictionary<string, TViewInstance> viewStore)
+	{
+		_views = viewStore;
+	}
 
 
-        public override TViewInstance Load(string viewId)
-        {
-            TViewInstance instance;
+	public override TViewInstance Load(string viewId)
+	{
+		TViewInstance instance;
 
-            return _views.TryGetValue(viewId, out instance)
-                ? instance
-                : null;
-        }
+		return _views.TryGetValue(viewId, out instance)
+			? instance
+			: null;
+	}
 
-        public ConcurrentDictionary<string, TViewInstance> LoadAll()
-        {
-            return _views;
-        }
+	public ConcurrentDictionary<string, TViewInstance> LoadAll()
+	{
+		return _views;
+	}
 
-        public override void Delete(string viewId)
-        {
-            Console.WriteLine("Deleting view {0}", viewId);
-            TViewInstance dummy;
-            _views.TryRemove(viewId, out dummy);
-        }
+	public override void Delete(string viewId)
+	{
+		Console.WriteLine("Deleting view {0}", viewId);
+		TViewInstance dummy;
+		_views.TryRemove(viewId, out dummy);
+	}
 
-        public override string Id
-        {
-            get { return string.Format("{0}/{1}", typeof(TViewInstance).GetPrettyName(), GetHashCode()); }
-        }
+	public override string Id
+	{
+		get { return string.Format("{0}/{1}", typeof(TViewInstance).GetPrettyName(), GetHashCode()); }
+	}
 
-        public bool BatchDispatchEnabled { get; set; }
+	public bool BatchDispatchEnabled { get; set; }
 
-        public override async Task<long> GetPosition(bool canGetFromCache = true)
-        {
-            return InnerGetPosition();
-        }
+	public override async Task<long> GetPosition(bool canGetFromCache = true)
+	{
+		return InnerGetPosition();
+	}
 
-        public override void Dispatch(IViewContext viewContext, IEnumerable<DomainEvent> batch, IViewManagerProfiler viewManagerProfiler)
-        {
-            var updatedViews = new HashSet<TViewInstance>();
-            var eventList = batch.ToList();
+	public override void Dispatch(IViewContext viewContext, IEnumerable<DomainEvent> batch, IViewManagerProfiler viewManagerProfiler)
+	{
+		var updatedViews = new HashSet<TViewInstance>();
+		var eventList = batch.ToList();
 
-            if (BatchDispatchEnabled)
-            {
-                var domainEventBatch = new DomainEventBatch(eventList);
-                eventList.Clear();
-                eventList.Add(domainEventBatch);
-            }
+		if (BatchDispatchEnabled)
+		{
+			var domainEventBatch = new DomainEventBatch(eventList);
+			eventList.Clear();
+			eventList.Add(domainEventBatch);
+		}
 
-            foreach (var e in eventList)
-            {
-                if (ViewLocator.IsRelevant<TViewInstance>(e))
-                {
-                    var stopwatch = Stopwatch.StartNew();
-                    var affectedViewIds = _viewLocator.GetAffectedViewIds(viewContext, e);
+		foreach (var e in eventList)
+		{
+			if (ViewLocator.IsRelevant<TViewInstance>(e))
+			{
+				var stopwatch = Stopwatch.StartNew();
+				var affectedViewIds = _viewLocator.GetAffectedViewIds(viewContext, e);
 
-                    foreach (var viewId in affectedViewIds)
-                    {
-                        var viewInstance = _views.GetOrAdd(viewId, id => _dispatcher.CreateNewInstance(id));
+				foreach (var viewId in affectedViewIds)
+				{
+					var viewInstance = _views.GetOrAdd(viewId, id => _dispatcher.CreateNewInstance(id));
 
-                        _dispatcher.DispatchToView(viewContext, e, viewInstance);
+					_dispatcher.DispatchToView(viewContext, e, viewInstance);
 
-                        updatedViews.Add(viewInstance);
-                    }
+					updatedViews.Add(viewInstance);
+				}
 
-                    viewManagerProfiler.RegisterTimeSpent(this, e, stopwatch.Elapsed);
-                }
+				viewManagerProfiler.RegisterTimeSpent(this, e, stopwatch.Elapsed);
+			}
 
-                Interlocked.Exchange(ref _position, e.GetGlobalSequenceNumber());
-            }
+			Interlocked.Exchange(ref _position, e.GetGlobalSequenceNumber());
+		}
 
-            RaiseUpdatedEventFor(updatedViews);
-        }
+		RaiseUpdatedEventFor(updatedViews);
+	}
 
-        public override void Purge()
-        {
-            _views.Clear();
-            Interlocked.Exchange(ref _position, -1);
-        }
+	public override void Purge()
+	{
+		_views.Clear();
+		Interlocked.Exchange(ref _position, -1);
+	}
 
-        long InnerGetPosition()
-        {
-            return Interlocked.Read(ref _position);
-        }
-    }
+	long InnerGetPosition()
+	{
+		return Interlocked.Read(ref _position);
+	}
 }

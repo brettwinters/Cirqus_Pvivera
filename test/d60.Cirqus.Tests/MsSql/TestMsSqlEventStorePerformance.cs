@@ -2,14 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using d60.Cirqus.Config;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
-using d60.Cirqus.MsSql.Events;
 using d60.Cirqus.Numbers;
-using d60.Cirqus.Tests.Contracts.EventStore;
 using d60.Cirqus.Tests.Contracts.EventStore.Factories;
-using d60.Cirqus.Tests.Contracts.Views.Factories;
 //using Microsoft.Extensions.Configuration;
 using NUnit.Framework;
 
@@ -19,7 +15,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
     [TestFixture(typeof(InMemoryEventStoreFactory))]
     //[TestFixture(typeof(MsSqlEventStoreFactory), Category = TestCategories.MsSql)]
     //[TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
-    [TestFixture(typeof(NtfsEventStoreFactory))]
+    //[TestFixture(typeof(NtfsEventStoreFactory))]
     //[TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
     //[TestFixture(typeof(CachedEventStoreFactory), Category = TestCategories.MongoDb, Description = "Uses MongoDB behind the scenes")]
     public class TestEventStorePerformance<TEventStoreFactory>
