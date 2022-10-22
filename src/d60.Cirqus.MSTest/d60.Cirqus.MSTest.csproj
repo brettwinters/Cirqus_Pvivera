@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ReleaseVersion>6.0.1</ReleaseVersion>
-    <PackageId>d60.Cirqus.Identity</PackageId>
+    <PackageId>d60.Cirqus.MSTest</PackageId>
     <Version>6.0.1</Version>
     <Authors>brettwinters</Authors>
     <Company>Mercenta</Company>
@@ -11,6 +11,11 @@
     <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Sprache" Version="2.3.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\d60.Cirqus.Testing\d60.Cirqus.Testing.csproj" />
+    <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
   </ItemGroup>
 </Project>

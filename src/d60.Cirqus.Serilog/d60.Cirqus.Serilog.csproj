@@ -1,11 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-<!--    <TargetFramework>netstandard2.0</TargetFramework>-->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>d60.Cirqus.Serilog</PackageId>
+    <Version>6.0.1</Version>
+    <Authors>brettwinters</Authors>
+    <Company>Mercenta</Company>
+    <PackageDescription>Update to net6</PackageDescription>
+    <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
+    <ReleaseVersion>6.0.1</ReleaseVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />

@@ -1,11 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-<!--    <TargetFramework>netstandard2.0</TargetFramework>-->
     <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Configurations>Release;Debug</Configurations>
+    <PackageId>d60.Cirqus</PackageId>
+    <Version>6.0.1</Version>
+    <Authors>brettwinters</Authors>
+    <Company>Mercenta</Company>
+    <PackageDescription>Update to net6</PackageDescription>
+    <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
   </PropertyGroup>
-
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Remove="MsSql\**" />
     <Compile Remove="Ntfs\**" />
@@ -18,9 +26,8 @@
     <Compile Remove="Config\Configurers\ViewManagerEventDispatcherConfiguationBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Scrutor" Version="4.2.0" />
   </ItemGroup>
-
 </Project>

@@ -2,9 +2,21 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ReleaseVersion>6.0.1</ReleaseVersion>
+    <PackageId>d60.Cirqus.MongoDb</PackageId>
+    <Version>6.0.1</Version>
+    <Authors>brettwinters</Authors>
+    <Company>Mercenta</Company>
+    <PackageDescription>Update to net6</PackageDescription>
+    <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
+    <Configurations>Release;Debug</Configurations>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.17.1" />
+    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
