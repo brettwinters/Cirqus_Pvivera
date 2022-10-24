@@ -7,7 +7,7 @@
     <Version>6.0.1</Version>
     <Authors>brettwinters</Authors>
     <Company>Mercenta</Company>
-    <PackageDescription>Update to net6</PackageDescription>
+    <PackageDescription>Tidy up links</PackageDescription>
     <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
