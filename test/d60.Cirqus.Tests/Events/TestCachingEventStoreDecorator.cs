@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using d60.Cirqus.Events;
-using d60.Cirqus.Testing.Internals;
+using d60.Cirqus.InMemory.Events;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Events
@@ -143,6 +143,11 @@ namespace d60.Cirqus.Tests.Events
             public long GetNextGlobalSequenceNumber()
             {
                 throw new NotImplementedException();
+            }
+
+            public long GetLastGlobalSequenceNumber()
+            {
+	            throw new NotImplementedException();
             }
         }
 

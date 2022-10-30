@@ -1,8 +1,8 @@
 ﻿using d60.Cirqus.Aggregates;
 using d60.Cirqus.Config;
 using d60.Cirqus.Exceptions;
+using d60.Cirqus.InMemory.Events;
 using d60.Cirqus.Serialization;
-using d60.Cirqus.Testing.Internals;
 using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.Aggregates

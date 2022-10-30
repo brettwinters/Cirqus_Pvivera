@@ -51,8 +51,7 @@ public class DefaultAggregateRootRepository : IAggregateRootRepository
 		foreach (var e in eventsToApply) {
 			if (aggregateRoot == null) {
 				if (!e.Meta.ContainsKey(DomainEvent.MetadataKeys.Owner)) {
-					throw new InvalidOperationException(string.Format("Attempted to load aggregate root with ID {0} but the first event {1} did not contain metadata with the aggregate root type name!",
-						aggregateRootId, e));
+					throw new InvalidOperationException($"Attempted to load aggregate root with ID {aggregateRootId} but the first event {e} did not contain metadata with the aggregate root type name!");
 				}
 
 				var aggregateRootTypeName = e.Meta[DomainEvent.MetadataKeys.Owner];
@@ -83,8 +82,7 @@ public class DefaultAggregateRootRepository : IAggregateRootRepository
 
 	private AggregateRoot CreateNewAggregateRootInstance(Type aggregateRootType, string aggregateRootId, IUnitOfWork unitOfWork) {
 		if (!typeof(AggregateRoot).IsAssignableFrom(aggregateRootType)) {
-			throw new ArgumentException(string.Format("Cannot create new aggregate root with ID {0} of type {1} because it is not derived from AggregateRoot!",
-				aggregateRootId, aggregateRootType));
+			throw new ArgumentException($"Cannot create new aggregate root with ID {aggregateRootId} of type {aggregateRootType} because it is not derived from AggregateRoot!");
 		}
 
 		var aggregateRoot = CreateAggregateRootInstance(aggregateRootType);

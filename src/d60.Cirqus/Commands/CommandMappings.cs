@@ -19,7 +19,7 @@ public class CommandMappings
             
 		if (_commandActions.ContainsKey(commandType))
 		{
-			throw new InvalidOperationException(string.Format("Cannot add a command mapping for {0} because one has already been added!", commandType));
+			throw new InvalidOperationException($"Cannot add a command mapping for {commandType} because one has already been added!");
 		}
             
 		_commandActions[commandType] = (context, command) => commandAction(context, (TCommand)command);

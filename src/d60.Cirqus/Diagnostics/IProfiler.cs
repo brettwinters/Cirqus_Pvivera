@@ -3,7 +3,8 @@
 namespace d60.Cirqus.Diagnostics;
 
 /// <summary>
-/// Core profiler interface. Implementor can be hooked into core operations to allow for recording time spent doing various operations.
+/// Core profiler interface. Implementor can be hooked into core operations to allow for recording
+/// time spent doing various operations.
 /// </summary>
 public interface IProfiler
 {
@@ -26,6 +27,9 @@ public interface IProfiler
 	/// Called after getting the next global sequence number from the event store
 	/// </summary>
 	void RecordGlobalSequenceNumberGetNext(TimeSpan elapsed);
+	
+	//TODO Uncomment
+	void RecordGlobalSequenceNumberGetLast(TimeSpan elapsed);
 
 	/// <summary>
 	/// Called after dispatching a successfully saved event batch

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using d60.Cirqus.Extensions;
+using d60.Cirqus.InMemory.Views;
 using d60.Cirqus.Tests.Extensions;
 using d60.Cirqus.Tests.Views.TestAggregateRootView.Model;
 using d60.Cirqus.Views.ViewManagers;

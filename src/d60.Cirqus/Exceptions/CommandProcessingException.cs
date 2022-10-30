@@ -25,7 +25,7 @@ public sealed class CommandProcessingException : ApplicationException
 
 	public static CommandProcessingException Create(Command command, Exception caughtException)
 	{
-		var message = string.Format("An error occurred while processing command {0} - any events emitted will most likely not have been saved", command);
+		var message = $"An error occurred while processing command {command} - any events emitted will most likely not have been saved";
 
 		return new CommandProcessingException(message, caughtException)
 		{

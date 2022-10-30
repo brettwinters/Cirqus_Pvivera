@@ -16,7 +16,7 @@ public static class EnumerableExtensions
 	{
 		if (maxItemsPerBatch < 1)
 		{
-			throw new ArgumentException(string.Format("Cannot set max items per batch to {0}!", maxItemsPerBatch));
+			throw new ArgumentException($"Cannot set max items per batch to {maxItemsPerBatch}!");
 		}
 
 		var batch = new List<T>();
@@ -25,7 +25,10 @@ public static class EnumerableExtensions
 		{
 			batch.Add(item);
 
-			if (batch.Count < maxItemsPerBatch) continue;
+			if (batch.Count < maxItemsPerBatch)
+			{
+				continue;
+			}
 
 			// time to return this partition and begin new one
 			yield return batch;
@@ -46,7 +49,7 @@ public static class EnumerableExtensions
 	{
 		if (numberOfBuckets < 1)
 		{
-			throw new ArgumentException(string.Format("Cannot distrbute {0} into {1} buckets!", items, numberOfBuckets));
+			throw new ArgumentException($"Cannot distrbute {items} into {numberOfBuckets} buckets!");
 		}
 
 		var buckets = Enumerable.Range(0, numberOfBuckets).Select(i => new List<TItem>()).ToList();

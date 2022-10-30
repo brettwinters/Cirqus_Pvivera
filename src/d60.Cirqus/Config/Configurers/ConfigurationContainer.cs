@@ -74,21 +74,14 @@ public class ConfigurationContainer : IRegistrar
 
 		if (!decorator && !multi && havePrimaryResolverAlready)
 		{
-			var message = string.Format("Attempted to register factory method for {0} as non-decorator," +
-			                            " but there's already a primary resolver for that service! There" +
-			                            " can be only one primary resolver for each service type (but" +
-			                            " any number of decorators)",
-				typeof(TService));
+			var message = $"Attempted to register factory method for {typeof(TService)} as non-decorator," + " but there's already a primary resolver for that service! There" + " can be only one primary resolver for each service type (but" + " any number of decorators)";
 
 			throw new InvalidOperationException(message);
 		}
 
 		if (multi && havePrimaryResolverAlready)
 		{
-			var message = string.Format("Attempted to register factory method for {0} as multi, but there's" +
-			                            " already a primary resolver for that service! When doing multi-registrations," +
-			                            " it is important that they're all configured to be multi-registrations!",
-				typeof (TService));
+			var message = $"Attempted to register factory method for {typeof(TService)} as multi, but there's" + " already a primary resolver for that service! When doing multi-registrations," + " it is important that they're all configured to be multi-registrations!";
 
 			throw new InvalidOperationException(message);
 		}
@@ -159,13 +152,13 @@ Event dispatcher:
 		if (primary.Any())
 		{
 			builder.AppendLine(@"    Primary:");
-			builder.AppendLine(string.Join(Environment.NewLine, primary.Select(p => string.Format("        {0}", p.Type))));
+			builder.AppendLine(string.Join(Environment.NewLine, primary.Select(p => $"        {p.Type}")));
 		}
 
 		if (decorators.Any())
 		{
 			builder.AppendLine(@"    Decorators:");
-			builder.AppendLine(string.Join(Environment.NewLine, decorators.Select(p => string.Format("        {0}", p.Type))));
+			builder.AppendLine(string.Join(Environment.NewLine, decorators.Select(p => $"        {p.Type}")));
 		}
 
 		return builder.ToString();

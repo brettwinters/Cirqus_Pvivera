@@ -1,5 +1,5 @@
 using d60.Cirqus.Events;
-using d60.Cirqus.Testing.Internals;
+using d60.Cirqus.InMemory.Events;
 
 namespace d60.Cirqus.Tests.Contracts.EventStore.Factories
 {

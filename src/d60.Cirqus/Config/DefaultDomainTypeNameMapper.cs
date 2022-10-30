@@ -13,7 +13,7 @@ public class DefaultDomainTypeNameMapper : IDomainTypeNameMapper
 
 		if (type == null)
 		{
-			throw new ArgumentException(string.Format("Could not get aggregate root type from '{0}'", name));
+			throw new ArgumentException($"Could not get aggregate root type from '{name}'");
 		}
 
 		return type;
@@ -21,6 +21,6 @@ public class DefaultDomainTypeNameMapper : IDomainTypeNameMapper
 
 	public string GetName(Type type)
 	{
-		return string.Format("{0}, {1}", type.FullName, type.Assembly.GetName().Name);
+		return $"{type.FullName}, {type.Assembly.GetName().Name}";
 	}
 }

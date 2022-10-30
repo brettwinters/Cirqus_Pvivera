@@ -162,9 +162,10 @@ namespace d60.Cirqus.Tests.Snapshotting
                         {
                             Meta =
                             {
+                                {DomainEvent.MetadataKeys.GlobalSequenceNumber, GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString()},
                                 {DomainEvent.MetadataKeys.AggregateRootId, aggregateRootId},
                                 {DomainEvent.MetadataKeys.SequenceNumber, number.ToString()},
-                                {DomainEvent.MetadataKeys.TimeUtc, Time.UtcNow().ToString("u")},
+                                {DomainEvent.MetadataKeys.TimeUtc, TimeService.GetUtcNow().ToString("u")},
                                 {DomainEvent.MetadataKeys.Type, typeNameMapper.GetName(typeof(RootGotNewNumber))},
                                 {DomainEvent.MetadataKeys.Owner, typeNameMapper.GetName(typeof(Root))},
                             }

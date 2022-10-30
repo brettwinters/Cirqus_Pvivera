@@ -1,12 +1,13 @@
 using System;
 using d60.Cirqus.Aggregates;
+using d60.Cirqus.Commands;
 using d60.Cirqus.Events;
 using d60.Cirqus.Exceptions;
 using d60.Cirqus.Numbers;
 
-namespace d60.Cirqus.Commands;
+namespace d60.Cirqus;
 
-class DefaultCommandContext : ICommandContext
+public class DefaultCommandContext : ICommandContext
 {
 	readonly RealUnitOfWork _unitOfWork;
 	readonly Metadata _metadata;
@@ -26,8 +27,7 @@ class DefaultCommandContext : ICommandContext
 	{
 		if (_unitOfWork.Exists(aggregateRootId, long.MaxValue))
 		{
-			throw new InvalidOperationException(string.Format("Cannot create aggregate root {0} with ID {1} because an instance with that ID already exists!",
-				typeof(TAggregateRoot), aggregateRootId));
+			throw new InvalidOperationException($"Cannot create aggregate root {typeof(TAggregateRoot)} with ID {aggregateRootId} because an instance with that ID already exists!");
 		}
 
 		var root = (TAggregateRoot)_unitOfWork.Get<TAggregateRoot>(aggregateRootId, long.MaxValue, createIfNotExists: true);

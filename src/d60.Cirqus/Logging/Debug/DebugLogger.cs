@@ -53,7 +53,10 @@ public class DebugLogger : Logger
 
 	void Write(Level level, string message)
 	{
-		if ((int) level < (int) _minLevel) return;
+		if ((int) level < (int) _minLevel)
+		{
+			return;
+		}
 
 		System.Diagnostics.Debug.WriteLine("{0:O}|{1}|{2}|{3}", DateTime.Now, level, _ownerType.FullName, message);
 	}

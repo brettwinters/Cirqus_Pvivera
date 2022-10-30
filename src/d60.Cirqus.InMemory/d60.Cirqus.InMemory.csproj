@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<WarningsAsErrors>Nullable</WarningsAsErrors>
+		<ReleaseVersion>6.0.1</ReleaseVersion>
+		<PackageId>d60.Cirqus.InMemory</PackageId>
+		<Version>6.0.1</Version>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="View\SpecialInMemoryViewManager.cs" />
+	</ItemGroup>
+</Project>

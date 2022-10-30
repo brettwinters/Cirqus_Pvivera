@@ -32,7 +32,10 @@ public class CachingAggregateRootRepositoryDecorator : IAggregateRootRepository
 	{
 		var cloneFromCache = PrepareCloneFromCache(aggregateRootId, maxGlobalSequenceNumber, unitOfWork);
 
-		if (cloneFromCache != null) return cloneFromCache;
+		if (cloneFromCache != null)
+		{
+			return cloneFromCache;
+		}
 
 		var fromRepository = GetFromInnerRepository<TAggregateRoot>(aggregateRootId, unitOfWork, maxGlobalSequenceNumber, createIfNotExists);
 
@@ -53,7 +56,10 @@ public class CachingAggregateRootRepositoryDecorator : IAggregateRootRepository
 	{
 		var cloneInfo = _snapshotCache.GetCloneFromCache(aggregateRootId, maxGlobalSequenceNumber);
 
-		if (cloneInfo == null) return null;
+		if (cloneInfo == null)
+		{
+			return null;
+		}
 
 		var lastSeqNo = cloneInfo.CurrentSequenceNumber;
 		var stopwatch = Stopwatch.StartNew();

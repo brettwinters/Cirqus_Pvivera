@@ -13,7 +13,7 @@ public class AggregateRootNotFoundException : ApplicationException
 	}
 
 	public AggregateRootNotFoundException(Type aggregateRootType, string id)
-		: base(string.Format("Could not find aggregate root of type {0} with ID {1}", aggregateRootType.GetPrettyName(), id))
+		: base($"Could not find aggregate root of type {aggregateRootType.GetPrettyName()} with ID {id}")
 	{
 	}
 }

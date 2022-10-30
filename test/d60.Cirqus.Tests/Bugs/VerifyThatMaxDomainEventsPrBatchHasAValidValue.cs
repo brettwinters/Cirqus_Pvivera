@@ -1,7 +1,7 @@
 ﻿using d60.Cirqus.Aggregates;
 using d60.Cirqus.Config;
+using d60.Cirqus.InMemory.Events;
 using d60.Cirqus.Serialization;
-using d60.Cirqus.Testing.Internals;
 using d60.Cirqus.Views;
 using Moq;
 using NUnit.Framework;

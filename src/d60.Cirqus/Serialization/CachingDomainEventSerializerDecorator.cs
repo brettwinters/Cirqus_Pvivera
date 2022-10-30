@@ -61,11 +61,17 @@ public class CachingDomainEventSerializerDecorator : IDomainEventSerializer, IDi
 
 	void PossiblyTrimCache()
 	{
-		if (_purging) return;
+		if (_purging)
+		{
+			return;
+		}
 
 		lock (_purgeLock)
 		{
-			if (_purging) return;
+			if (_purging)
+			{
+				return;
+			}
 
 			_purging = true;
 		}
@@ -75,7 +81,10 @@ public class CachingDomainEventSerializerDecorator : IDomainEventSerializer, IDi
 
 		try
 		{
-			if (_cachedDomainEvents.Count < _approximateMaxNumberOfEntries) return;
+			if (_cachedDomainEvents.Count < _approximateMaxNumberOfEntries)
+			{
+				return;
+			}
 
 			didTrimCache = true;
 			_log.Debug("Trimming cache");

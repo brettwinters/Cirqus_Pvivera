@@ -71,7 +71,10 @@ class NewSnapshottingAggregateRootRepositoryDecorator : IAggregateRootRepository
 		{
 			var aggregateRootHasChanges = new AggregateRootInfo(aggregateRootInstance).SequenceNumber != checkedOutSequenceNumber;
 
-			if (!aggregateRootHasChanges) return;
+			if (!aggregateRootHasChanges)
+			{
+				return;
+			}
 
 			var lastGlobalSequenceNumber = eventBatch.Max(e => e.GetGlobalSequenceNumber());
 			_snapshotStore.SaveSnapshot<TAggregateRoot>(aggregateRootId, aggregateRootInstance, lastGlobalSequenceNumber);
@@ -90,7 +93,11 @@ class NewSnapshottingAggregateRootRepositoryDecorator : IAggregateRootRepository
 
 			foreach (var e in _eventStore.Load(aggregateRootId, info.SequenceNumber + 1))
 			{
-				if (e.GetGlobalSequenceNumber() > maxGlobalSequenceNumber) break;
+				if (e.GetGlobalSequenceNumber() > maxGlobalSequenceNumber)
+				{
+					break;
+				}
+
 				var domainEvent = _domainEventSerializer.Deserialize(e);
 				info.Apply(domainEvent, unitOfWork);
 				hadEventsAppliedToIt = true;

@@ -169,6 +169,11 @@ caching in use: {3}",
                 return InnerEventStore.GetNextGlobalSequenceNumber();
             }
 
+            public long GetLastGlobalSequenceNumber()
+            {
+	            return InnerEventStore.GetLastGlobalSequenceNumber();
+            }
+
             public void Save(Guid batchId, IEnumerable<EventData> events)
             {
                 var stopwatch = Stopwatch.StartNew();

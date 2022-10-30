@@ -26,7 +26,8 @@ public class EventDispatcherConfigurationBuilder : NewConfigurationBuilder<IEven
 	}
 
 	/// <summary>
-	/// Registers a <see cref="Views.ViewManagerEventDispatcher"/> to manage the given views. Can be called multiple times in order to register
+	/// Registers a <see cref="Views.ViewManagerEventDispatcher"/> to manage the given views.
+	/// Can be called multiple times in order to register
 	/// multiple "pools" of views (each will be managed by a dedicated worker thread).
 	/// </summary>
 	public ViewManagerEventDispatcherConfigurationBuilder UseViewManagerEventDispatcher(
@@ -86,7 +87,8 @@ public class EventDispatcherConfigurationBuilder : NewConfigurationBuilder<IEven
 	/// Configures a dependent view manager event dispatcher that tacks on to any number of dependent views, catching up from the
 	/// event store when the dependent views have caught up.
 	/// </summary>
-	public DependentViewManagerEventDispatcherSettings UseDependentViewManagerEventDispatcher(params IViewManager[] viewManagers)
+	public DependentViewManagerEventDispatcherSettings UseDependentViewManagerEventDispatcher(
+		params IViewManager[] viewManagers)
 	{
 		var settings = new DependentViewManagerEventDispatcherSettings();
 

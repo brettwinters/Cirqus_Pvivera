@@ -15,8 +15,8 @@ namespace d60.Cirqus.Tests.Events.Replicator
     [TestFixture, Category(TestCategories.MongoDb)]
     public class BasicReplication : FixtureBase
     {
-        readonly Dictionary<Guid, int> _seqNos = new Dictionary<Guid, int>();
-        readonly JsonDomainEventSerializer _serializer = new JsonDomainEventSerializer();
+        readonly Dictionary<Guid, int> _seqNos = new();
+        readonly JsonDomainEventSerializer _serializer = new();
 
         EventReplicator _replicator;
         MongoDbEventStore _source;
@@ -121,8 +121,10 @@ namespace d60.Cirqus.Tests.Events.Replicator
                 Data = data,
                 Meta =
                 {
-                    {DomainEvent.MetadataKeys.AggregateRootId, aggregateRootId.ToString()},
-                    {DomainEvent.MetadataKeys.SequenceNumber, GetNextSeqNoFor(aggregateRootId).ToString(Metadata.NumberCulture)},
+	                //TODO Uncomment
+                    [DomainEvent.MetadataKeys.GlobalSequenceNumber] = GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString(),
+                    [DomainEvent.MetadataKeys.AggregateRootId] = aggregateRootId.ToString(),
+                    [DomainEvent.MetadataKeys.SequenceNumber] = GetNextSeqNoFor(aggregateRootId).ToString(Metadata.NumberCulture),
                 }
             };
         }

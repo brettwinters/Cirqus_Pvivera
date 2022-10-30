@@ -19,18 +19,12 @@ public class MetaAttribute : Attribute
 		_value = value;
 	}
 
-	public string Key
-	{
-		get { return _key; }
-	}
+	public string Key => _key;
 
-	public string Value
-	{
-		get { return _value; }
-	}
+	public string Value => _value;
 
 	public override string ToString()
 	{
-		return string.Format("{0}: {1}", _key, _value);
+		return $"{_key}: {_value}";
 	}
 }

@@ -26,27 +26,33 @@ public sealed class Metadata : Dictionary<string, string>
 	{
 	}
 
-	internal void Merge(Metadata otherMeta)
+	public void Merge(Metadata otherMeta)
 	{
 		foreach (var kvp in otherMeta)
 		{
-			if (ContainsKey(kvp.Key)) continue;
+			if (ContainsKey(kvp.Key))
+			{
+				continue;
+			}
 
 			this[kvp.Key] = kvp.Value;
 		}
 	}
 
-	internal void TakeFromAttributes(ICustomAttributeProvider provider)
+	public void TakeFromAttributes(ICustomAttributeProvider provider)
 	{
 		foreach (var meta in provider.GetAttributes<MetaAttribute>())
 		{
-			if (ContainsKey(meta.Key)) continue;
+			if (ContainsKey(meta.Key))
+			{
+				continue;
+			}
 
 			this[meta.Key] = meta.Value;
 		}
 	}
 
-	internal Metadata Clone()
+	public Metadata Clone()
 	{
 		var clone = new Metadata();
 		foreach (var key in Keys.ToArray())
@@ -58,6 +64,6 @@ public sealed class Metadata : Dictionary<string, string>
 
 	public override string ToString()
 	{
-		return string.Join(", ", this.Select(kvp => string.Format(@"""{0}"": ""{1}""", kvp.Key, kvp.Value)));
+		return string.Join(", ", this.Select(kvp => $@"""{kvp.Key}"": ""{kvp.Value}"""));
 	}
 }

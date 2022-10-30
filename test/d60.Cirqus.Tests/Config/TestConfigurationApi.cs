@@ -21,10 +21,72 @@ namespace d60.Cirqus.Tests.Config
     [TestFixture]
     public class TestConfigurationApi : FixtureBase
     {
-        [Test, Category(TestCategories.MongoDb)]
-        public async Task CanInstallMultipleEventDispatchers() {
-            var database = MongoHelper.InitializeTestDatabase();
+	    #region
 
+	    class ConfigTestView : IViewInstance<GlobalInstanceLocator>, ISubscribeTo<ConfigTestEvent>
+	    {
+		    public ConfigTestView() {
+			    CountsByRootId = new Dictionary<string, int>();
+			    ProcessedEventNumbers = new List<long>();
+		    }
+		    public string Id { get; set; }
+		    public long LastGlobalSequenceNumber { get; set; }
+		    public List<long> ProcessedEventNumbers { get; set; }
+		    public Dictionary<string, int> CountsByRootId { get; set; }
+		    public void Handle(IViewContext context, ConfigTestEvent domainEvent) {
+			    ProcessedEventNumbers.Add(domainEvent.GetGlobalSequenceNumber());
+
+			    var id = domainEvent.GetAggregateRootId();
+
+			    if (!CountsByRootId.ContainsKey(id))
+				    CountsByRootId[id] = 0;
+
+			    CountsByRootId[id]++;
+
+			    Thread.Sleep(10);
+		    }
+	    }
+
+	    public class ConfigTestRoot : AggregateRoot, IEmit<ConfigTestEvent>
+	    {
+		    public int EmittedEvents { get; set; }
+
+		    public void EmitStuff() {
+			    Emit(new ConfigTestEvent());
+		    }
+
+		    public void Apply(ConfigTestEvent e) {
+			    EmittedEvents++;
+		    }
+	    }
+
+	    public class ConfigTestEvent : DomainEvent<ConfigTestRoot> { }
+
+	    class ConfigTestCommand : Cirqus.Commands.Command<ConfigTestRoot>
+	    {
+		    public ConfigTestCommand(string aggregateRootId) : base(aggregateRootId) { }
+
+		    public override void Execute(ConfigTestRoot aggregateRoot) {
+			    aggregateRoot.EmitStuff();
+		    }
+	    }
+        
+	    private class SomeCommand : ExecutableCommand
+	    {
+		    public bool WasProcessed { get; set; }
+
+		    public override void Execute(ICommandContext context) {
+			    WasProcessed = true;
+		    }
+	    }
+
+	    #endregion
+	    
+        [Test, Category(TestCategories.MongoDb)]
+        public async Task CanInstallMultipleEventDispatchers() 
+        {
+	        FakeGlobalSequenceNumberService.Reset();
+            var database = MongoHelper.InitializeTestDatabase();
             var waiter = new ViewManagerWaitHandle();
 
 
@@ -36,7 +98,8 @@ namespace d60.Cirqus.Tests.Config
                      ed.UseViewManagerEventDispatcher(new MongoDbViewManager<ConfigTestView>(database, "view2")).WithWaitHandle(waiter);
                      ed.UseViewManagerEventDispatcher(new MongoDbViewManager<ConfigTestView>(database, "view3")).WithWaitHandle(waiter);
                      ed.UseViewManagerEventDispatcher(new MongoDbViewManager<ConfigTestView>(database, "view4")).WithWaitHandle(waiter);
-                 }));
+                 })
+            );
 
             //orig
             //var commandProcessor = CommandProcessor.With()
@@ -116,59 +179,11 @@ namespace d60.Cirqus.Tests.Config
                 });
         }
 
-        public class ConfigTestView : IViewInstance<GlobalInstanceLocator>, ISubscribeTo<ConfigTestEvent>
-        {
-            public ConfigTestView() {
-                CountsByRootId = new Dictionary<string, int>();
-                ProcessedEventNumbers = new List<long>();
-            }
-            public string Id { get; set; }
-            public long LastGlobalSequenceNumber { get; set; }
-            public List<long> ProcessedEventNumbers { get; set; }
-            public Dictionary<string, int> CountsByRootId { get; set; }
-            public void Handle(IViewContext context, ConfigTestEvent domainEvent) {
-                ProcessedEventNumbers.Add(domainEvent.GetGlobalSequenceNumber());
-
-                var id = domainEvent.GetAggregateRootId();
-
-                if (!CountsByRootId.ContainsKey(id))
-                    CountsByRootId[id] = 0;
-
-                CountsByRootId[id]++;
-
-                Thread.Sleep(10);
-            }
-        }
-
-        public class ConfigTestRoot : AggregateRoot, IEmit<ConfigTestEvent>
-        {
-            public int EmittedEvents { get; set; }
-
-            public void EmitStuff() {
-                Emit(new ConfigTestEvent());
-            }
-
-            public void Apply(ConfigTestEvent e) {
-                EmittedEvents++;
-            }
-        }
-
-        public class ConfigTestEvent : DomainEvent<ConfigTestRoot> { }
-
-        public class ConfigTestCommand : d60.Cirqus.Commands.Command<ConfigTestRoot>
-        {
-            public ConfigTestCommand(string aggregateRootId) : base(aggregateRootId) { }
-
-            public override void Execute(ConfigTestRoot aggregateRoot) {
-                aggregateRoot.EmitStuff();
-            }
-        }
-
         [Test, Category(TestCategories.MongoDb)]
-        public void CanDoTheConfigThing() {
+        public void CanDoTheConfigThing() 
+        {
             var database = MongoHelper.InitializeTestDatabase();
-
-
+            
             //Brett new
             var processor = CreateCommandProcessor(config => config
                 .Logging(l => l.UseConsole())
@@ -181,19 +196,6 @@ namespace d60.Cirqus.Tests.Config
                     o.SetMaxRetries(10);
                 }));
 
-            //orig
-            //var fullConfiguration = CommandProcessor.With()
-            //    .Logging(l => l.UseConsole())
-            //    .EventStore(e => e.UseMongoDb(database, "Events"))
-            //    .AggregateRootRepository(r => r.EnableInMemorySnapshotCaching(10000))
-            //    .EventDispatcher(d => d.UseViewManagerEventDispatcher())
-            //    .Options(o => {
-            //        o.PurgeExistingViews(true);
-            //        o.AddDomainExceptionType<ApplicationException>();
-            //        o.SetMaxRetries(10);
-            //    });
-            //var processor = fullConfiguration;
-
             RegisterForDisposal(processor);
 
             var someCommand = new SomeCommand();
@@ -203,37 +205,19 @@ namespace d60.Cirqus.Tests.Config
         }
 
         [Test]
-        public void CanDecorateAggregateRootRepositoryForTestContext() {
+        public void CanDecorateAggregateRootRepositoryForTestContext() 
+        {
             var decorated = false;
-
-            //Brett
             CreateTestContext(config => config
                 .AggregateRootRepository(rcb => rcb
-                    .Decorate<IAggregateRootRepository>((repo, services) => {
+                    .Decorate<IAggregateRootRepository>((repo, _) => {
                         decorated = true;
                         return repo;
                     })
                 )
             );
 
-            //orig
-            //TestContext.With()
-            //    .AggregateRootRepository(x => x.Decorate(c => {
-            //        decorated = true;
-            //        return c.Get<IAggregateRootRepository>();
-            //    }))
-            //    .Create();
-
             Assert.True(decorated);
-        }
-
-        public class SomeCommand : ExecutableCommand
-        {
-            public bool WasProcessed { get; set; }
-
-            public override void Execute(ICommandContext context) {
-                WasProcessed = true;
-            }
         }
     }
 }

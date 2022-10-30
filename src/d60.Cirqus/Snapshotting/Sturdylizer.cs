@@ -24,7 +24,7 @@ public class Sturdylizer
 		}
 		catch (Exception exception)
 		{
-			throw new JsonSerializationException(string.Format("Could not serialize aggregate root {0} with ID {1}", rootInstance.GetType(), rootInstance), exception);
+			throw new JsonSerializationException($"Could not serialize aggregate root {rootInstance.GetType()} with ID {rootInstance}", exception);
 		}
 	}
 
@@ -38,7 +38,7 @@ public class Sturdylizer
 		}
 		catch (Exception exception)
 		{
-			throw new JsonSerializationException(string.Format("Could not deserialize JSON text '{0}'", data), exception);
+			throw new JsonSerializationException($"Could not deserialize JSON text '{data}'", exception);
 		}
 	}
 
@@ -92,7 +92,9 @@ public class Sturdylizer
 
 			// if type has constructor marked with JsonConstructor attribute or can't be instantiated, return default contract
 			if (objectContract.OverrideCreator != null || objectContract.CreatedType.IsInterface || objectContract.CreatedType.IsAbstract)
+			{
 				return objectContract;
+			}
 
 			// prepare function to check that specified constructor parameter corresponds to non writable property on a type
 			Func<JsonProperty, bool> isParameterForNonWritableProperty =
@@ -101,7 +103,9 @@ public class Sturdylizer
 					var propertyForParameter = objectContract.Properties.FirstOrDefault(property => property.PropertyName == parameter.PropertyName);
 
 					if (propertyForParameter == null)
+					{
 						return false;
+					}
 
 					return !propertyForParameter.Writable;
 				};
@@ -110,7 +114,9 @@ public class Sturdylizer
 			// this is needed to handle special cases for types that can be initialized only via constructor, i.e. Tuple<>
 			if (objectContract.CreatorParameters != null
 			    && objectContract.CreatorParameters.Any(parameter => isParameterForNonWritableProperty(parameter)))
+			{
 				return objectContract;
+			}
 
 			// override default creation method to create object without constructor call
 			objectContract.DefaultCreatorNonPublic = false;

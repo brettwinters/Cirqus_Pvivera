@@ -1,27 +1,27 @@
 using d60.Cirqus.Ntfs.Events;
 using NUnit.Framework;
-//using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
-using Xunit;
-using Assert = NUnit.Framework.Assert;
+
 
 namespace d60.Cirqus.Tests.Events.Ntfs
 {
     [TestFixture]
     public class TestCommitLog : FixtureBase
     {
-        readonly CommitLog _log;
+	    CommitLog _log;
 
-        public TestCommitLog()
+        [SetUp]
+        public void TestCommitLog2()
         {
             _log = RegisterForDisposal(new CommitLog("testdata", dropEvents: true));
         }
 
+        [TearDown]
         protected override void DoTearDown() {
             base.DoTearDown();
             DisposeStuff();
         }
 
-        [Fact]
+        [Test]
         public void GetLastComittedGlobalSequenceNumberFromEmptyFile()
         {
             bool corrupted;
@@ -30,7 +30,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void GetLastComittedGlobalSequenceNumberFromOkFile()
         {
             _log.Writer.Write(10L);
@@ -43,7 +43,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void GetLastComittedGlobalSequenceNumberFromFileWithCorruptFirstCommit()
         {
             // a corrupted one
@@ -56,7 +56,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(true, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void RecoverFileWithCorruptFirstCommit()
         {
             // a corrupted one
@@ -71,7 +71,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void GetLastComittedGlobalSequenceNumberFromFileWithCorruptFirstChecksum()
         {
             // a corrupted one
@@ -85,7 +85,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(true, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void RecoverFileWithCorruptFirstChecksum()
         {
             // a corrupted one
@@ -101,7 +101,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void GetLastComittedGlobalSequenceNumberFromFileWithMissingFirstChecksum()
         {
             // a commit without checksum
@@ -113,7 +113,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(-1, global);
             Assert.AreEqual(true, corrupted);
         }
-        [Fact]
+        [Test]
         public void RecoverFileWithMissingFirstChecksum()
         {
             // a commit without checksum
@@ -128,8 +128,8 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
-        public void GetLastComittedGlobalSequenceNumberFromFileWithCorruptCommit()
+        [Test]
+        public void GetLastCommittedGlobalSequenceNumberFromFileWithCorruptCommit()
         {
             // a good one
             _log.Writer.Write(10L);
@@ -145,7 +145,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(true, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void RecoverFileWithCorruptCommit()
         {
             // a good one
@@ -164,8 +164,8 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
-        public void GetLastComittedGlobalSequenceNumberFromFileWithCorruptChecksum()
+        [Test]
+        public void GetLastCommittedGlobalSequenceNumberFromFileWithCorruptChecksum()
         {
             // a good one
             _log.Writer.Write(10L);
@@ -182,7 +182,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(true, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void RecoverFileWithCorruptChecksum()
         {
             // a good one
@@ -196,14 +196,13 @@ namespace d60.Cirqus.Tests.Events.Ntfs
 
             _log.Recover();
 
-            bool corrupted;
-            var global = _log.Read(out corrupted);
+            var global = _log.Read(out var corrupted);
             Assert.AreEqual(10, global);
             Assert.AreEqual(false, corrupted);
         }
 
-        [Fact]
-        public void GetLastComittedGlobalSequenceNumberFromFileWithMissingChecksum()
+        [Test]
+        public void GetLastCommittedGlobalSequenceNumberFromFileWithMissingChecksum()
         {
             // a good one
             _log.Writer.Write(10L);
@@ -219,7 +218,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
             Assert.AreEqual(true, corrupted);
         }
 
-        [Fact]
+        [Test]
         public void RecoverFileWithMissingChecksum()
         {
             // a good one
@@ -232,8 +231,7 @@ namespace d60.Cirqus.Tests.Events.Ntfs
 
             _log.Recover();
 
-            bool corrupted;
-            var global = _log.Read(out corrupted);
+            var global = _log.Read(out var corrupted);
             Assert.AreEqual(10, global);
             Assert.AreEqual(false, corrupted);
         }

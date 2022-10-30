@@ -21,8 +21,7 @@ public class TypeAliasBinder : DefaultSerializationBinder
 
 		if (!_typeToName.ContainsKey(specialType) && _nameToType.ContainsKey(shortTypeName))
 		{
-			var errorMessage = String.Format("Cannot add short name mapping for {0} because the short type name {1} has already been added for {2}",
-				specialType, shortTypeName, _nameToType[shortTypeName]);
+			var errorMessage = $"Cannot add short name mapping for {specialType} because the short type name {shortTypeName} has already been added for {_nameToType[shortTypeName]}";
 
 			throw new InvalidOperationException(errorMessage);
 		}

@@ -50,7 +50,28 @@ public static class EventExtensions
 		this EventData domainEvent, 
 		bool throwIfNotFound = true)
 	{
-		return GetMetadataField(domainEvent, DomainEvent.MetadataKeys.GlobalSequenceNumber, Convert.ToInt64, throwIfNotFound);
+		return GetMetadataField(
+			domainEvent: domainEvent, 
+			key: DomainEvent.MetadataKeys.GlobalSequenceNumber, 
+			converter: Convert.ToInt64, 
+			throwIfNotFound: throwIfNotFound
+		);
+	}
+
+	//TODO Write Tests
+	/// <summary>
+	/// Gets the timestamp in <see cref="DateTime.Ticks"/> from the domain event
+	/// </summary>
+	public static long GetTimeStamp(
+		this EventData domainEvent, 
+		bool throwIfNotFound = true)
+	{
+		return GetMetadataField(
+			domainEvent: domainEvent, 
+			key: DomainEvent.MetadataKeys.TimeUtc, 
+			converter: v => DateTime.Parse(v).Ticks, 
+			throwIfNotFound: throwIfNotFound
+		);
 	}
 
 	/// <summary>
@@ -75,13 +96,18 @@ public static class EventExtensions
 	{
 		var metadata = domainEvent.Meta;
 
-		if (metadata.ContainsKey(key)) return converter(metadata[key]);
+		if (metadata.ContainsKey(key))
+		{
+			return converter(metadata[key]);
+		}
 
-		if (!throwIfNotFound) return converter(null);
+		if (!throwIfNotFound)
+		{
+			return converter(null);
+		}
 
-		var metadataString = string.Join(", ", metadata.Select(kvp => string.Format("{0}: {1}", kvp.Key, kvp.Value)));
-		var message = string.Format("Attempted to get value of key '{0}' from event, but only the following" +
-		                            " metadata were available: {1}", key, metadataString);
+		var metadataString = string.Join(", ", metadata.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+		var message = $"Attempted to get value of key '{key}' from event, but only the following" + $" metadata were available: {metadataString}";
 
 		throw new InvalidOperationException(message);
 	}

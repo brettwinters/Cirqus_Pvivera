@@ -24,7 +24,7 @@ public class InMemoryEventStore : IEventStore, IEnumerable<EventData>
 		var batch = events.ToList();
 
 		var tuplesInBatch = batch
-			.Select(e => string.Format("{0}:{1}", e.GetAggregateRootId(), e.GetSequenceNumber()))
+			.Select(e => $"{e.GetAggregateRootId()}:{e.GetSequenceNumber()}")
 			.ToList();
 
 		lock (_lock)
@@ -45,7 +45,7 @@ public class InMemoryEventStore : IEventStore, IEnumerable<EventData>
 				{
 					if (_idAndSeqNoTuples.Contains(tuple))
 					{
-						throw new InvalidOperationException(string.Format("Found duplicate event: {0}", tuple));
+						throw new InvalidOperationException($"Found duplicate event: {tuple}");
 					}
 				}
 
@@ -129,7 +129,8 @@ public class InMemoryEventStore : IEventStore, IEnumerable<EventData>
 		}
 	}
 
-	EventData Clone(EventData arg)
+	EventData Clone(
+		EventData arg)
 	{
 		var meta = arg.Meta;
 		var data = arg.Data;

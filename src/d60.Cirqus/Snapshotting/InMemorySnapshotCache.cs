@@ -35,7 +35,7 @@ public class InMemorySnapshotCache : ISnapshotCache
 		{
 			if (value < 0)
 			{
-				throw new ArgumentException(string.Format("Cannot set maximum number of cache entries to {0} - it must be 0 or greater", value));
+				throw new ArgumentException($"Cannot set maximum number of cache entries to {value} - it must be 0 or greater");
 			}
 			_approximateMaxNumberOfCacheEntries = value;
 
@@ -109,8 +109,7 @@ public class InMemorySnapshotCache : ISnapshotCache
 			}
 			catch (Exception exception)
 			{
-				throw new SerializationException(string.Format("An error occured when attempting to deserialize {0} into an aggregate root",
-					Data), exception);
+				throw new SerializationException($"An error occured when attempting to deserialize {Data} into an aggregate root", exception);
 			}
 		}
 	}
@@ -129,12 +128,17 @@ public class InMemorySnapshotCache : ISnapshotCache
 				.Select(e => e.Value.GlobalSequenceNumber)
 				.ToArray();
 
-			if (!availableSequenceNumbersForThisRoot.Any()) return null;
+			if (!availableSequenceNumbersForThisRoot.Any())
+			{
+				return null;
+			}
 
 			var highestSequenceNumberAvailableForThisRoot = availableSequenceNumbersForThisRoot.Max();
 
 			if (!entriesForThisRoot.TryGetValue(highestSequenceNumberAvailableForThisRoot, out entry))
+			{
 				return null;
+			}
 
 			var aggregateRootInfoToReturn = entry.GetClone();
 
@@ -153,7 +157,10 @@ public class InMemorySnapshotCache : ISnapshotCache
 	public void PutCloneToCache(AggregateRoot aggregateRootInfo)
 	{
 		// don't waste cycles add/trimming
-		if (IsEffectivelyDisabled) return;
+		if (IsEffectivelyDisabled)
+		{
+			return;
+		}
 
 		var aggregateRootId = aggregateRootInfo.Id;
 		var entriesForThisRoot = _cacheEntries.GetOrAdd(aggregateRootId, id => new ConcurrentDictionary<long, CacheEntry>());
@@ -177,7 +184,10 @@ public class InMemorySnapshotCache : ISnapshotCache
 	{
 		var numberOfEntriesCurrentlyInTheCache = Interlocked.Read(ref _currentNumberOfCacheEntries);
 
-		if (numberOfEntriesCurrentlyInTheCache <= _approximateMaxNumberOfCacheEntries) return;
+		if (numberOfEntriesCurrentlyInTheCache <= _approximateMaxNumberOfCacheEntries)
+		{
+			return;
+		}
 
 		var removalsToPerform = Math.Max(10, _approximateMaxNumberOfCacheEntries / 10);
 
@@ -204,7 +214,9 @@ public class InMemorySnapshotCache : ISnapshotCache
 			var entryToRemove = entriesOrderedByValue[index++];
 
 			if (!_cacheEntries.TryGetValue(entryToRemove.Entry.AggregateRootId, out entriesForThisRoot))
+			{
 				continue;
+			}
 
 			CacheEntry removedEntry;
 

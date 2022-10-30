@@ -72,6 +72,11 @@ public abstract class DomainEvent : IDomainEvent
 	}
 
 	/// <summary>
+	/// Format for the timestamp in the <see cref="MetadataKeys.TimeUtc"/>
+	/// </summary>
+	public const string DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fffff";
+
+	/// <summary>
 	/// Constructs the domain event with an empty metadata collection
 	/// </summary>
 	protected DomainEvent()
@@ -86,11 +91,7 @@ public abstract class DomainEvent : IDomainEvent
 
 	public override string ToString()
 	{
-		return string.Format("{0} ({1}/{2}/{3})", 
-			GetType().Name, 
-			Meta.ContainsKey(MetadataKeys.AggregateRootId) ? Meta[MetadataKeys.AggregateRootId] : "?",
-			Meta.ContainsKey(MetadataKeys.SequenceNumber) ? Meta[MetadataKeys.SequenceNumber] : "?",
-			Meta.ContainsKey(MetadataKeys.GlobalSequenceNumber) ? Meta[MetadataKeys.GlobalSequenceNumber] : "?");
+		return $"{GetType().Name} ({(Meta.ContainsKey(MetadataKeys.AggregateRootId) ? Meta[MetadataKeys.AggregateRootId] : "?")}/{(Meta.ContainsKey(MetadataKeys.SequenceNumber) ? Meta[MetadataKeys.SequenceNumber] : "?")}/{(Meta.ContainsKey(MetadataKeys.GlobalSequenceNumber) ? Meta[MetadataKeys.GlobalSequenceNumber] : "?")})";
 	}
 }
 

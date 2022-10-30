@@ -27,6 +27,6 @@ public class ResolutionException : ApplicationException
 
 	static string CreateMessage(Type resolvedType, string message, object[] objs)
 	{
-		return string.Format("Error when getting {0}: {1}", resolvedType, string.Format(message, objs));
+		return $"Error when getting {resolvedType}: {string.Format(message, objs)}";
 	}
 }

@@ -18,8 +18,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\d60.Cirqus.InMemory\d60.Cirqus.InMemory.csproj" />
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
     <ProjectReference Include="..\d60.Cirqus.Identity\d60.Cirqus.Identity.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Copied\InMemoryEventStore.cs" />
   </ItemGroup>
 
 </Project>

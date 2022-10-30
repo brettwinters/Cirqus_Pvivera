@@ -30,7 +30,11 @@ public class ViewManagerEventDispatcherConfigurationBuilder : NewConfigurationBu
 	/// </summary>
 	public ViewManagerEventDispatcherConfigurationBuilder WithViewContext(IDictionary<string, object> viewContextItems)
 	{
-		if (viewContextItems == null) throw new ArgumentNullException("viewContextItems");
+		if (viewContextItems == null)
+		{
+			throw new ArgumentNullException(nameof(viewContextItems));
+		}
+
 		RegisterInstance(viewContextItems);
 		return this;
 	}

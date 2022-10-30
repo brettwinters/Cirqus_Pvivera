@@ -9,8 +9,9 @@ using Timer = System.Timers.Timer;
 namespace d60.Cirqus.Events;
 
 /// <summary>
-/// Replicator that can sync events from one event store to another. PLEASE NOTE that it is assumed that the destination
-/// event store does not receive events from anywhere else, since the destinations event store's <see cref="IEventStore.GetNextGlobalSequenceNumber"/>
+/// Replicator that can sync events from one event store to another.
+/// PLEASE NOTE that it is assumed that the destination event store does not receive events from anywhere
+/// else, since the destinations event store's <see cref="IEventStore.GetNextGlobalSequenceNumber"/>
 /// is used to figure out which sequence number to resume from in the source event store.
 /// </summary>
 public class EventReplicator : IDisposable
@@ -90,6 +91,8 @@ public class EventReplicator : IDisposable
 		}
 	}
 
+	static readonly object Lock = new object();
+	
 	void Replicate()
 	{
 		_running = true;
@@ -98,12 +101,18 @@ public class EventReplicator : IDisposable
 		{
 			try
 			{
-				PumpEvents();
+				lock (Lock)
+				{
+					PumpEvents();
+				}
 			}
 			catch (Exception exception)
 			{
-				_logger.Error(exception, "An error occurred while attempting to load events from {0} into {1} - waiting {2}",
-					_sourceEventStore, _destinationEventStore, TimeToPauseOnError);
+				_logger.Error(
+					exception, 
+					"An error occurred while attempting to load events from {0} into {1} - waiting {2}",
+					_sourceEventStore, _destinationEventStore, TimeToPauseOnError
+				);
 
 				// avoid thrashing
 				Thread.Sleep(TimeToPauseOnError);
@@ -123,13 +132,14 @@ public class EventReplicator : IDisposable
 	/// roots, but it can increase throughput when streaming events when replaying projections.
 	/// </summary>
 	public int MaxEventsPerBatch { get; set; }
-
+	
 	void PumpEvents()
 	{
 		var didGetEvents = false;
 		var nextEventBatch = new List<EventData>();
-
-		foreach (var newEvent in _sourceEventStore.Stream(_destinationEventStore.GetNextGlobalSequenceNumber()))
+		
+		var sourceEventsAfterLastSavedToDestination = _sourceEventStore.Stream(_destinationEventStore.GetLastGlobalSequenceNumber() + 1);
+		foreach (var newEvent in sourceEventsAfterLastSavedToDestination)
 		{
 			newEvent.Meta[SourceEventBatchId] = newEvent.GetBatchId().ToString();
 
@@ -171,11 +181,17 @@ public class EventReplicator : IDisposable
 	/// </summary>
 	public void Dispose()
 	{
-		if (_disposed) return;
+		if (_disposed)
+		{
+			return;
+		}
 
 		try
 		{
-			if (!_running) return;
+			if (!_running)
+			{
+				return;
+			}
 
 			_statsTimer.Dispose();
 			_stop = true;

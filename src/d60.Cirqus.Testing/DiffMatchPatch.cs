@@ -27,7 +27,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace EnergyProjects.Tests.Utils;
+namespace d60.Cirqus.Testing;
 
 internal static class CompatibilityExtensions
 {

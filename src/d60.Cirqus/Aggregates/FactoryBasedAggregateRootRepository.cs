@@ -13,7 +13,9 @@ public class FactoryBasedAggregateRootRepository : DefaultAggregateRootRepositor
 		: base(eventStore, domainEventSerializer, domainTypeNameMapper)
 	{
 		if (aggregateRootFactoryMethod == null)
-			throw new ArgumentNullException("aggregateRootFactoryMethod");
+		{
+			throw new ArgumentNullException(nameof(aggregateRootFactoryMethod));
+		}
 
 		_aggregateRootFactoryMethod = aggregateRootFactoryMethod;
 	}

@@ -11,7 +11,8 @@ using NUnit.Framework;
 
 namespace d60.Cirqus.Tests.MsSql
 {
-    [TestFixture]
+    [TestFixture(Ignore = "true")]
+    //[TestFixture(typeof(MsSqlViewManagerFactory), Category = TestCategories.MsSql)]
     public class TestNewMsSqlViewManager_AutomaticSchemaRegeneration : FixtureBase
     {
         MsSqlViewManager<SomeView> _viewManager;

@@ -13,7 +13,10 @@ public static class InMemSnapshotConfigEx
 	/// </summary>
 	public static void UseInMemorySnapshotStore(this SnapshottingConfigurationBuilder builder)
 	{
-		if (builder == null) throw new ArgumentNullException("builder");
+		if (builder == null)
+		{
+			throw new ArgumentNullException(nameof(builder));
+		}
 
 		builder.Register(c => new InMemorySnapshotStore());
 	}

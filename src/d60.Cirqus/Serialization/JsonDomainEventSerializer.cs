@@ -179,7 +179,7 @@ public class JsonDomainEventSerializer : IDomainEventSerializer
 			return result;
 		}
 		catch (Exception exception) {
-			throw new SerializationException(string.Format("Could not serialize DomainEvent {0} into JSON! (headers: {1})", e, e.Meta), exception);
+			throw new SerializationException($"Could not serialize DomainEvent {e} into JSON! (headers: {e.Meta})", exception);
 		}
 	}
 
@@ -198,7 +198,7 @@ public class JsonDomainEventSerializer : IDomainEventSerializer
 			return deserializedObject;
 		}
 		catch (Exception exception) {
-			throw new SerializationException(string.Format("Could not deserialize JSON text '{0}' into proper DomainEvent! (headers: {1})", text, e.Meta), exception);
+			throw new SerializationException($"Could not deserialize JSON text '{text}' into proper DomainEvent! (headers: {e.Meta})", exception);
 		}
 	}
 }

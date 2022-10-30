@@ -21,7 +21,7 @@ public class GenericSerializer
 		}
 		catch (Exception exception)
 		{
-			throw new SerializationException(string.Format("Could not serialize {0}!", obj), exception);
+			throw new SerializationException($"Could not serialize {obj}!", exception);
 		}
 	}
 
@@ -40,7 +40,7 @@ public class GenericSerializer
 		}
 		catch (Exception exception)
 		{
-			throw new SerializationException(string.Format("Could not deserialize {0}!", json), exception);
+			throw new SerializationException($"Could not deserialize {json}!", exception);
 		}
 	}
 
@@ -52,7 +52,7 @@ public class GenericSerializer
 
 		if (typeProperty == null)
 		{
-			throw new FormatException(string.Format("Could not find '$type' property when attempting to deserialize JSON object {0}", jObject));    
+			throw new FormatException($"Could not find '$type' property when attempting to deserialize JSON object {jObject}");    
 		}
 
 		var typeName = typeProperty.ToString();
@@ -60,7 +60,7 @@ public class GenericSerializer
 
 		if (objectType == null)
 		{
-			throw new FormatException(string.Format("Could not find .NET type {0} when attempting to deserialize JSON object {1}", typeName, jObject));
+			throw new FormatException($"Could not find .NET type {typeName} when attempting to deserialize JSON object {jObject}");
 		}
 
 		return jObject.ToObject(objectType);

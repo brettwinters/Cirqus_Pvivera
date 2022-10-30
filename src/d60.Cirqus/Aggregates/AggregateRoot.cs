@@ -8,15 +8,17 @@ using d60.Cirqus.Numbers;
 namespace d60.Cirqus.Aggregates;
 
 /// <summary>
-/// This is the base class of aggregate roots. Derive from this in order to create an event-driven domain model root object that
-/// is capable of emitting its own events, building its state as a projection off of previously emitted events.
+/// This is the base class of aggregate roots. Derive from this in order to create an event-driven
+/// domain model root object that is capable of emitting its own events, building its state as a
+/// projection off of previously emitted events.
 /// </summary>
 public abstract class AggregateRoot
 {
 	internal const int InitialAggregateRootSequenceNumber = -1;
 
 	/// <summary>
-	/// Gets the ID of the aggregate root. This one should be automatically set on the aggregate root instance provided by Cirqus
+	/// Gets the ID of the aggregate root. This one should be automatically set on the aggregate root
+	/// instance provided by Cirqus
 	/// </summary>
 	public string Id { get; internal set; }
 
@@ -29,7 +31,7 @@ public abstract class AggregateRoot
 		Id = id;
 	}
 
-	internal void InvokeCreated()
+	public void InvokeCreated()
 	{
 		Created();
 	}
@@ -43,33 +45,35 @@ public abstract class AggregateRoot
 	internal ReplayState ReplayState = ReplayState.None;
 
 	/// <summary>
-	/// Method that is called when the aggregate root is first created, allowing you to emit that famous created event if you absolutely need it ;)
+	/// Method that is called when the aggregate root is first created, allowing you to emit that
+	/// famous created event if you absolutely need it ;)
 	/// </summary>
 	protected virtual void Created() { }
 
 	/// <summary>
-	/// Gets whether this aggregate root has emitted any events. I.e. it will already be false after having used the <see cref="Created"/> method to emit one
+	/// Gets whether this aggregate root has emitted any events. I.e. it will already be false after
+	/// having used the <see cref="Created"/> method to emit one
 	/// single "MyRootCreated" event.
 	/// </summary>
-	protected bool IsNew
-	{
-		get { return CurrentSequenceNumber == InitialAggregateRootSequenceNumber; }
-	}
-
-	//Brett - changed this from protected to protected internal
+	protected bool IsNew => CurrentSequenceNumber == InitialAggregateRootSequenceNumber;
+	
 	/// <summary>
-	/// Emits the given domain event, adding the aggregate root's <see cref="Id"/> and a sequence number to its metadata, along with some type information
+	/// Emits the given domain event, adding the aggregate root's <see cref="Id"/> and a sequence
+	/// number to its metadata, along with some type information
 	/// </summary>
-	protected internal void Emit<TAggregateRoot>(DomainEvent<TAggregateRoot> e) where TAggregateRoot : AggregateRoot
+	protected internal void Emit<TAggregateRoot>(
+		DomainEvent<TAggregateRoot> e)
+		where TAggregateRoot : AggregateRoot
 	{
-		if (e == null) throw new ArgumentNullException("e", "Can't emit null!");
+		if (e == null)
+		{
+			throw new ArgumentNullException(nameof(e), "Can't emit null!");
+		}
 
 		if (string.IsNullOrWhiteSpace(Id))
 		{
-			throw new InvalidOperationException(
-				string.Format(
-					"Attempted to emit event {0} from aggregate root {1}, but it has not yet been assigned an ID!",
-					e, GetType()));
+			throw new InvalidOperationException($"Attempted to emit event {e} from aggregate root {GetType()}, " +
+			                                    $"but it has not yet been assigned an ID!");
 		}
 
 		var eventType = e.GetType();
@@ -78,34 +82,43 @@ public abstract class AggregateRoot
 		if (!emitterInterface.IsAssignableFrom(GetType()))
 		{
 			throw new InvalidOperationException(
-				string.Format(
-					"Attempted to emit event {0} but the aggregate root {1} does not implement IEmit<{2}>",
-					e, GetType().Name, e.GetType().Name));
+				$"Attempted to emit event {e} but the aggregate root {GetType().Name} does not " +
+				$"implement IEmit<{e.GetType().Name}>"
+			);
 		}
 
 		if (UnitOfWork == null)
 		{
-			throw new InvalidOperationException(string.Format("Attempted to emit event {0}, but the aggreate root does not have a unit of work!", e));
+			throw new InvalidOperationException($"Attempted to emit event {e}, but the aggreate root does " +
+			                                    $"not have a unit of work!");
 		}
 
 		if (ReplayState != ReplayState.None)
 		{
-			throw new InvalidOperationException(string.Format("Attempted to emit event {0}, but the aggreate root's replay state is {1}! - events can only be emitted when the root is not applying events", e, ReplayState));
+			throw new InvalidOperationException($"Attempted to emit event {e}, but the aggreate root's replay " +
+			                                    $"state is {ReplayState}! - events can only be emitted when the root " +
+			                                    $"is not applying events");
 		}
 
 		if (!typeof(TAggregateRoot).IsAssignableFrom(GetType()))
 		{
 			throw new InvalidOperationException(
-				string.Format("Attempted to emit event {0} which is owned by {1} from aggregate root of type {2}",
-					e, typeof(TAggregateRoot), GetType()));
+				$"Attempted to emit event {e} which is owned by {typeof(TAggregateRoot)} from aggregate root of " +
+				$"type {GetType()}"
+			);
 		}
 
-		var now = Time.UtcNow();
+		// Use 1 tick resolution which is 100 ns. This corresponds to 5 zeros
+		var now = TimeService.GetUtcNow();
+		//TODO Uncomment
+		var globalSequenceNumber = GlobalSequenceNumberService.GetNewGlobalSequenceNumber();
+		//var now = new DateTime(globalSequenceNumber);
 		var sequenceNumber = CurrentSequenceNumber + 1;
 
 		e.Meta.Merge(CurrentCommandMetadata ?? new Metadata());
 		e.Meta[DomainEvent.MetadataKeys.AggregateRootId] = Id;
-		e.Meta[DomainEvent.MetadataKeys.TimeUtc] = now.ToString("u");
+		e.Meta[DomainEvent.MetadataKeys.TimeUtc] = now.ToString(DomainEvent.DateTimeFormat);
+		e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = globalSequenceNumber.ToString(Metadata.NumberCulture);
 		e.Meta[DomainEvent.MetadataKeys.SequenceNumber] = sequenceNumber.ToString(Metadata.NumberCulture);
 
 		e.Meta.TakeFromAttributes(eventType);
@@ -117,17 +130,23 @@ public abstract class AggregateRoot
 		}
 		catch (Exception exception)
 		{
-			throw new ApplicationException(string.Format(@"Could not apply event {0} to {1} - please check the inner exception, and/or make sure that the aggregate root type is PUBLIC", e, this), exception);
+			throw new ApplicationException(
+				$"Could not apply event {e} to {this} - please check the inner exception, " +
+				$"and/or make sure that the aggregate root type is PUBLIC", 
+				exception
+			);
 		}
 
 		UnitOfWork.AddEmittedEvent(this, e);
 		EventEmitted(e);
 	}
-
-
-	internal void ApplyEvent(DomainEvent e, ReplayState replayState)
+	
+	internal void ApplyEvent(
+		DomainEvent e, 
+		ReplayState replayState)
 	{
-		// tried caching here with a (aggRootType, eventType) lookup in two levels of concurrent dictionaries.... didn't provide significant perf boost
+		// tried caching here with a (aggRootType, eventType) lookup in two levels of concurrent dictionaries....
+		// didn't provide significant perf boost
 
 		var aggregateRootType = GetType();
 		var domainEventType = e.GetType();
@@ -137,15 +156,18 @@ public abstract class AggregateRoot
 		if (applyMethod == null)
 		{
 			throw new ApplicationException(
-				string.Format("Could not find appropriate Apply method on {0} - expects a method with a public void Apply({1}) signature",
-					aggregateRootType, domainEventType.FullName));
+				$"Could not find appropriate Apply method on {aggregateRootType} - expects a method with a " +
+				$"public void Apply({domainEventType.FullName}) signature"
+			);
 		}
-
+		
 		if (CurrentSequenceNumber + 1 != e.GetSequenceNumber())
 		{
 			throw new ApplicationException(
-				string.Format("Tried to apply event with sequence number {0} to aggregate root of type {1} with ID {2} with current sequence number {3}. Expected an event with sequence number {4}.",
-					e.GetSequenceNumber(), aggregateRootType, Id, CurrentSequenceNumber, CurrentSequenceNumber + 1));
+				$"Tried to apply event with sequence number {e.GetSequenceNumber()} to aggregate root of " +
+				$"type {aggregateRootType} with ID {Id} with current sequence number {CurrentSequenceNumber}. " +
+				$"Expected an event with sequence number {CurrentSequenceNumber + 1}."
+			);
 		}
 
 		var previousReplayState = ReplayState;
@@ -166,7 +188,7 @@ public abstract class AggregateRoot
 		}
 		catch (TargetInvocationException tae)
 		{
-			throw new ApplicationException(string.Format("Error when applying event {0} to aggregate root with ID {1}", e, Id), tae);
+			throw new ApplicationException($"Error when applying event {e} to aggregate root with ID {Id}", tae);
 		}
 
 		CurrentSequenceNumber = e.GetSequenceNumber();
@@ -174,32 +196,31 @@ public abstract class AggregateRoot
 
 	public override string ToString()
 	{
-		return string.Format("{0} ({1})", GetType().Name, Id);
+		return $"{GetType().Name} ({Id})";
 	}
 
 	/// <summary>
 	/// Creates another aggregate root with the specified <paramref name="aggregateRootId"/>. Will throw an exception if a root already exists with the specified ID.
 	/// </summary>
-	protected TAggregateRoot Create<TAggregateRoot>(string aggregateRootId) where TAggregateRoot : AggregateRoot, new()
+	protected TAggregateRoot Create<TAggregateRoot>(
+		string aggregateRootId) 
+		where TAggregateRoot : AggregateRoot, new()
 	{
 		if (UnitOfWork == null)
 		{
 			throw new InvalidOperationException(
-				string.Format(
-					"Attempted to Load {0} with ID {1} from {2}, but it has not been initialized with a unit of work! The unit of work must be attached to the aggregate root in order to cache hydrated aggregate roots within the current unit of work.",
-					typeof(TAggregateRoot), aggregateRootId, GetType()));
+				$"Attempted to Load {typeof(TAggregateRoot)} with ID {aggregateRootId} from {GetType()}, but it has not been initialized with a unit of work! The unit of work must be attached to the aggregate root in order to cache hydrated aggregate roots within the current unit of work."
+			);
 		}
 
 		if (ReplayState != ReplayState.None)
 		{
-			throw new InvalidOperationException(string.Format("Attempted to create new aggregate root of type {0} with ID {1}, but cannot create anything when replay state is {2}",
-				typeof(TAggregateRoot), aggregateRootId, ReplayState));
+			throw new InvalidOperationException($"Attempted to create new aggregate root of type {typeof(TAggregateRoot)} with ID {aggregateRootId}, but cannot create anything when replay state is {ReplayState}");
 		}
 
 		if (UnitOfWork.Exists(aggregateRootId, long.MaxValue))
 		{
-			throw new InvalidOperationException(string.Format("Cannot create aggregate root {0} with ID {1} because an instance with that ID already exists!",
-				typeof(TAggregateRoot), aggregateRootId));
+			throw new InvalidOperationException($"Cannot create aggregate root {typeof(TAggregateRoot)} with ID {aggregateRootId} because an instance with that ID already exists!");
 		}
 
 		var aggregateRoot = (TAggregateRoot)UnitOfWork.Get<TAggregateRoot>(aggregateRootId, long.MaxValue, createIfNotExists: true);
@@ -215,14 +236,15 @@ public abstract class AggregateRoot
 	/// Tries to load another aggregate root with the specified <paramref name="aggregateRootId"/>. Returns null if no root exists with that ID.
 	/// Throws an <see cref="InvalidCastException"/> if a root was found, but its type was not compatible with the specified <typeparamref name="TAggregateRoot"/> type.
 	/// </summary>
-	protected TAggregateRoot TryLoad<TAggregateRoot>(string aggregateRootId) where TAggregateRoot : AggregateRoot, new()
+	protected TAggregateRoot TryLoad<TAggregateRoot>(
+		string aggregateRootId) 
+		where TAggregateRoot : AggregateRoot, new()
 	{
 		if (UnitOfWork == null)
 		{
 			throw new InvalidOperationException(
-				string.Format(
-					"Attempted to Load {0} with ID {1} from {2}, but it has not been initialized with a unit of work! The unit of work must be attached to the aggregate root in order to cache hydrated aggregate roots within the current unit of work.",
-					typeof(TAggregateRoot), aggregateRootId, GetType()));
+				$"Attempted to Load {typeof(TAggregateRoot)} with ID {aggregateRootId} from {GetType()}, but it has not been initialized with a unit of work! The unit of work must be attached to the aggregate root in order to cache hydrated aggregate roots within the current unit of work."
+			);
 		}
 
 		var globalSequenceNumberCutoffToLookFor = ReplayState == ReplayState.ReplayApply
@@ -248,8 +270,7 @@ public abstract class AggregateRoot
 		}
 		catch (Exception exception)
 		{
-			throw new InvalidCastException(string.Format("Found aggregate root with ID {0} and type {1}, but the type is not compatible with the desired {2} type!",
-				aggregateRoot, aggregateRoot.GetType(), typeof(TAggregateRoot)), exception);
+			throw new InvalidCastException($"Found aggregate root with ID {aggregateRoot} and type {aggregateRoot.GetType()}, but the type is not compatible with the desired {typeof(TAggregateRoot)} type!", exception);
 		}
 	}
 
@@ -262,9 +283,8 @@ public abstract class AggregateRoot
 		if (UnitOfWork == null)
 		{
 			throw new InvalidOperationException(
-				string.Format(
-					"Attempted to Load {0} with ID {1} from {2}, but it has not been initialized with a unit of work! The unit of work must be attached to the aggregate root in order to cache hydrated aggregate roots within the current unit of work.",
-					typeof(TAggregateRoot), aggregateRootId, GetType()));
+				$"Attempted to Load {typeof(TAggregateRoot)} with ID {aggregateRootId} from {GetType()}, but it has not been initialized with a unit of work! The unit of work must be attached to the aggregate root in order to cache hydrated aggregate roots within the current unit of work."
+			);
 		}
 
 		var globalSequenceNumberCutoffToLookFor = ReplayState == ReplayState.ReplayApply
@@ -275,8 +295,7 @@ public abstract class AggregateRoot
 
 		if (!(aggregateRoot is TAggregateRoot))
 		{
-			throw new InvalidOperationException(string.Format("Attempted to load aggregate root with ID {0} as a {1}, but the concrete type is {2} which is not compatible",
-				aggregateRootId, typeof(TAggregateRoot), aggregateRootId.GetType()));
+			throw new InvalidOperationException($"Attempted to load aggregate root with ID {aggregateRootId} as a {typeof(TAggregateRoot)}, but the concrete type is {aggregateRootId.GetType()} which is not compatible");
 		}
 
 		aggregateRoot.CurrentCommandMetadata = CurrentCommandMetadata;

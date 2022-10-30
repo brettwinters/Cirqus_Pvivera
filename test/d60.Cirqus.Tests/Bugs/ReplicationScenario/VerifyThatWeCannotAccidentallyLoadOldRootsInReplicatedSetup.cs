@@ -188,6 +188,12 @@ And we will repeat again here, at the bottom: There was never any problem. We we
             {
                 return _innerEventStore.GetNextGlobalSequenceNumber();
             }
+            
+            //TODO Uncomment
+            public long GetLastGlobalSequenceNumber()
+            {
+                return _innerEventStore.GetLastGlobalSequenceNumber();
+            }
         }
     }
 }

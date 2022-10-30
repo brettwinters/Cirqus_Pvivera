@@ -17,14 +17,14 @@ namespace d60.Cirqus.Tests.Contracts.Views
         TFactory _factory;
         TestContext _context;
 
-        protected override void DoSetUp() {
+        protected override void DoSetUp() 
+        {
             CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel: Logger.Level.Warn);
 
             _factory = RegisterForDisposal(new TFactory());
 
             //brett
-            _context = RegisterForDisposal(base.CreateTestContext());
-            //_context = RegisterForDisposal(TestContext.Create());
+            _context = RegisterForDisposal(CreateTestContext());
 
             _context.AddViewManager(_factory.GetViewManager<ViewRoot>());
         }

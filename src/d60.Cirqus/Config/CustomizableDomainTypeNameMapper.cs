@@ -101,7 +101,7 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 		}
 		catch (Exception exception)
 		{
-			throw new ArgumentException(string.Format("Could not get a .NET type from the name '{0}' - please make sure that the customizable type name mapper is loaded with all the needed aggregate root and domain event types before you start using it", name), exception);
+			throw new ArgumentException($"Could not get a .NET type from the name '{name}' - please make sure that the customizable type name mapper is loaded with all the needed aggregate root and domain event types before you start using it", exception);
 		}
 	}
 
@@ -114,7 +114,7 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 		}
 		catch (Exception exception)
 		{
-			throw new ArgumentException(string.Format("Could not get a name from the .NET type {0} - please make sure that the customizable type name mapper is loaded with all the needed aggregate root and domain event types before you start using it", type), exception);
+			throw new ArgumentException($"Could not get a name from the .NET type {type} - please make sure that the customizable type name mapper is loaded with all the needed aggregate root and domain event types before you start using it", exception);
 		}
 	}
 
@@ -132,16 +132,12 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 
 		if (_typeToName.ContainsKey(type) && _typeToName[type] != name)
 		{
-			throw new ArgumentException(string.Format(
-				"Could not add type alias for {0} with name '{1}' because one already exists with the name '{2}'!",
-				type, name, _typeToName[type]));
+			throw new ArgumentException($"Could not add type alias for {type} with name '{name}' because one already exists with the name '{_typeToName[type]}'!");
 		}
 
 		if (_nameToType.ContainsKey(name) && _nameToType[name] != type)
 		{
-			throw new ArgumentException(string.Format(
-				"Could not add type alias with name '{0}' for type {1} because one already exists for the type {2}!",
-				name, type, _nameToType[name]));
+			throw new ArgumentException($"Could not add type alias with name '{name}' for type {type} because one already exists for the type {_nameToType[name]}!");
 		}
 
 		_typeToName[type] = name;

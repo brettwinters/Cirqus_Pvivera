@@ -30,10 +30,7 @@ public static class ExceptionExtensions
 		}
 		catch (Exception ex)
 		{
-			var message = string.Format("This exception was caught while attempting to preserve the stack trace for" +
-			                            " an exception: {0} - the original exception is passed as the inner exception" +
-			                            " of this exception. This is most likely caused by the absence of a proper" +
-			                            " serialization constructor on an exception", ex);
+			var message = "This exception was caught while attempting to preserve the stack trace for" + $" an exception: {ex} - the original exception is passed as the inner exception" + " of this exception. This is most likely caused by the absence of a proper" + " serialization constructor on an exception";
 
 			throw new ApplicationException(message, exception);
 		}

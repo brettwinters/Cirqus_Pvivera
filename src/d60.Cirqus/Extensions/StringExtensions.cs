@@ -18,7 +18,10 @@ public static class StringExtensions
 	{
 		return lines.Select(line =>
 		{
-			if (absolute) line = line.TrimStart(' ');
+			if (absolute)
+			{
+				line = line.TrimStart(' ');
+			}
 
 			return string.Concat(new string(indentChar, indentation), line);
 		});

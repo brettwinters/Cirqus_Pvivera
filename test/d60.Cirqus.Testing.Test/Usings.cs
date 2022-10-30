@@ -1,0 +1,13 @@
+global using NUnit.Framework;
+global using Shouldly;
+global using System.Text;
+global using d60.Cirqus.Aggregates;
+global using d60.Cirqus.Commands;
+global using d60.Cirqus.Events;
+global using d60.Cirqus.Extensions;
+global using d60.Cirqus.Numbers;
+global using d60.Cirqus.Tests;
+global using d60.Cirqus.Views;
+global using d60.Cirqus.Views.ViewManagers;
+global using d60.Cirqus.NUnit;
+global using d60.Cirqus.Serialization;

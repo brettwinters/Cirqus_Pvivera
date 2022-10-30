@@ -110,39 +110,92 @@ public class MongoDbViewManager<TViewInstance>
 
 	}
 
-	public override string Id
-	{
-		get { return string.Format("{0}/{1}", typeof(TViewInstance).GetPrettyName(), _viewCollection); }
-	}
+	public override string Id => $"{typeof(TViewInstance).GetPrettyName()}/{_viewCollection}";
 
 	public override async Task<long> GetPosition(
 		bool canGetFromCache = true)
 	{
-		if(canGetFromCache && false)
-		{
-			return GetPositionFromMemory()
-			       ?? GetPositionFromPersistentCache()
-			       ?? GetPositionFromViewInstances()
-			       ?? GetDefaultPosition();
-		}
-
-		
+		// if(canGetFromCache && false)
+		// {
+		// 	return GetPositionFromMemory()
+		// 	       ?? GetPositionFromPersistentCache()
+		// 	       ?? GetPositionFromViewInstances()
+		// 	       ?? GetDefaultPosition();
+		// }
 
 		// return GetPositionFromPersistentCache()
 		//        ?? GetPositionFromViewInstances()
 		//        ?? GetDefaultPosition();
 
-		var position = GetPositionFromPersistentCache()
-		       ?? GetPositionFromViewInstances()
-		       ?? GetDefaultPosition();
+		
+
+		var position = GetPositionFromPersistentCache() 
+		               ?? GetPositionFromViewInstances()
+		               ?? GetDefaultPosition();
 
 		return position;
+
+
+		#region
+		
+		static long GetDefaultPosition()
+		{
+			return DefaultPosition;
+		}
+		
+		long? GetPositionFromMemory()
+		{
+			var value = Interlocked.Read(ref _cachedPosition);
+		
+			if (value != DefaultPosition)
+			{
+				return value;
+			}
+		
+			return null;
+		}
+
+		long? GetPositionFromPersistentCache()
+		{
+			var currentPositionDocument = 
+				_positionCollection
+				.Find(x => x.Id == _currentPositionDocId)
+				.SingleOrDefault();
+
+			return currentPositionDocument?.CurrentPosition;
+		}
+
+		// long? GetPositionFromViewInstance()
+		// {
+		// 	var viewIds = _viewLocator.GetAffectedViewIds();
+		// }
+
+		long? GetPositionFromViewInstances()
+		{
+			// with MongoDB, we cannot know for sure how many events we've successfully processed of those that
+			// have sequence numbers between the MIN and MAX sequence numbers currently stored in our views
+			// - therefore, to be safe, we need to pick the MIN as our starting point....
+			
+			var viewWithTheLowestGlobalSequenceNumber = _viewCollection
+				.Find(_ => true)
+				.Limit(1)
+				.SortBy(x => x.LastGlobalSequenceNumber)
+				.FirstOrDefault();
+
+			if (viewWithTheLowestGlobalSequenceNumber == null)
+			{
+				return null;
+			}
+		
+			var lowPosition = viewWithTheLowestGlobalSequenceNumber.LastGlobalSequenceNumber;
+		
+			return lowPosition;
+		}
+		
+		#endregion
 	}
 
-	static long GetDefaultPosition()
-	{
-		return DefaultPosition;
-	}
+	
 
 	public override void Purge()
 	{
@@ -153,7 +206,6 @@ public class MongoDbViewManager<TViewInstance>
 			_logger.Info("Purging '{0}'", _viewCollection.CollectionNamespace.CollectionName);
 			
 			_viewCollection.DeleteMany(_ => true);
-			//_viewCollection.RemoveAll();
 
 			UpdatePersistentCache(DefaultPosition);
 
@@ -176,16 +228,6 @@ public class MongoDbViewManager<TViewInstance>
 				Builders<PositionDoc>.Update.Set(p => p.CurrentPosition, newPosition),
 				new UpdateOptions(){ IsUpsert = true }
 			);
-		
-		// _positionCollection.ReplaceOne(
-		// 	filter: x => x.Id == _currentPositionDocId,
-		// 	replacement: new PositionDoc
-		// 	{
-		// 		Id = _currentPositionDocId,
-		// 		CurrentPosition = newPosition
-		// 	},
-		// 	options: new ReplaceOptions() { IsUpsert = true }
-		// );
 
 		Interlocked.Exchange(ref _cachedPosition, newPosition);
 	}
@@ -215,6 +257,7 @@ public class MongoDbViewManager<TViewInstance>
 			if(!ViewLocator.IsRelevant<TViewInstance>(e)) continue;
 
 			var stopwatch = Stopwatch.StartNew();
+
 			var viewIds = _viewLocator.GetAffectedViewIds(viewContext, e);
 
 			foreach(var viewId in viewIds)
@@ -239,7 +282,11 @@ public class MongoDbViewManager<TViewInstance>
 	{
 		if(!cachedViewInstances.Any()) return;
 
-		_logger.Debug("Flushing {0} view instances to '{1}'", cachedViewInstances.Values.Count, _viewCollection.CollectionNamespace.CollectionName);
+		_logger.Debug(
+			"Flushing {0} view instances to '{1}'", 
+			cachedViewInstances.Values.Count, 
+			_viewCollection.CollectionNamespace.CollectionName
+		);
 
 		foreach(var viewInstance in cachedViewInstances.Values)
 		{
@@ -266,63 +313,6 @@ public class MongoDbViewManager<TViewInstance>
 		return instanceToReturn;
 	}
 
-	long? GetPositionFromMemory()
-	{
-		var value = Interlocked.Read(ref _cachedPosition);
-
-		if (value != DefaultPosition)
-		{
-			return value;
-		}
-
-		return null;
-	}
-
-	long? GetPositionFromPersistentCache()
-	{
-		var currentPositionDocument = _positionCollection
-			.Find(x => x.Id == _currentPositionDocId)
-			.SingleOrDefault();
-
-		if (currentPositionDocument == null)
-		{
-			return null;
-		}
-
-		return currentPositionDocument.CurrentPosition;
-	}
-
-	long? GetPositionFromViewInstances()
-	{
-		// with MongoDB, we cannot know for sure how many events we've successfully processed of those that
-		// have sequence numbers between the MIN and MAX sequence numbers currently stored in our views
-		// - therefore, to be safe, we need to pick the MIN as our starting point....
-
-		//var onlyTheSequenceNumber = Fields<TViewInstance>.Include(i => i.LastGlobalSequenceNumber).Exclude(i => i.Id);
-		//var ascendingBySequenceNumber = SortBy<TViewInstance>.Ascending(v => v.LastGlobalSequenceNumber);
-		// var viewWithTheLowestGlobalSequenceNumber =
-		// 	_viewCollection
-		// 		.FindAll()
-		// 		.SetFields(onlyTheSequenceNumber)
-		// 		.SetLimit(1)
-		// 		.SetSortOrder(ascendingBySequenceNumber)
-		// 		.FirstOrDefault();
-		
-		var viewWithTheLowestGlobalSequenceNumber = _viewCollection
-			.Find(_ => true)
-			.Limit(1)
-			.SortBy(x => x.LastGlobalSequenceNumber)
-			.FirstOrDefault();
-
-		if (viewWithTheLowestGlobalSequenceNumber == null)
-		{
-			return null;
-		}
-		
-		var lowPosition = viewWithTheLowestGlobalSequenceNumber.LastGlobalSequenceNumber;
-		
-		return lowPosition;
-	}
 
 	static IMongoDatabase GetDatabaseFromConnectionString(
 		string mongoDbConnectionString)
@@ -331,7 +321,7 @@ public class MongoDbViewManager<TViewInstance>
 
 		if(string.IsNullOrWhiteSpace(mongoUrl.DatabaseName))
 		{
-			throw new MongoException(string.Format("MongoDB URL does not contain a database name!: {0}", mongoDbConnectionString));
+			throw new MongoException($"MongoDB URL does not contain a database name!: {mongoDbConnectionString}");
 		}
 
 		return new MongoClient(mongoUrl).GetDatabase(mongoUrl.DatabaseName);

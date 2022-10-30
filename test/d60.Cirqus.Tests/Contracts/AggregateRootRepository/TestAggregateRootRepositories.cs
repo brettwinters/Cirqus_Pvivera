@@ -40,13 +40,15 @@ namespace d60.Cirqus.Tests.Contracts.AggregateRootRepository
 
         static SomeEvent NewEvent(string aggregateRootId, int sequenceNumber)
         {
+	        //TODO Uncomment (delete)
             return new SomeEvent
             {
                 Meta =
                 {
-                    { DomainEvent.MetadataKeys.AggregateRootId, aggregateRootId},
-                    { DomainEvent.MetadataKeys.Owner, new DefaultDomainTypeNameMapper().GetName(typeof(SomeRoot))},
-                    { DomainEvent.MetadataKeys.SequenceNumber, sequenceNumber.ToString(Metadata.NumberCulture)},
+	                [DomainEvent.MetadataKeys.GlobalSequenceNumber] = GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString(),
+                    [DomainEvent.MetadataKeys.AggregateRootId] = aggregateRootId,
+                    [DomainEvent.MetadataKeys.Owner] = new DefaultDomainTypeNameMapper().GetName(typeof(SomeRoot)),
+                    [DomainEvent.MetadataKeys.SequenceNumber] = sequenceNumber.ToString(Metadata.NumberCulture),
                 }
             };
         }

@@ -18,7 +18,10 @@ namespace d60.Cirqus.Tests.MongoDb
         [TestCase(false, 100, 1000, Description = "NO indexes")]
         [LongRunningTestCase(true, 100, 10*1000, Description = "Indexes")]
         [LongRunningTestCase(false, 100, 10 * 1000, Description = "NO indexes")]
-        public void IndexSpeedTest(bool useIndexes, int numberOfQueries, int numberOfEvents)
+        public void IndexSpeedTest(
+	        bool useIndexes, 
+	        int numberOfQueries, 
+	        int numberOfEvents)
         {
             var sequenceNumbers = new Dictionary<string, long>();
             var serializer = new JsonDomainEventSerializer();
@@ -50,12 +53,13 @@ namespace d60.Cirqus.Tests.MongoDb
             }
             finally
             {
-                Console.WriteLine(@"This is how far we got:
-{0}", string.Join(Environment.NewLine, sequenceNumbers.Select(kvp => string.Format("    {0}: {1}", kvp.Key, kvp.Value))));
+                Console.WriteLine("This is how far we got:{0}", string.Join(Environment.NewLine, sequenceNumbers.Select(kvp => $"    {kvp.Key}: {kvp.Value}")));
             }
         }
 
-        static DomainEvent Event(Func<string, long> getNextSeqNo, string aggregateRootId)
+        static DomainEvent Event(
+	        Func<string, long> getNextSeqNo, 
+	        string aggregateRootId)
         {
             var nextSeqNo = getNextSeqNo(aggregateRootId);
 
@@ -66,8 +70,9 @@ namespace d60.Cirqus.Tests.MongoDb
                 SomeValue = "hej",
                 Meta =
                 {
-                    { DomainEvent.MetadataKeys.SequenceNumber, nextSeqNo.ToString(Metadata.NumberCulture) },
-                    { DomainEvent.MetadataKeys.AggregateRootId, aggregateRootId }
+	                [DomainEvent.MetadataKeys.GlobalSequenceNumber] = GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString(),
+	                [DomainEvent.MetadataKeys.AggregateRootId] = aggregateRootId,
+	                [DomainEvent.MetadataKeys.SequenceNumber] = nextSeqNo.ToString(Metadata.NumberCulture),
                 }
             };
         }

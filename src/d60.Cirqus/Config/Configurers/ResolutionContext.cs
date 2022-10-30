@@ -120,7 +120,9 @@ public class ResolutionContext : IDisposable
 		var serviceType = typeof(TService);
 
 		if (!_levels.ContainsKey(serviceType))
+		{
 			_levels[serviceType] = 0;
+		}
 
 		_levels[serviceType] += addend;
 	}
@@ -130,7 +132,9 @@ public class ResolutionContext : IDisposable
 		var serviceType = typeof(TService);
 
 		if (!_levels.ContainsKey(serviceType))
+		{
 			_levels[serviceType] = 0;
+		}
 
 		return _levels[serviceType];
 	}
@@ -180,7 +184,11 @@ public class ResolutionContext : IDisposable
 		public Resolver(Func<ResolutionContext, TService> factory, bool decorator, bool multi)
 			: base(decorator, multi, typeof(TService))
 		{
-			if (factory == null) throw new ArgumentNullException("factory");
+			if (factory == null)
+			{
+				throw new ArgumentNullException(nameof(factory));
+			}
+
 			_factory = factory;
 		}
 

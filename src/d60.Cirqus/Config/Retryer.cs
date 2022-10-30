@@ -59,7 +59,7 @@ public class Retryer
 				if (caughtExceptions.Count >= maxRetries)
 				{
 					throw new AggregateException(
-						string.Format("Could not complete the call (retried {0} times)", maxRetries),
+						$"Could not complete the call (retried {maxRetries} times)",
 						caughtExceptions);
 				}
 

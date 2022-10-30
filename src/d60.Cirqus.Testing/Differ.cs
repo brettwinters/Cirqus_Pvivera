@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EnergyProjects.Tests.Utils;
+namespace d60.Cirqus.Testing;
 
 public class Differ : diff_match_patch
 {

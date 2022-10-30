@@ -6,7 +6,7 @@ using d60.Cirqus.Aggregates;
 using d60.Cirqus.Commands;
 using d60.Cirqus.Config;
 using d60.Cirqus.Events;
-using d60.Cirqus.Testing.Internals;
+using d60.Cirqus.InMemory.Events;
 using d60.Cirqus.Tests.Extensions;
 using NUnit.Framework;
 

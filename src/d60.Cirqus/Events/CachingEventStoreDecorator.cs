@@ -61,7 +61,7 @@ public class CachingEventStoreDecorator : IEventStore, IDisposable
 		{
 			if (value < 0)
 			{
-				throw new ArgumentException(string.Format("Cannot set max cache entries to {0} - the value must be greater than or equal to 0!", value));
+				throw new ArgumentException($"Cannot set max cache entries to {value} - the value must be greater than or equal to 0!");
 			}
 			_maxCacheEntries = value;
 		}
@@ -78,10 +78,16 @@ public class CachingEventStoreDecorator : IEventStore, IDisposable
 			AddToCache(e);
 		}
 	}
-
+	
 	public long GetNextGlobalSequenceNumber()
 	{
 		return _innerEventStore.GetNextGlobalSequenceNumber();
+	}
+
+	public long GetLastGlobalSequenceNumber()
+	{
+		return _innerEventStore.GetLastGlobalSequenceNumber();
+
 	}
 
 	public IEnumerable<EventData> Load(string aggregateRootId, long firstSeq = 0)
@@ -133,11 +139,17 @@ public class CachingEventStoreDecorator : IEventStore, IDisposable
 	void PossiblyTrimCache()
 	{
 		// never trim in parallel
-		if (_currentlyTrimmingCache) return;
+		if (_currentlyTrimmingCache)
+		{
+			return;
+		}
 
 		lock (_trimLock)
 		{
-			if (_currentlyTrimmingCache) return;
+			if (_currentlyTrimmingCache)
+			{
+				return;
+			}
 
 			_currentlyTrimmingCache = true;
 		}
@@ -145,7 +157,10 @@ public class CachingEventStoreDecorator : IEventStore, IDisposable
 		// _currentlyTrimmingCache is set to false again in the finally snippet
 		try
 		{
-			if (_eventsPerGlobalSequenceNumber.Count <= _maxCacheEntries) return;
+			if (_eventsPerGlobalSequenceNumber.Count <= _maxCacheEntries)
+			{
+				return;
+			}
 
 			_log.Debug("Trimming caches");
 
@@ -157,7 +172,10 @@ public class CachingEventStoreDecorator : IEventStore, IDisposable
 
 			foreach (var entryToRemove in entriesOldestFirst)
 			{
-				if (_eventsPerGlobalSequenceNumber.Count <= _maxCacheEntries) break;
+				if (_eventsPerGlobalSequenceNumber.Count <= _maxCacheEntries)
+				{
+					break;
+				}
 
 				CacheEntry<EventData> removedCacheEntry;
 

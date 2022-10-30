@@ -20,7 +20,6 @@ namespace d60.Cirqus.MsSql.Events
         readonly Action<SqlConnection> _cleanupAction;
 
         public MsSqlEventStore(
-            //IConfigurationRoot configuration, 
             string connectionStringOrConnectionStringName, 
             string tableName,
             bool automaticallyCreateSchema = true)
@@ -44,7 +43,9 @@ namespace d60.Cirqus.MsSql.Events
             }
         }
 
-        public void Save(Guid batchId, IEnumerable<EventData> events)
+        public void Save(
+	        Guid batchId, 
+	        IEnumerable<EventData> events)
         {
             var eventList = events.ToList();
 
@@ -58,7 +59,8 @@ namespace d60.Cirqus.MsSql.Events
 
                         foreach (var e in eventList)
                         {
-                            e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (globalSequenceNumber++).ToString(Metadata.NumberCulture);
+	                        //TODO Uncomment
+                            //e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (globalSequenceNumber++).ToString(Metadata.NumberCulture);
                             e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
                         }
 
@@ -288,6 +290,28 @@ SELECT TOP 2000 [meta],[data] FROM [{0}]
                 {
                     globalSequenceNumber = GetNextGlobalSequenceNumber(conn, tx);
                 }
+            });
+
+            return globalSequenceNumber;
+        }
+        
+        public long GetLastGlobalSequenceNumber()
+        {
+            var globalSequenceNumber = 0L;
+
+            WithConnection(conn =>
+            {
+	            using var tx = conn.BeginTransaction();
+
+	            using var cmd = conn.CreateCommand();
+	            cmd.Transaction = tx;
+	            cmd.CommandText = $"SELECT MAX(globSeqNo) FROM [{_tableName}]";
+
+	            var result = cmd.ExecuteScalar();
+
+	            globalSequenceNumber = result != DBNull.Value
+		            ? (long)result
+		            : -1;
             });
 
             return globalSequenceNumber;

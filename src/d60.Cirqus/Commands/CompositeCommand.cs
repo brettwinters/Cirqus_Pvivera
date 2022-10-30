@@ -20,9 +20,8 @@ public class CompositeCommand<TAggregateRoot> : Command<TAggregateRoot> where TA
 		if (addressedAggregateRoots.Count > 1)
 		{
 			throw new ArgumentException(
-				string.Format(
-					"Cannot address more than one single aggregate root instance with a composite command - the following aggregate root IDs were addressed: {0}",
-					string.Join(", ", addressedAggregateRoots)));
+				$"Cannot address more than one single aggregate root instance with a composite command - the following aggregate root IDs were addressed: {string.Join(", ", addressedAggregateRoots)}"
+			);
 		}
 
 		Commands = commands.ToList();

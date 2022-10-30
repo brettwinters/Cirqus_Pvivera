@@ -1,4 +1,5 @@
-﻿using d60.Cirqus.Views.ViewManagers;
+﻿using d60.Cirqus.InMemory.Views;
+using d60.Cirqus.Views.ViewManagers;
 
 namespace d60.Cirqus.Tests.Contracts.Views.Factories
 {

@@ -42,7 +42,11 @@ public class DependentViewManagerEventDispatcherSettings
 	/// </summary>
 	public DependentViewManagerEventDispatcherSettings WithWaitHandle(ViewManagerWaitHandle viewManagerWaitHandle)
 	{
-		if (viewManagerWaitHandle == null) throw new ArgumentNullException("viewManagerWaitHandle");
+		if (viewManagerWaitHandle == null)
+		{
+			throw new ArgumentNullException(nameof(viewManagerWaitHandle));
+		}
+
 		_waitHandles.Add(viewManagerWaitHandle);
 		return this;
 	}
@@ -53,7 +57,11 @@ public class DependentViewManagerEventDispatcherSettings
 	/// </summary>
 	public DependentViewManagerEventDispatcherSettings WithViewContext(IDictionary<string, object> viewContextItems)
 	{
-		if (viewContextItems == null) throw new ArgumentNullException("viewContextItems");
+		if (viewContextItems == null)
+		{
+			throw new ArgumentNullException(nameof(viewContextItems));
+		}
+
 		foreach (var kvp in viewContextItems)
 		{
 			_viewContextItems[kvp.Key] = kvp.Value;
@@ -67,7 +75,11 @@ public class DependentViewManagerEventDispatcherSettings
 	/// </summary>
 	public DependentViewManagerEventDispatcherSettings DependentOn(params IViewManager[] dependentViewManagers)
 	{
-		if (dependentViewManagers == null) throw new ArgumentNullException("dependentViewManagers");
+		if (dependentViewManagers == null)
+		{
+			throw new ArgumentNullException(nameof(dependentViewManagers));
+		}
+
 		_dependentViewManagers.AddRange(dependentViewManagers);
 		return this;
 	}
@@ -90,7 +102,7 @@ public class DependentViewManagerEventDispatcherSettings
 	{
 		if (ViewManagerProfiler != null)
 		{
-			throw new InvalidOperationException(string.Format("Cannot register view profiler {0} because {1} has already been registered", profiler, ViewManagerProfiler));
+			throw new InvalidOperationException($"Cannot register view profiler {profiler} because {ViewManagerProfiler} has already been registered");
 		}
 		ViewManagerProfiler = profiler;
 		return this;

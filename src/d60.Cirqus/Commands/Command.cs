@@ -44,7 +44,10 @@ public abstract class Command<TAggregateRoot> : ExecutableCommand where TAggrega
 {
 	protected Command(string aggregateRootId)
 	{
-		if (aggregateRootId == null) throw new ArgumentNullException("aggregateRootId", "You need to specify an aggregate root ID");
+		if (aggregateRootId == null)
+		{
+			throw new ArgumentNullException(nameof(aggregateRootId), "You need to specify an aggregate root ID");
+		}
 
 		AggregateRootId = aggregateRootId;
 	}
@@ -63,6 +66,6 @@ public abstract class Command<TAggregateRoot> : ExecutableCommand where TAggrega
 
 	public override string ToString()
 	{
-		return string.Format("{0} => {1} {2}", GetType().Name, typeof(TAggregateRoot).Name, AggregateRootId);
+		return $"{GetType().Name} => {typeof(TAggregateRoot).Name} {AggregateRootId}";
 	}
 }

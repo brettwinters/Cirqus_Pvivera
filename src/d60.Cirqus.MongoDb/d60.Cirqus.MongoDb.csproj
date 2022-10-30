@@ -21,4 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Views\SpecialMongoDbViewManager.cs" />
+  </ItemGroup>
 </Project>

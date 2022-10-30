@@ -51,6 +51,11 @@ public static class DiagnosticsConfigurationExtensions
 			_profiler.RecordGlobalSequenceNumberGetNext(elapsed);
 		}
 
+		public void RecordGlobalSequenceNumberGetLast(TimeSpan elapsed)
+		{
+			_profiler.RecordGlobalSequenceNumberGetLast(elapsed);
+		}
+
 		public void RecordEventDispatch(TimeSpan elapsed)
 		{
 			_profiler.RecordEventDispatch(elapsed);
@@ -153,7 +158,7 @@ public static class DiagnosticsConfigurationExtensions
 		{
 			return _innerEventStore.Stream(globalSequenceNumber);
 		}
-
+		
 		public long GetNextGlobalSequenceNumber()
 		{
 			var stopwatch = Stopwatch.StartNew();
@@ -164,6 +169,19 @@ public static class DiagnosticsConfigurationExtensions
 			finally
 			{
 				_operationProfiler.RecordGlobalSequenceNumberGetNext(stopwatch.Elapsed);
+			}
+		}
+
+		public long GetLastGlobalSequenceNumber()
+		{
+			var stopwatch = Stopwatch.StartNew();
+			try
+			{
+				return _innerEventStore.GetLastGlobalSequenceNumber();
+			}
+			finally
+			{
+				_operationProfiler.RecordGlobalSequenceNumberGetLast(stopwatch.Elapsed);
 			}
 		}
 

@@ -18,8 +18,15 @@ class InMemorySnapshotStore : ISnapshotStore
 	public Snapshot LoadSnapshot<TAggregateRoot>(string aggregateRootId, long maxGlobalSequenceNumber)
 	{
 		InMemSnapshot snapshot;
-		if (!_snapshots.TryGetValue(aggregateRootId, out snapshot)) return null;
-		if (snapshot.ValidFromGlobalSequenceNumber > maxGlobalSequenceNumber) return null;
+		if (!_snapshots.TryGetValue(aggregateRootId, out snapshot))
+		{
+			return null;
+		}
+
+		if (snapshot.ValidFromGlobalSequenceNumber > maxGlobalSequenceNumber)
+		{
+			return null;
+		}
 
 		snapshot.UpdateLastUsed();
 

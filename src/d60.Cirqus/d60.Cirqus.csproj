@@ -18,10 +18,30 @@
   <ItemGroup>
     <Compile Remove="MsSql\**" />
     <Compile Remove="Ntfs\**" />
+    <Compile Include="Testing\Internals\CommandProcessingResultWithEvents.cs" />
+    <Compile Include="Testing\Internals\EventCollection.cs" />
+    <Compile Include="Testing\Internals\InMemoryEventStore.cs" />
+    <Compile Include="Testing\Internals\InMemoryUnitOfWork.cs" />
+    <Compile Include="Testing\Internals\TestCommandMapper.cs" />
+    <Compile Include="Testing\Internals\TestContext.cs" />
+    <Compile Include="Testing\Internals\TestContextConfigurationBuilder.cs" />
+    <Compile Include="Testing\Internals\TestContextConfigurationExtensions.cs" />
+    <Compile Include="Testing\Internals\TestUnitOfWork.cs" />
     <EmbeddedResource Remove="MsSql\**" />
     <EmbeddedResource Remove="Ntfs\**" />
     <None Remove="MsSql\**" />
     <None Remove="Ntfs\**" />
+    <Compile Remove="Views\ViewManagers\Custom\CustomAbstractViewManager.cs" />
+    <Compile Remove="Views\ViewManagers\Custom\**" />
+    <EmbeddedResource Remove="Views\ViewManagers\Custom\**" />
+    <None Remove="Views\ViewManagers\Custom\**" />
+    <Compile Remove="Views\ViewManagers\EventDispatcher\Special\**" />
+    <EmbeddedResource Remove="Views\ViewManagers\EventDispatcher\Special\**" />
+    <None Remove="Views\ViewManagers\EventDispatcher\Special\**" />
+    <Compile Remove="Views\ViewManagers\ViewManager\SpecialAbstractViewManager.cs" />
+    <Compile Remove="Testing\**" />
+    <EmbeddedResource Remove="Testing\**" />
+    <None Remove="Testing\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Config\Configurers\ViewManagerEventDispatcherConfiguationBuilder.cs" />

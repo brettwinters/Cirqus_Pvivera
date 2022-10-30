@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
+using d60.Cirqus.InMemory.Views;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Tests.Contracts.EventStore;
 using d60.Cirqus.Tests.Contracts.EventStore.Factories;

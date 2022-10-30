@@ -124,6 +124,7 @@ namespace d60.Cirqus.Tests.Diagnostics
         
         long _millisecondsSpentSavingEvents = 0;
         long _millisecondsSpentGettingNextSequenceNumber = 0;
+        long _millisecondsSpentGettingLastSequenceNumber = 0;
 
         public void RecordAggregateRootGet(TimeSpan elapsed, Type aggregateRootType, string aggregateRootId)
         {
@@ -142,6 +143,11 @@ namespace d60.Cirqus.Tests.Diagnostics
         public void RecordGlobalSequenceNumberGetNext(TimeSpan elapsed)
         {
             Interlocked.Add(ref _millisecondsSpentGettingNextSequenceNumber, (long)elapsed.TotalMilliseconds);
+        }
+
+        public void RecordGlobalSequenceNumberGetLast(TimeSpan elapsed)
+        {
+	        Interlocked.Add(ref _millisecondsSpentGettingLastSequenceNumber, (long)elapsed.TotalMilliseconds);
         }
 
         public void RecordEventDispatch(TimeSpan elapsed)

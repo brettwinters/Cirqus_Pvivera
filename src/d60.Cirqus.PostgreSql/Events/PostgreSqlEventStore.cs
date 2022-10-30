@@ -98,7 +98,8 @@ END$$;
 
                     foreach (var e in eventList)
                     {
-                        e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextSequenceNumber++).ToString(Metadata.NumberCulture);
+	                    //TODO Uncomment
+                        //e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextSequenceNumber++).ToString(Metadata.NumberCulture);
                         e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
                     }
 
@@ -169,6 +170,8 @@ INSERT INTO ""{0}"" (
                     : 0;
             }
         }
+        
+        
 
         NpgsqlConnection GetConnection()
         {
@@ -255,6 +258,21 @@ SELECT ""data"", ""meta"" FROM ""{0}"" WHERE ""globSeqNo"" >= @cutoff ORDER BY "
                     return GetNextGlobalSequenceNumber(connection, tx);
                 }
             }
+        }
+        
+        public long GetLastGlobalSequenceNumber()
+        {
+	        using var connection = GetConnection();
+	        using var tx = connection.BeginTransaction();
+	        using var cmd = connection.CreateCommand();
+	        cmd.Transaction = tx;
+	        cmd.CommandText = $@"SELECT MAX(""globSeqNo"") FROM ""{_tableName}""";
+
+	        var result = cmd.ExecuteScalar();
+
+	        return result is not null && result != DBNull.Value 
+		        ? (long)result 
+		        : -1;
         }
 
         public void DropEvents()

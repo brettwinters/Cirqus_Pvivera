@@ -23,15 +23,14 @@ public static class TypeExtensions
 
 		if (implementedViewManagerInterfaces.Count == 0)
 		{
-			throw new InvalidOperationException(string.Format("Cannot get view type from view manager of type {0} because it does not implement IViewManager<TViewInstance>", type));
+			throw new InvalidOperationException($"Cannot get view type from view manager of type {type} because it does not implement IViewManager<TViewInstance>");
 		}
 
 		if (implementedViewManagerInterfaces.Count > 1)
 		{
 			throw new InvalidOperationException(
-				string.Format(
-					"Cannot unambiguously determine the view type for view manager of type {0} because it implements IViewManager<TViewInstance> for multiple types: {1}",
-					type, string.Join(", ", implementedViewManagerInterfaces.Select(i => i.GetPrettyName()))));
+				$"Cannot unambiguously determine the view type for view manager of type {type} because it implements IViewManager<TViewInstance> for multiple types: {string.Join(", ", implementedViewManagerInterfaces.Select(i => i.GetPrettyName()))}"
+			);
 		}
 
 		return implementedViewManagerInterfaces.Single().GetGenericArguments().First();
@@ -59,7 +58,7 @@ public static class TypeExtensions
 			var typeArgumentsString = string.Join(",", type.GetGenericArguments()
 				.Select(typeArgument => GetTypeName(typeArgument, includeNamespace)));
 
-			return string.Format("{0}<{1}>", typeName, typeArgumentsString);
+			return $"{typeName}<{typeArgumentsString}>";
 		}
 
 		return typeName;

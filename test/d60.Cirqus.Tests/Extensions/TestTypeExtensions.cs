@@ -1,5 +1,6 @@
 ﻿using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
+using d60.Cirqus.InMemory.Views;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;

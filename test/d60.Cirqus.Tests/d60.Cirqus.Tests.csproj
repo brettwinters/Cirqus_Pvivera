@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-<!--    <TargetFramework>netcoreapp3.1</TargetFramework>-->
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <ReleaseVersion>6.0.1</ReleaseVersion>
   </PropertyGroup>
@@ -17,6 +16,9 @@
     <None Remove="Contracts\EventStore\**" />
     <None Remove="EntityFramework\**" />
     <None Remove="MsSql\**" />
+    <Compile Remove="Views\EventDispatcher\Standard\TestSpecialViewManagerEventDispatcher.cs" />
+    <Compile Remove="Views\EventDispatcher\Standard\TestTwoDispatchesOneView.cs" />
+    <Compile Remove="_Copied\InMemoryEventStore.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -211,21 +213,22 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="Moq" Version="4.18.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit3TestAdapter" Version="3.16.1">
+    <PackageReference Include="NUnit3TestAdapter" Version="4.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Scrutor" Version="4.2.0" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="Sprache" Version="2.3.1" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+<!--    <PackageReference Include="xunit" Version="2.4.2" />-->
+<!--    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">-->
+<!--      <PrivateAssets>all</PrivateAssets>-->
+<!--      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>-->
+<!--    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\d60.Cirqus.InMemory\d60.Cirqus.InMemory.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus.MongoDb\d60.Cirqus.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus.MSSql\d60.Cirqus.MSSql.csproj" />
     <ProjectReference Include="..\..\src\d60.Cirqus.Ntfs\d60.Cirqus.Ntfs.csproj" />
@@ -241,6 +244,10 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Views\_Fixtures" />
   </ItemGroup>
 
 </Project>

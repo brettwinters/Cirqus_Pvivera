@@ -75,11 +75,17 @@ public class RealUnitOfWork : IUnitOfWork
 
 	AggregateRoot GetAggregateRootFromCache(string aggregateRootId, long globalSequenceNumberCutoff)
 	{
-		if (!CachedAggregateRoots.ContainsKey(globalSequenceNumberCutoff)) return null;
+		if (!CachedAggregateRoots.ContainsKey(globalSequenceNumberCutoff))
+		{
+			return null;
+		}
 
 		var cachedEntriesForThisInstant = CachedAggregateRoots[globalSequenceNumberCutoff];
 
-		if (!cachedEntriesForThisInstant.ContainsKey(aggregateRootId)) return null;
+		if (!cachedEntriesForThisInstant.ContainsKey(aggregateRootId))
+		{
+			return null;
+		}
 
 		var aggregateRoot = cachedEntriesForThisInstant[aggregateRootId];
 

@@ -24,13 +24,15 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _factory = RegisterForDisposal(new TFactory());
 
             //brett
-            _context = RegisterForDisposal(base.CreateTestContext()); // RegisterForDisposal(TestContext.Create());
+            _context = RegisterForDisposal(CreateTestContext()); // RegisterForDisposal(TestContext.Create());
         }
 
         [Test]
         public void RaisesEventWheneverViewInstanceIsUpdated()
         {
-            // arrange
+	        //Flaky 1 (id2 not found in dict)
+	        
+	        // arrange
             var viewManager = _factory.GetViewManager<View>();
             _context.AddViewManager(viewManager);
 

@@ -27,12 +27,12 @@ public class ConcurrencyException : ApplicationException
 	static string FormatErrorMessage(Guid batchId, IEnumerable<EventData> involvedDomainEvents)
 	{
 		var sequenceNumbersText = string.Join(Environment.NewLine, involvedDomainEvents
-			.Select(e => string.Format("    {0} - {1} / {2}", e.GetGlobalSequenceNumber(), e.GetAggregateRootId(), e.GetSequenceNumber())));
+			.Select(e => $"    {e.GetGlobalSequenceNumber()} - {e.GetAggregateRootId()} / {e.GetSequenceNumber()}"));
 
-		return string.Format(@"Could not save batch {0} containing
+		return $@"Could not save batch {batchId} containing
 
-{1}
+{sequenceNumbersText}
 
-to the event store because someone else beat us to it", batchId, sequenceNumbersText);
+to the event store because someone else beat us to it";
 	}
 }

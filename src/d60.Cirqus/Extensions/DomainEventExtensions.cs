@@ -39,12 +39,30 @@ public static class DomainEventExtensions
 		return GetMetadataField(domainEvent, DomainEvent.MetadataKeys.GlobalSequenceNumber, Convert.ToInt64, throwIfNotFound);
 	}
 
+	//TODO Write Tests
+	/// <summary>
+	/// Gets the timestamp in <see cref="DateTime.Ticks"/> from the domain event
+	/// </summary>
+	public static long GetTimeStamp(
+		this IDomainEvent domainEvent, 
+		bool throwIfNotFound = true)
+	{
+		return GetMetadataField(
+			domainEvent: domainEvent, 
+			key: DomainEvent.MetadataKeys.TimeUtc, 
+			converter: v => DateTime.Parse(v).Ticks, 
+			throwIfNotFound: throwIfNotFound
+		);
+	}
+
 	/// <summary>
 	/// Gets the UTC time of when the event was emitted from the <seealso cref="DomainEvent.MetadataKeys.TimeUtc"/>
-	/// header on the event. If <seealso cref="throwIfNotFound"/> is false and the header is not present, <seealso cref="DateTime.MinValue"/>
-	/// is returned
+	/// header on the event. If <seealso cref="throwIfNotFound"/> is false and the header is not present,
+	/// <seealso cref="DateTime.MinValue"/> is returned
 	/// </summary>
-	public static DateTime GetUtcTime(this IDomainEvent domainEvent, bool throwIfNotFound = true)
+	public static DateTime GetUtcTime(
+		this IDomainEvent domainEvent, 
+		bool throwIfNotFound = true)
 	{
 		var timeAsString = GetMetadataField(domainEvent, DomainEvent.MetadataKeys.TimeUtc, Convert.ToString, throwIfNotFound);
 
@@ -53,23 +71,32 @@ public static class DomainEventExtensions
 			return DateTime.MinValue;
 		}
 
-		var dateTime = DateTime.ParseExact(timeAsString, "u", CultureInfo.CurrentCulture);
+		var dateTime = DateTime.ParseExact(timeAsString, DomainEvent.DateTimeFormat, CultureInfo.CurrentCulture);
 
 		return new DateTime(dateTime.Ticks, DateTimeKind.Utc);
 	}
 
 
-	static TValue GetMetadataField<TValue>(IDomainEvent domainEvent, string key, Func<string, TValue> converter, bool throwIfNotFound)
+	static TValue GetMetadataField<TValue>(
+		IDomainEvent domainEvent, 
+		string key, 
+		Func<string, TValue> converter, 
+		bool throwIfNotFound)
 	{
 		var metadata = domainEvent.Meta;
 
-		if (metadata.ContainsKey(key)) return converter(metadata[key]);
-            
-		if (!throwIfNotFound) return converter(null);
+		if (metadata.ContainsKey(key))
+		{
+			return converter(metadata[key]);
+		}
 
-		var metadataString = string.Join(", ", metadata.Select(kvp => string.Format("{0}: {1}", kvp.Key, kvp.Value)));
-		var message = string.Format("Attempted to get value of key '{0}' from event {1}, but only the following" +
-		                            " metadata were available: {2}", key, domainEvent, metadataString);
+		if (!throwIfNotFound)
+		{
+			return converter(null);
+		}
+
+		var metadataString = string.Join(", ", metadata.Select(kvp => $"{kvp.Key}: {kvp.Value}"));
+		var message = $"Attempted to get value of key '{key}' from event {domainEvent}, but only the following" + $" metadata were available: {metadataString}";
 
 		throw new InvalidOperationException(message);
 	}
