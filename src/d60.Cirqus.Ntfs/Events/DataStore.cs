@@ -19,12 +19,12 @@ namespace d60.Cirqus.Ntfs.Events
     /// </summary>
     public class DataStore
     {
-        readonly JsonSerializer _serializer;
+        readonly JsonSerializer serializer;
         readonly string _dataDirectory;
 
         public DataStore(string basePath, bool dropEvents)
         {
-            _serializer = CreateSerializer();
+            serializer = CreateSerializer();
             _dataDirectory = Path.Combine(basePath, "events");
 
             if (dropEvents && Directory.Exists(_dataDirectory))
@@ -61,7 +61,7 @@ namespace d60.Cirqus.Ntfs.Events
             using (var fileStream = new FileStream(filename, FileMode.CreateNew, FileAccess.Write, FileShare.None, 1024, FileOptions.None))
             using (var bsonWriter = new BsonWriter(fileStream))
             {
-                _serializer.Serialize(bsonWriter, EventData.Create(domainEvent));
+                serializer.Serialize(bsonWriter, EventData.Create(domainEvent));
             }
         }
 
@@ -135,7 +135,7 @@ namespace d60.Cirqus.Ntfs.Events
 
                 try
                 {
-                    var eventData = _serializer.Deserialize<EventData>(bsonReader);
+                    var eventData = serializer.Deserialize<EventData>(bsonReader);
                     
                     return Cirqus.Events.EventData.FromMetadata(eventData.Meta, eventData.Data);
                 }

@@ -10,26 +10,62 @@ namespace d60.Cirqus.Tests.Serialization
     [TestFixture]
     public class TestJsonDomainEventSerializer : FixtureBase
     {
-        JsonDomainEventSerializer _serializer;
-
-        protected override void DoSetUp()
+	    protected override void DoSetUp()
         {
-            _serializer = new JsonDomainEventSerializer();
+            
         }
 
-        // ReSharper disable once ClassNeverInstantiated.Local
-        private class Root : AggregateRoot { }
+	    #region
 
+	    // ReSharper disable once ClassNeverInstantiated.Local
+	    private class Root : AggregateRoot { }
+        
+	    private class MyEvent : DomainEvent<Root>
+	    {
+		    public MyEvent()
+		    {
+			    Meta["bim"] = "hej!";
+		    }
+
+		    public List<string> ListOfStuff { get; set; }
+	    }
+        
+	    private class SimpleEvent : DomainEvent<Root>
+	    {
+		    public List<string> ListOfStuff { get; set; }
+	    }
+        
+	    private class MostSimpleEvent : DomainEvent<Root>
+	    {
+		    public string Text { get; set; }
+	    }
+
+	    #endregion
+	    
+	    [Test]
+	    public void CanRoundtripMostSimpleEvent()
+	    {
+		    var serializer = new JsonDomainEventSerializer();
+		    var anEvent = new MostSimpleEvent { Text = "hej med dig" };
+
+		    var eventData = serializer.Serialize(anEvent);
+		    var roundTrippedEvent = (MostSimpleEvent)serializer.Deserialize(eventData);
+
+		    Assert.That(roundTrippedEvent.Text, Is.EqualTo("hej med dig"));
+	    }
+	    
         [Test]
         public void CanRoundtripMyEvent()
         {
-            var anEvent = new MyEvent
+	        var serializer = new JsonDomainEventSerializer();
+
+	        var anEvent = new MyEvent
             {
                 ListOfStuff = new List<string> { "hej", "med", "dig" }
             };
 
-            var eventData = _serializer.Serialize(anEvent);
-            var roundtrippedEvent = (MyEvent)_serializer.Deserialize(eventData);
+            var eventData = serializer.Serialize(anEvent);
+            var roundtrippedEvent = (MyEvent)serializer.Deserialize(eventData);
 
             Assert.That(roundtrippedEvent.ListOfStuff, Is.EqualTo(new[] { "hej", "med", "dig" }));
         }
@@ -37,15 +73,17 @@ namespace d60.Cirqus.Tests.Serialization
         [Test]
         public void UsesTypeAliasWhenProvided()
         {
+	        var serializer = new JsonDomainEventSerializer();
+
 	        //Arrange
-	        _serializer.AddAliasesFor(typeof(MyEvent));
+	        serializer.AddAliasesFor(typeof(MyEvent));
 	        var anEvent = new MyEvent
             {
                 ListOfStuff = new List<string> { "hej", "med", "dig" }
             };
 
             //Act
-            var eventData = _serializer.Serialize(anEvent);
+            var eventData = serializer.Serialize(anEvent);
 
             //Assert
             var jsonDocument = System.Text.Json.JsonDocument.Parse(Encoding.UTF8.GetString(eventData.Data));
@@ -53,101 +91,54 @@ namespace d60.Cirqus.Tests.Serialization
 	            "MyEvent, <events>", 
 	            jsonDocument.RootElement.GetProperty("$type").ToString()
 	        );
+            
+            var roundtrippedEvent = (MyEvent)serializer.Deserialize(eventData);
+            Assert.That(roundtrippedEvent.ListOfStuff, Is.EqualTo(new[] { "hej", "med", "dig" }));
         }
 
-        private class MyGenericEvent<T> : DomainEvent<Root>
-        {
-	        public MyGenericEvent()
-	        {
-		        Meta["bim"] = "hej!";
-	        }
-
-	        public List<T> ListOfStuff { get; set; }
-        }
-        
         [Test]
-        public void CanRoundtripGenericEvent()
+        public void SerialisesTypeAliasWithTypeNameFunctionWhenProvided()
         {
-	        _serializer.AddAliasesFor(typeof(MyGenericEvent<string>));
-	        var anEvent = new MyGenericEvent<string>()
-	        {
-		        ListOfStuff = new List<string> { "hej", "med", "dig" }
-	        };
-
-	        var eventData = _serializer.Serialize(anEvent);
-	        var roundtrippedEvent = _serializer.Deserialize(eventData);
-	        
-	        Assert.IsInstanceOf<MyGenericEvent<string>>(roundtrippedEvent);
-
-	        Assert.That(((MyGenericEvent<string>)roundtrippedEvent).ListOfStuff, Is.EqualTo(new[] { "hej", "med", "dig" }));
-        }
-        
-        [Test]
-        public void UsesTypeAliasWhenEventIsGenericProvided()
-        {
-	        //Arrange
-	        _serializer.AddAliasesFor(typeof(MyGenericEvent<string>));
-	        var anEvent = new MyGenericEvent<string>
+	        var serializer = new JsonDomainEventSerializer(
+		        virtualNamespaceName: "my_namespace", 
+		        typeToAliasFunction: t => "Special_" + t.Name
+		    );
+	        serializer.AddAliasesFor(typeof(MyEvent));
+	        var anEvent = new MyEvent
             {
                 ListOfStuff = new List<string> { "hej", "med", "dig" }
             };
 
-	        var name = typeof(MyGenericEvent<>).Name;
-
             //Act
-            var eventData = _serializer.Serialize(anEvent);
+            var eventData = serializer.Serialize(anEvent);
 
             //Assert
             var jsonDocument = System.Text.Json.JsonDocument.Parse(Encoding.UTF8.GetString(eventData.Data));
             Assert.AreEqual(
-	            "MyGenericEvent`1, <events>", 
+	            $"Special_MyEvent, my_namespace", 
 	            jsonDocument.RootElement.GetProperty("$type").ToString()
 	        );
-        }
+            
+            var roundtrippedEvent = (MyEvent)serializer.Deserialize(eventData);
 
-        private class MyEvent : DomainEvent<Root>
-        {
-            public MyEvent()
-            {
-                Meta["bim"] = "hej!";
-            }
-
-            public List<string> ListOfStuff { get; set; }
+            Assert.That(roundtrippedEvent.ListOfStuff, Is.EqualTo(new[] { "hej", "med", "dig" }));
+            Assert.That(roundtrippedEvent.Meta["bim"], Is.EqualTo("hej!"));
         }
 
         [Test]
         public void CanRoundtripSimpleEvent()
         {
-            var anEvent = new SimpleEvent
+	        var serializer = new JsonDomainEventSerializer();
+
+	        var anEvent = new SimpleEvent
             {
                 ListOfStuff = new List<string> { "hej", "med", "dig" }
             };
 
-            var eventData = _serializer.Serialize(anEvent);
-            var roundtrippedEvent = (SimpleEvent)_serializer.Deserialize(eventData);
+            var eventData = serializer.Serialize(anEvent);
+            var roundtrippedEvent = (SimpleEvent)serializer.Deserialize(eventData);
 
             Assert.That(roundtrippedEvent.ListOfStuff, Is.EqualTo(new[] { "hej", "med", "dig" }));
-        }
-
-        private class SimpleEvent : DomainEvent<Root>
-        {
-            public List<string> ListOfStuff { get; set; }
-        }
-
-        [Test]
-        public void CanRoundtripMostSimpleEvent()
-        {
-            var anEvent = new MostSimpleEvent { Text = "hej med dig" };
-
-            var eventData = _serializer.Serialize(anEvent);
-            var roundTrippedEvent = (MostSimpleEvent)_serializer.Deserialize(eventData);
-
-            Assert.That(roundTrippedEvent.Text, Is.EqualTo("hej med dig"));
-        }
-
-        private class MostSimpleEvent : DomainEvent<Root>
-        {
-            public string Text { get; set; }
         }
     }
 }

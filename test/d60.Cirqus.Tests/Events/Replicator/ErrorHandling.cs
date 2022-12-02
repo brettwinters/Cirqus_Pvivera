@@ -121,7 +121,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
         MongoDbEventStore _source;
         MongoDbEventStore _destination;
         ListLoggerFactory _listLoggerFactory;
-        readonly JsonDomainEventSerializer _serializer = new();
+        readonly JsonDomainEventSerializer serializer = new();
 
         protected override void DoSetUp()
         {
@@ -166,7 +166,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
                 Enumerable.Range(0, numberOfEvents)
                     .Select(i => CreateNewEvent(Guid.NewGuid(), "event no " + i))
                     .ToList()
-                    .ForEach(e => _source.Save(Guid.NewGuid(), new[] {e}.Select(e2 => _serializer.Serialize(e2))));
+                    .ForEach(e => _source.Save(Guid.NewGuid(), new[] {e}.Select(e2 => serializer.Serialize(e2))));
                 
                 // TODO Remove once sure it works
                 // while (_destination.GetNextGlobalSequenceNumber() < numberOfEvents)
@@ -188,7 +188,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
 
                 var myKindOfEvents = _destination
                     .Stream()
-                    .Select(e => _serializer.Deserialize(e))
+                    .Select(e => serializer.Deserialize(e))
                     .OfType<Event>()
                     .ToList();
 

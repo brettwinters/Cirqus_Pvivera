@@ -16,7 +16,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
     public class BasicReplication : FixtureBase
     {
         readonly Dictionary<Guid, int> _seqNos = new();
-        readonly JsonDomainEventSerializer _serializer = new();
+        readonly JsonDomainEventSerializer serializer = new();
 
         EventReplicator _replicator;
         MongoDbEventStore _source;
@@ -89,7 +89,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
             {
                 var result = _destination
                     .Stream()
-                    .Select(e => _serializer.Deserialize(e))
+                    .Select(e => serializer.Deserialize(e))
                     .ToList();
 
                 if (result.Any())
@@ -109,7 +109,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
         {
             return data
                 .Select(str => CreateNewEvent(Guid.NewGuid(), str))
-                .Select(e => _serializer.Serialize(e))
+                .Select(e => serializer.Serialize(e))
                 .ToArray();
         }
 

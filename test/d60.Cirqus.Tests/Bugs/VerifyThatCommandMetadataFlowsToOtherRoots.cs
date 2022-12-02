@@ -17,7 +17,7 @@ namespace d60.Cirqus.Tests.Bugs
         TestContext _context;
         ICommandProcessor _commandProcessor;
         InMemoryEventStore _inMemoryEventStore;
-        IDomainEventSerializer _serializer = new JsonDomainEventSerializer();
+        IDomainEventSerializer serializer = new JsonDomainEventSerializer();
 
         protected override void DoSetUp()
         {
@@ -45,7 +45,7 @@ namespace d60.Cirqus.Tests.Bugs
             Assert.That(eventsInTestContext[0].Meta.ContainsKey("testkey"), "Metadata did NOT contain the 'testkey' key!");
             Assert.That(eventsInTestContext[0].Meta["testkey"], Is.EqualTo("testvalue"));
 
-            var eventsInRealEventStore = _inMemoryEventStore.Select(x => _serializer.Deserialize(x)).OfType<CreatedEvent>().ToList();
+            var eventsInRealEventStore = _inMemoryEventStore.Select(x => serializer.Deserialize(x)).OfType<CreatedEvent>().ToList();
 
             Assert.That(eventsInRealEventStore.Count, Is.EqualTo(1));
             Assert.That(eventsInRealEventStore[0].Meta.ContainsKey("testkey"), "Metadata did NOT contain the 'testkey' key!");
@@ -157,7 +157,7 @@ namespace d60.Cirqus.Tests.Bugs
         {
             VerifyEvents(expectedNumberOfEvents, _context.History.OfType<Event>(), "TestContext");
 
-            VerifyEvents(expectedNumberOfEvents, _inMemoryEventStore.Select(x => _serializer.Deserialize(x)).OfType<Event>(), "real CommandProcessor");
+            VerifyEvents(expectedNumberOfEvents, _inMemoryEventStore.Select(x => serializer.Deserialize(x)).OfType<Event>(), "real CommandProcessor");
         }
 
         static void VerifyEvents(int expectedNumberOfEvents, IEnumerable<Event> events, string whichCommandProcessor)

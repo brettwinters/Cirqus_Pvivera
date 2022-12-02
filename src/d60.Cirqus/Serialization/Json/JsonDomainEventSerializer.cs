@@ -28,11 +28,13 @@ public class JsonDomainEventSerializer : IDomainEventSerializer
 			virtualNamespaceName: virtualNamespaceName, 
 			typeToAliasFunction: typeToAliasFunction ?? (t => t.Name)
 		);
+
+		AddAliasFor(typeof(Metadata));
 	
 		Settings = new JsonSerializerSettings 
 		{
 			ContractResolver = new ContractResolver(),
-			SerializationBinder = _binder.AddType(typeof(Metadata)),
+			SerializationBinder = _binder,
 			TypeNameHandling = TypeNameHandling.Objects,
 			Formatting = Formatting.Indented,
 			FloatFormatHandling = FloatFormatHandling.DefaultValue,

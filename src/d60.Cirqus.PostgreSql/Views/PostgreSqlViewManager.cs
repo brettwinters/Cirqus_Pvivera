@@ -26,7 +26,7 @@ namespace d60.Cirqus.PostgreSql.Views
         readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
         readonly Logger _logger = CirqusLoggerFactory.Current.GetCurrentClassLogger();
         readonly string _connectionString;
-        readonly GenericSerializer _serializer = new GenericSerializer();
+        readonly GenericSerializer serializer = new GenericSerializer();
 
         public PostgreSqlViewManager(string connectionStringOrConnectionStringName, string tableName, string positionTableName = null, bool automaticallyCreateSchema = true, Action<NpgsqlConnection> additionalConnectionSetup = null)
         {
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS ""{1}"" (
                 foreach (var a in parametersAndData)
                 {
                     command.Parameters.Add(a.IdParameterName, NpgsqlDbType.Varchar, PrimaryKeySize).Value = a.Id;
-                    command.Parameters.AddWithValue(a.DataParameterName, _serializer.Serialize(a.ViewInstance));
+                    command.Parameters.AddWithValue(a.DataParameterName, serializer.Serialize(a.ViewInstance));
                 }
 
                 command.CommandText = string.Join(Environment.NewLine, sqlCommands);
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS ""{1}"" (
                     var data = reader["data"];
                     var jsonText = data.ToString();
 
-                    return (TViewInstance)_serializer.Deserialize(jsonText);
+                    return (TViewInstance)serializer.Deserialize(jsonText);
                 }
             }
         }

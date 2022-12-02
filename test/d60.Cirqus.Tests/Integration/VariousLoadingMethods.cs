@@ -15,7 +15,7 @@ namespace d60.Cirqus.Tests.Integration
     [TestFixture]
     public class VariousLoadingMethods : FixtureBase
     {
-        readonly JsonDomainEventSerializer _serializer = new JsonDomainEventSerializer();
+        readonly JsonDomainEventSerializer serializer = new JsonDomainEventSerializer();
         ICommandProcessor _commandProcessor;
         Task<InMemoryEventStore> _eventStore;
 
@@ -23,7 +23,7 @@ namespace d60.Cirqus.Tests.Integration
         {
             _commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => _eventStore = e.UseInMemoryEventStore())
-                .Options(o => o.UseCustomDomainEventSerializer(_serializer)));
+                .Options(o => o.UseCustomDomainEventSerializer(serializer)));
 
             RegisterForDisposal(_commandProcessor);
         }
@@ -40,7 +40,7 @@ namespace d60.Cirqus.Tests.Integration
             _commandProcessor.ProcessCommand(command);
 
             var createdEvents = _eventStore.Result.Stream()
-                .Select(e => _serializer.Deserialize(e))
+                .Select(e => serializer.Deserialize(e))
                 .OfType<SomeAggregateRootCreated>()
                 .ToList();
 
