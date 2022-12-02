@@ -21,9 +21,13 @@ public class JsonDomainEventSerializer : IDomainEventSerializer
 	}
 
 	public JsonDomainEventSerializer(
-		string virtualNamespaceName) 
+		string virtualNamespaceName,
+		Func<Type, string> typeToAliasFunction = null) 
 	{
-		_binder = new TypeAliasBinder(virtualNamespaceName);
+		_binder = new TypeAliasBinder(
+			virtualNamespaceName: virtualNamespaceName, 
+			typeToAliasFunction: typeToAliasFunction ?? (t => t.Name)
+		);
 	
 		Settings = new JsonSerializerSettings 
 		{

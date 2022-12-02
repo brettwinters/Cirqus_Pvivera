@@ -242,6 +242,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Serialization\Binary" />
+    <Folder Include="Serialization\Generic" />
     <Folder Include="Views\_Fixtures" />
   </ItemGroup>
 
