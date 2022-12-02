@@ -140,10 +140,11 @@ namespace d60.Cirqus.Tests.Events
                 throw new NotImplementedException();
             }
 
-            public long GetNextGlobalSequenceNumber()
-            {
-                throw new NotImplementedException();
-            }
+            //TODO Remove once sure it works
+            // public long GetNextGlobalSequenceNumber()
+            // {
+            //     throw new NotImplementedException();
+            // }
 
             public long GetLastGlobalSequenceNumber()
             {

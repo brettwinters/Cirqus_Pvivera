@@ -30,8 +30,6 @@ namespace d60.Cirqus.Tests.Contracts.Views
         [Test]
         public void RaisesEventWheneverViewInstanceIsUpdated()
         {
-	        //Flaky 1 (id2 not found in dict)
-	        
 	        // arrange
             var viewManager = _factory.GetViewManager<View>();
             _context.AddViewManager(viewManager);
@@ -53,6 +51,10 @@ namespace d60.Cirqus.Tests.Contracts.Views
             _context.Save("id1", new Event());
             _context.Save("id1", new Event());
             _context.Save("id2", new Event());
+            
+            //Flaky 1 (id2 not found in dict)
+            //Flaky 2 added wait
+            _context.WaitForViewsToCatchUp();
 
             // assert
             Assert.That(registeredUpdates["id1"], Is.GreaterThanOrEqualTo(3));

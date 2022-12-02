@@ -35,12 +35,12 @@ namespace d60.Cirqus.Tests.MsSql
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = string.Format(@"
+                        cmd.CommandText = $@"
 BEGIN
-    CREATE DATABASE [{0}]
+    CREATE DATABASE [{databaseName}]
 END
 
-", databaseName);
+";
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -66,12 +66,12 @@ END
 
                     using (var cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = string.Format(@"
+                        cmd.CommandText = $@"
 BEGIN
-    DROP TABLE [{0}]
+    DROP TABLE [{tableName}]
 END
 
-", tableName);
+";
                         cmd.ExecuteNonQuery();
                     }
                 }

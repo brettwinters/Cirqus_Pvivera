@@ -65,10 +65,7 @@ public abstract class AggregateRoot
 		DomainEvent<TAggregateRoot> e)
 		where TAggregateRoot : AggregateRoot
 	{
-		if (e == null)
-		{
-			throw new ArgumentNullException(nameof(e), "Can't emit null!");
-		}
+		ArgumentNullException.ThrowIfNull(e);
 
 		if (string.IsNullOrWhiteSpace(Id))
 		{
@@ -110,9 +107,7 @@ public abstract class AggregateRoot
 
 		// Use 1 tick resolution which is 100 ns. This corresponds to 5 zeros
 		var now = TimeService.GetUtcNow();
-		//TODO Uncomment
 		var globalSequenceNumber = GlobalSequenceNumberService.GetNewGlobalSequenceNumber();
-		//var now = new DateTime(globalSequenceNumber);
 		var sequenceNumber = CurrentSequenceNumber + 1;
 
 		e.Meta.Merge(CurrentCommandMetadata ?? new Metadata());

@@ -23,7 +23,7 @@ namespace d60.Cirqus.Testing;
 /// Use the test context to carry out realistic testing of command processing, aggregate roots, and 
 /// event processing in view generation.
 /// </summary>
-public class TestContext : IDisposable
+public sealed class TestContext : IDisposable
 {
 	readonly IDomainEventSerializer _domainEventSerializer;
 	readonly IDomainTypeNameMapper _domainTypeNameMapper;
@@ -56,21 +56,16 @@ public class TestContext : IDisposable
 		return new TestContextConfigurationBuilder(new ServiceCollection());
 	}
 
-	public IDomainEventSerializer EventSerializer
-	{
-		get { return _domainEventSerializer; }
-	}
+	public IDomainEventSerializer EventSerializer => _domainEventSerializer;
 
-	public IEventStore EventStore
-	{
-		get { return _eventStore; }
-	}
+	public IEventStore EventStore => _eventStore;
 
 	internal event Action Disposed = delegate { };
 	
 	public bool Asynchronous { get; set; }
 
-	public TestContext AddViewManager(IViewManager viewManager)
+	public TestContext AddViewManager(
+		IViewManager viewManager)
 	{
 		WithEventDispatcherOfType<ViewManagerEventDispatcher>(x =>
 		{
@@ -83,49 +78,34 @@ public class TestContext : IDisposable
 	/// <summary>
 	/// Processes the specified command in a unit of work.
 	/// </summary>
-	public CommandProcessingResultWithEvents ProcessCommand(Command command)
+	public CommandProcessingResultWithEvents ProcessCommand(
+		Command command)
 	{
-		using (var unitOfWork = BeginUnitOfWork())
+		using var unitOfWork = BeginUnitOfWork();
+		var handler = _testCommandMapper.GetCommandAction(command);
+
+		handler(new DefaultCommandContext(unitOfWork.RealUnitOfWork, command.Meta), command);
+
+		var eventsToReturn = unitOfWork.EmittedEvents.ToList();
+
+		foreach (var e in eventsToReturn)
 		{
-			var handler = _testCommandMapper.GetCommandAction(command);
-
-			handler(new DefaultCommandContext(unitOfWork.RealUnitOfWork, command.Meta), command);
-
-			var eventsToReturn = unitOfWork.EmittedEvents.ToList();
-
-			foreach (var e in eventsToReturn)
-			{
-				e.Meta.Merge(command.Meta);
-			}
-
-			unitOfWork.Commit();
-
-			var result = new CommandProcessingResultWithEvents(eventsToReturn);
-
-			//brett
-			//_eventDispatcher.Dispatch(eventsToReturn);
-
-			if (!Asynchronous)
-			{
-				WaitForViewsToCatchUp();
-			}
-
-			return result;
-			
-			// void Merge(
-			// 	Metadata otherMeta)
-			// {
-			// 	foreach (var kvp in otherMeta)
-			// 	{
-			// 		if (ContainsKey(kvp.Key))
-			// 		{
-			// 			continue;
-			// 		}
-			//
-			// 		this[kvp.Key] = kvp.Value;
-			// 	}
-			// }
+			e.Meta.Merge(command.Meta);
 		}
+
+		unitOfWork.Commit();
+
+		var result = new CommandProcessingResultWithEvents(eventsToReturn);
+
+		//brett
+		//_eventDispatcher.Dispatch(eventsToReturn);
+
+		if (!Asynchronous)
+		{
+			WaitForViewsToCatchUp();
+		}
+
+		return result;
 	}
 
 	/// <summary>
@@ -210,7 +190,8 @@ public class TestContext : IDisposable
 					}
 					catch (Exception exception)
 					{
-						throw new ApplicationException($"Could not hydrate aggregate root {type} with ID {aggregateRootId}!", exception);
+						throw new ApplicationException($"Could not hydrate aggregate root {type} with " +
+						                               $"ID {aggregateRootId}!", exception);
 					}
 				})
 				.Where(aggregateRoot => aggregateRoot != null);
@@ -232,7 +213,9 @@ public class TestContext : IDisposable
 	/// <summary>
 	/// Saves the given domain event to the history - requires that the aggregate root ID has been added in the event's metadata under the <see cref="DomainEvent.MetadataKeys.AggregateRootId"/> key
 	/// </summary>
-	public CommandProcessingResultWithEvents Save(Type owner, DomainEvent domainEvent)
+	public CommandProcessingResultWithEvents Save(
+		Type owner, 
+		DomainEvent domainEvent)
 	{
 		if (!domainEvent.Meta.ContainsKey(DomainEvent.MetadataKeys.AggregateRootId))
 		{
@@ -258,7 +241,8 @@ public class TestContext : IDisposable
 	}
 
 	/// <summary>
-	/// Saves the given domain events to the history as if they were emitted by the specified aggregate root, immediately dispatching the events to the event dispatcher
+	/// Saves the given domain events to the history as if they were emitted by the specified aggregate root,
+	/// immediately dispatching the events to the event dispatcher
 	/// </summary>
 	public CommandProcessingResultWithEvents Save(
 		string aggregateRootId, 
@@ -267,14 +251,8 @@ public class TestContext : IDisposable
 	{
 		foreach (var domainEvent in domainEvents)
 		{
-			
 			SetMetadata(aggregateRootId, owner, domainEvent);
 		}
-		
-		//TODO Uncomment
-		// domainEvents
-		// 	.ToList()
-		// 	.ForEach(e => e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString());
 		
 		var eventData = domainEvents.Select(e => _domainEventSerializer.Serialize(e)).ToList();
 
@@ -295,7 +273,8 @@ public class TestContext : IDisposable
 	/// <summary>
 	/// Waits for all views to catch up with the entire history of events, timing out if that takes longer than 10 seconds
 	/// </summary>
-	public void WaitForViewsToCatchUp(int timeoutSeconds = 10)
+	public void WaitForViewsToCatchUp(
+		int timeoutSeconds = 10)
 	{
 		var allGlobalSequenceNumbers = History.Select(h => h.GetGlobalSequenceNumber()).ToArray();
 
@@ -306,13 +285,18 @@ public class TestContext : IDisposable
 
 		var result = CommandProcessingResult.WithNewPosition(allGlobalSequenceNumbers.Max());
 
-		WithEventDispatcherOfType<IAwaitableEventDispatcher>(x => x.WaitUntilProcessed(result, TimeSpan.FromSeconds(timeoutSeconds)).Wait());
+		WithEventDispatcherOfType<IAwaitableEventDispatcher>(x => 
+			x.WaitUntilProcessed(result, TimeSpan.FromSeconds(timeoutSeconds)).Wait()
+		);
 	}
 
 	/// <summary>
-	/// Waits for views managing the specified <see cref="TViewInstance"/> to catch up with the entire history of events, timing out if that takes longer than 10 seconds
+	/// Waits for views managing the specified <see cref="TViewInstance"/> to catch up with the
+	/// entire history of events, timing out if that takes longer than 10 seconds
 	/// </summary>
-	public void WaitForViewToCatchUp<TViewInstance>(int timeoutSeconds = 10) where TViewInstance : IViewInstance
+	public void WaitForViewToCatchUp<TViewInstance>(
+		int timeoutSeconds = 10) 
+		where TViewInstance : IViewInstance
 	{
 		var allGlobalSequenceNumbers = History.Select(h => h.GetGlobalSequenceNumber()).ToArray();
 
@@ -323,7 +307,9 @@ public class TestContext : IDisposable
 
 		var result = CommandProcessingResult.WithNewPosition(allGlobalSequenceNumbers.Max());
 
-		WithEventDispatcherOfType<IAwaitableEventDispatcher>(x => x.WaitUntilProcessed<TViewInstance>(result, TimeSpan.FromSeconds(timeoutSeconds)).Wait());
+		WithEventDispatcherOfType<IAwaitableEventDispatcher>(x => 
+			x.WaitUntilProcessed<TViewInstance>(result, TimeSpan.FromSeconds(timeoutSeconds)).Wait()
+		);
 	}
 
 	public void Initialize()
@@ -365,17 +351,9 @@ public class TestContext : IDisposable
 		}
 
 		throw new ArgumentException(
-			$@"Could not properly roundtrip the following domain event: {domainEvent}
-
-Result after first serialization:
-
-{firstSerialization}
-
-Result after roundtripping:
-
-{secondSerialization}
-
-Headers: {domainEvent.Meta}"
+			$"Could not properly roundtrip the following domain event: {domainEvent} Result after first " +
+			$"serialization: {firstSerialization} Result after roundtripping: {secondSerialization} " +
+			$"Headers: {domainEvent.Meta}"
 		);
 	}
 
@@ -396,14 +374,10 @@ Headers: {domainEvent.Meta}"
 
 	void WithEventDispatcherOfType<T>(Action<T> action) where T: IEventDispatcher
 	{
-		if (!(_eventDispatcher is T))
+		if (_eventDispatcher is T viewManagerEventDispatcher)
 		{
-			return;
+			action(viewManagerEventDispatcher);
 		}
-
-		var viewManangerEventDispatcher = (T)_eventDispatcher;
-
-		action(viewManangerEventDispatcher);
 	}
 
 	bool _disposed;
@@ -419,7 +393,7 @@ Headers: {domainEvent.Meta}"
 		GC.SuppressFinalize(this);
 	}
 
-	protected virtual void Dispose(bool disposing)
+	private void Dispose(bool disposing)
 	{
 		if (_disposed)
 		{

@@ -8,8 +8,7 @@ namespace d60.Cirqus.Tests.Events
     [TestFixture, Description("Ensures that events can be properly serialized/deserialized")]
     public class TestSerialization
     {
-
-        private static object[] NumberValues =
+	    private static object[] NumberValues =
         {
             new object[]{ Decimal.MaxValue },
             new object[]{ Decimal.MinValue }
@@ -23,11 +22,11 @@ namespace d60.Cirqus.Tests.Events
 
 
         [Test]
-        [TestCaseSource("NumberValues")]
+        [TestCaseSource(nameof(NumberValues))]
         public void RoundtripEventWithBoxedDecimalFields(object value)
         {
-            var serializer = new JsonDomainEventSerializer("<events>");
-            //  .AddAliasesFor(typeof(NumberDomainEvent), typeof(ComplexValue));
+            var serializer = new JsonDomainEventSerializer("<events>")
+            .AddAliasesFor(typeof(NumberDomainEvent), typeof(ComplexValue));
 
             var rootId = Guid.NewGuid();
             var utcNow = DateTime.UtcNow;
@@ -47,9 +46,9 @@ namespace d60.Cirqus.Tests.Events
 
             var roundtrippedEvent = (NumberDomainEvent)serializer.Deserialize(text);
 
-            //Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.AggregateRootId], Is.EqualTo(rootId));
-            //Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeLocal], Is.EqualTo(utcNow.ToLocalTime()));
-            //Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeUtc], Is.EqualTo(utcNow));
+            // Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.AggregateRootId], Is.EqualTo(rootId));
+            // Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeLocal], Is.EqualTo(utcNow.ToLocalTime()));
+            // Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeUtc], Is.EqualTo(utcNow));
             Assert.AreEqual(value?.ToString(), roundtrippedEvent.Value?.ToString());
         }
 
@@ -121,7 +120,7 @@ namespace d60.Cirqus.Tests.Events
 
             //Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.AggregateRootId], Is.EqualTo(rootId));
             //Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeLocal], Is.EqualTo(utcNow.ToLocalTime()));
-            //Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeUtc], Is.EqualTo(utcNow));
+            // Assert.That(roundtrippedEvent.Meta[DomainEvent.MetadataKeys.TimeUtc], Is.EqualTo(utcNow));
             Assert.That(roundtrippedEvent.Text, Is.EqualTo("hello there"));
             Assert.That(roundtrippedEvent.Value.Value, Is.EqualTo(23));
         }

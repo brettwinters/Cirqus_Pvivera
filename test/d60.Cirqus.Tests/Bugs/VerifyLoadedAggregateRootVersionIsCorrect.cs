@@ -35,27 +35,25 @@ namespace d60.Cirqus.Tests.Bugs
 
             var provider = services.BuildServiceProvider();
 
-            var commandProcessor = provider.GetService<ICommandProcessor>();
+            var commandProcessor = provider.GetRequiredService<ICommandProcessor>();
 
             const string oneWootId = "oneWoot";
             const string anotherWootId = "anotherWoot";
-            
-            using (commandProcessor)
-            {
-                commandProcessor.ProcessCommand(new MakeAnotherWootDoItsThing(anotherWootId));
 
-                commandProcessor.ProcessCommand(new MakeOneWootReadAnotherWoot(oneWootId, anotherWootId));
+            using var processor = commandProcessor;
+            commandProcessor.ProcessCommand(new MakeAnotherWootDoItsThing(anotherWootId));
 
-                commandProcessor.ProcessCommand(new MakeAnotherWootDoItsThing(anotherWootId));
+            commandProcessor.ProcessCommand(new MakeOneWootReadAnotherWoot(oneWootId, anotherWootId));
 
-                var lastResult = commandProcessor.ProcessCommand(new MakeOneWootReadAnotherWoot(oneWootId, anotherWootId));
+            commandProcessor.ProcessCommand(new MakeAnotherWootDoItsThing(anotherWootId));
 
-                await waitHandle.WaitFor<Wview>(lastResult, TimeSpan.FromSeconds(10));
+            var lastResult = commandProcessor.ProcessCommand(new MakeOneWootReadAnotherWoot(oneWootId, anotherWootId));
 
-                var instance = viewManager.Load(GlobalInstanceLocator.GetViewInstanceId());
+            await waitHandle.WaitFor<Wview>(lastResult, TimeSpan.FromSeconds(10));
 
-                instance.ToString();
-            }
+            var instance = viewManager.Load(GlobalInstanceLocator.GetViewInstanceId());
+
+            instance.ToString() ;
         }
 
         class Wview : IViewInstance<GlobalInstanceLocator>, ISubscribeTo<OneWootDidItsThing>

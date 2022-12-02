@@ -99,7 +99,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 
         string GetRandomAggregateRootId()
         {
-            return string.Format("agg-{0}", _random.Next(100));
+            return $"agg-{_random.Next(100)}";
         }
 
         string GetNext(Dictionary<string, int> sequenceNumbers, string aggregateRootId)

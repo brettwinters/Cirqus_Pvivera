@@ -56,7 +56,7 @@ namespace d60.Cirqus.Tests.Aggregates
         [SetUp]
         public void Setup()
         {
-	        //TODO Uncomment
+	        //TODO Remove once sure it works
 	        FakeGlobalSequenceNumberService.Reset();
 	        
 	        _aggregateRootRepository = new DefaultAggregateRootRepository(

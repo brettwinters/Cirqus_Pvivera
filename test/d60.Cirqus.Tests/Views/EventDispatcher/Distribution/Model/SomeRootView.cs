@@ -17,7 +17,7 @@ namespace d60.Cirqus.Tests.Views.Distribution.Model
         {
             if (Thread.CurrentThread.Name == null)
             {
-                Thread.CurrentThread.Name = string.Format("thread-{0}", Interlocked.Increment(ref _threadIdCounter));
+                Thread.CurrentThread.Name = $"thread-{Interlocked.Increment(ref _threadIdCounter)}";
             }
 
             Thread.Sleep(1000);

@@ -3,12 +3,12 @@
     <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>d60.Cirqus.Serilog</PackageId>
-    <Version>6.0.1</Version>
+    <Version>6.1.0</Version>
     <Authors>brettwinters</Authors>
     <Company>Mercenta</Company>
     <PackageDescription>Tidy up links</PackageDescription>
     <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
-    <ReleaseVersion>6.0.1</ReleaseVersion>
+    <ReleaseVersion>6.1.0</ReleaseVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.12.0" />

@@ -28,7 +28,7 @@ public interface IProfiler
 	/// </summary>
 	void RecordGlobalSequenceNumberGetNext(TimeSpan elapsed);
 	
-	//TODO Uncomment
+	//TODO Remove once sure it works
 	void RecordGlobalSequenceNumberGetLast(TimeSpan elapsed);
 
 	/// <summary>

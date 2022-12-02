@@ -32,7 +32,8 @@ public class TestContextConfigurationBuilder : IOptionalConfiguration<TestContex
 		CirqusLoggerFactory.Changed += f => _logger = f.GetCurrentClassLogger();
 	}
 
-	public IOptionalConfiguration<TestContext> AggregateRootRepository(Action<AggregateRootRepositoryConfigurationBuilder> configure)
+	public IOptionalConfiguration<TestContext> AggregateRootRepository(
+		Action<AggregateRootRepositoryConfigurationBuilder> configure)
 	{
 		configure(new AggregateRootRepositoryConfigurationBuilder(_newContainer));
 		return this;

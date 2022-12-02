@@ -27,7 +27,7 @@ namespace d60.Cirqus.Tests.Stubs
 
             public override string ToString()
             {
-                return string.Format("{0:O}|{1}|{2}|{3}", Time, Level, OwnerType.FullName, Text);
+                return $"{Time:O}|{Level}|{OwnerType.FullName}|{Text}";
             }
         }
 
@@ -71,7 +71,9 @@ namespace d60.Cirqus.Tests.Stubs
 
             public override void Warn(Exception exception, string message, params object[] objs)
             {
-                Emit(Level.Warn, string.Format("{0} - exception: {1}", string.Format(message, objs), exception));
+                Emit(Level.Warn,
+	                $"{string.Format(message, objs)} - exception: {exception}"
+                );
             }
 
             public override void Error(string message, params object[] objs)
@@ -81,7 +83,9 @@ namespace d60.Cirqus.Tests.Stubs
 
             public override void Error(Exception exception, string message, params object[] objs)
             {
-                Emit(Level.Error, string.Format("{0} - exception: {1}", string.Format(message, objs), exception));
+                Emit(Level.Error,
+	                $"{string.Format(message, objs)} - exception: {exception}"
+                );
             }
 
             void Emit(Level level, string text)

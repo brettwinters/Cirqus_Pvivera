@@ -208,10 +208,10 @@ namespace d60.Cirqus.Tests.Views
                 }
                 catch (Exception exception)
                 {
-                    throw new InvalidCastException(string.Format("Could not get item {0} with key '{1}' as {2}!", value, key, typeof(T)), exception);
+                    throw new InvalidCastException($"Could not get item {value} with key '{key}' as {typeof(T)}!", exception);
                 }
             }
-            throw new KeyNotFoundException(string.Format("Could not find item with key '{0}' in the current view context!", key));
+            throw new KeyNotFoundException($"Could not find item with key '{key}' in the current view context!");
         }
     }
 }

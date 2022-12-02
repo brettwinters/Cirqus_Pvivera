@@ -24,14 +24,18 @@ public class TestGlobalSequenceNumberService
 	[SetUp]
 	public void Setup()
 	{
-		//FakeGlobalSequenceNumberService.Reset();
+		//Flaky 1
+		//Flaky 2 added this
+		GlobalSequenceNumberService.GetNewGlobalSequenceNumber();
 	}
 	
 	[Test]
 	public void ShouldReturnCurrentUtcTicks()
 	{
+		// flaky
+		// flaky 100 -> 200
 		Assert.That(GlobalSequenceNumberService.GetNewGlobalSequenceNumber(), 
-			Is.EqualTo(DateTimeOffset.UtcNow.Ticks).Within(100));
+			Is.EqualTo(DateTimeOffset.UtcNow.Ticks).Within(200));
 	}
 	
 	[Test]

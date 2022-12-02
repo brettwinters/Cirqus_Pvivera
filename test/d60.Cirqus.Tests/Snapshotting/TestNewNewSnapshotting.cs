@@ -141,8 +141,11 @@ namespace d60.Cirqus.Tests.Snapshotting
         CommandProcessingResult GetLastResult()
         {
             var eventStore = new MongoDbEventStore(_database, "Events");
-            var nextGlobalSequenceNumber = eventStore.GetNextGlobalSequenceNumber();
-            var lastGlobalSequenceNumber = nextGlobalSequenceNumber - 1;
+            //TODO Remove once sure it works
+            // var nextGlobalSequenceNumber = eventStore.GetNextGlobalSequenceNumber();
+            // var lastGlobalSequenceNumber = nextGlobalSequenceNumber - 1;
+            // return CommandProcessingResult.WithNewPosition(lastGlobalSequenceNumber);
+            var lastGlobalSequenceNumber = eventStore.GetLastGlobalSequenceNumber();
             return CommandProcessingResult.WithNewPosition(lastGlobalSequenceNumber);
         }
 

@@ -12,8 +12,7 @@ namespace d60.Cirqus.Tests.Contracts.Views.Models.LoadingStuffDuringViewLocation
         {
             if (ParentNodeId != null)
             {
-                throw new InvalidOperationException(string.Format("Cannot attach node {0} to {1} because it's already attached to {2}",
-                    Id, parentNode.Id, ParentNodeId));
+                throw new InvalidOperationException($"Cannot attach node {Id} to {parentNode.Id} because it's already attached to {ParentNodeId}");
             }
             Emit(new NodeAttachedToParentNode { ParentNodeId = parentNode.Id });
         }

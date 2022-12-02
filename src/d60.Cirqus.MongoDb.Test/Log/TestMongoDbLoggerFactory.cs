@@ -20,7 +20,7 @@ namespace d60.Cirqus.Tests.MongoDb
             _commandProcessor = CreateCommandProcessor(configure => configure
 	            .Logging(l => l.UseMongoDb(_database, "lost"))
 	            .EventStore(e => e.UseMongoDb(_database, "events"))
-	            .EventDispatcher(ed => ed.UseSynchronousViewManangerEventDispatcher())
+	            .EventDispatcher(ed => ed.UseSynchronousViewManagerEventDispatcher())
 	        );
 
             RegisterForDisposal(_commandProcessor);

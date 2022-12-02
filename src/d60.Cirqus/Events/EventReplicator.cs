@@ -11,7 +11,7 @@ namespace d60.Cirqus.Events;
 /// <summary>
 /// Replicator that can sync events from one event store to another.
 /// PLEASE NOTE that it is assumed that the destination event store does not receive events from anywhere
-/// else, since the destinations event store's <see cref="IEventStore.GetNextGlobalSequenceNumber"/>
+/// else, since the destinations event store's <see cref="IEventStore.GetLastGlobalSequenceNumber"/>
 /// is used to figure out which sequence number to resume from in the source event store.
 /// </summary>
 public class EventReplicator : IDisposable

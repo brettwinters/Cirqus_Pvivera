@@ -126,7 +126,7 @@ namespace d60.Cirqus.Tests.Views
             var view = _viewManager1.Load(InstancePerAggregateRootLocator.GetViewIdFromAggregateRootId("rootid"));
 
             Assert.That(view.Calls.All(c => c.Item1 == c.Item2), "Registered calls contained a call where the version of the loaded aggregate root did not correspond to the version of the event that the view got to process: {0}",
-                string.Join(", ", view.Calls.Select(c => string.Format("{0}/{1}", c.Item1, c.Item2))));
+                string.Join(", ", view.Calls.Select(c => $"{c.Item1}/{c.Item2}")));
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace d60.Cirqus.Tests.Views
             Assert.That(view, Is.Not.Null);
 
             Assert.That(view.Calls.All(c => c.Item1 == c.Item2), "Registered calls contained a call where the version of the loaded aggregate root did not correspond to the version of the event that the view got to process: {0}",
-                string.Join(", ", view.Calls.Select(c => string.Format("{0}/{1}", c.Item1, c.Item2))));
+                string.Join(", ", view.Calls.Select(c => $"{c.Item1}/{c.Item2}")));
         }
 
         class MyCommand : Command<MyRoot>

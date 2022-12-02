@@ -141,7 +141,7 @@ many time in parallel, and after some time the consistency of everything is veri
                         Emit(new IncreasedKnowledge());
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(string.Format("Unknown current state: {0}", currentState));
+                        throw new ArgumentOutOfRangeException($"Unknown current state: {currentState}");
                 }
             }
 

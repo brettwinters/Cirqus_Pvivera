@@ -47,7 +47,7 @@ namespace d60.Cirqus.Ntfs.Events
 
                 foreach (var domainEvent in batch)
                 {
-	                //TODO Uncomment
+	                //TODO Remove once sure it works
 	                //domainEvent.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (++globalSequenceNumber).ToString(Metadata.NumberCulture);
                     domainEvent.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
                 }
@@ -76,10 +76,11 @@ namespace d60.Cirqus.Ntfs.Events
                    select DataStore.Read(record.AggregateRootId, record.LocalSequenceNumber);
         }
 
-        public long GetNextGlobalSequenceNumber()
-        {
-            return CommitLog.Read() + 1;
-        }
+        //TODO Remove once sure it works
+        // public long GetNextGlobalSequenceNumber()
+        // {
+        //     return CommitLog.Read() + 1;
+        // }
 
         public long GetLastGlobalSequenceNumber()
         {

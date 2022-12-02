@@ -21,7 +21,7 @@ public class EventValidation
 
 		EnsureAllEventsHaveAggregateRootId(events);
 
-		//TODO uncomment
+		//TODO Remove once sure it works
 		//EnsureSeq(batchId, events);
 		EnsureSequenceNumbers(batchId, events);
 		EnsureGlobalSequenceNumbers(batchId, events);

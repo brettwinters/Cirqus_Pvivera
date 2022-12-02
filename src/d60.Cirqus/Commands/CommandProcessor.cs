@@ -150,7 +150,7 @@ public class CommandProcessor : ICommandProcessor
 			throw new ApplicationException(message, exception);
 		}
 
-		//TODO Uncomment
+		//TODO Remove once sure it works
 		return emittedDomainEvents.Any()
 			? CommandProcessingResult.WithNewPosition(emittedDomainEvents.Max(e => e.GetGlobalSequenceNumber()))
 			// ? CommandProcessingResult.WithNewPosition(

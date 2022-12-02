@@ -6,6 +6,7 @@ using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.Numbers;
 using d60.Cirqus.Serialization;
 using NUnit.Framework;
+using d60.Cirqus.Tests;
 
 namespace d60.Cirqus.Tests.MongoDb
 {

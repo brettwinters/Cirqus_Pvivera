@@ -121,7 +121,7 @@ namespace d60.Cirqus.Tests.Integration
                         // just keep on knowing
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(string.Format("Unknown current state: {0}", currentState));
+                        throw new ArgumentOutOfRangeException($"Unknown current state: {currentState}");
                 }
             }
 

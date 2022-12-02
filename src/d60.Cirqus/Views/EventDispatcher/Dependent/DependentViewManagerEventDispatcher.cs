@@ -151,7 +151,9 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 			return;
 		}
 
-		var sequenceNumberToCatchUpTo = GetPosition(_dependencies, _eventStore.GetNextGlobalSequenceNumber() - 1);
+		//TODO Remove once sure it works
+		// var sequenceNumberToCatchUpTo = GetPosition(_dependencies, _eventStore.GetNextGlobalSequenceNumber() - 1);
+		var sequenceNumberToCatchUpTo = GetPosition(_dependencies, _eventStore.GetLastGlobalSequenceNumber());
 
 		var positions = _viewManagers
 			.Select(viewManager => new Pos(viewManager, viewManager.GetPosition().Result))

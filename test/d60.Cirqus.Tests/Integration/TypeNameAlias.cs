@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace d60.Cirqus.Tests.Integration
 {
     [TestFixture]
-    public class TypeNameAliaseses : FixtureBase
+    public class TypeNameAliases : FixtureBase
     {
         ICommandProcessor _commandProcessor;
         Task<InMemoryEventStore> _eventStore;
@@ -73,81 +73,85 @@ namespace d60.Cirqus.Tests.Integration
             Assert.That(metadataOfEvent[DomainEvent.MetadataKeys.Type], Is.EqualTo("OneEvent"));
         }
 
+        #region
+
         void SetUpCommandProcessor(IDomainTypeNameMapper typeNameMapperToUse)
         {
-            _commandProcessor = CreateCommandProcessor(config => config
-                .EventStore(e => _eventStore = e.UseInMemoryEventStore())
-                .Options(o => o.UseCustomDomainTypeNameMapper(typeNameMapperToUse)));
+	        _commandProcessor = CreateCommandProcessor(config => config
+		        .EventStore(e => _eventStore = e.UseInMemoryEventStore())
+		        .Options(o => o.UseCustomDomainTypeNameMapper(typeNameMapperToUse)));
 
-            RegisterForDisposal(_commandProcessor);
+	        RegisterForDisposal(_commandProcessor);
         }
 
         class OneRoot : AggregateRoot, IEmit<OneEvent>
         {
-            public void Bam()
-            {
-                Emit(new OneEvent());
-            }
+	        public void Bam()
+	        {
+		        Emit(new OneEvent());
+	        }
 
-            public void Apply(OneEvent e)
-            {
-            }
+	        public void Apply(OneEvent e)
+	        {
+	        }
         }
 
         class OneEvent : DomainEvent<OneRoot> { }
 
         class GenericCommand : ExecutableCommand
         {
-            readonly Action<ICommandContext> _action;
+	        readonly Action<ICommandContext> _action;
 
-            public GenericCommand(Action<ICommandContext> action)
-            {
-                _action = action;
-            }
+	        public GenericCommand(Action<ICommandContext> action)
+	        {
+		        _action = action;
+	        }
 
-            public override void Execute(ICommandContext context)
-            {
-                _action(context);
-            }
+	        public override void Execute(ICommandContext context)
+	        {
+		        _action(context);
+	        }
         }
+        
+        #endregion
     }
 
     public class MyNameNameMapper : IDomainTypeNameMapper
     {
-        readonly ConcurrentDictionary<string, Type> _aliasToType = new ConcurrentDictionary<string, Type>();
-        readonly ConcurrentDictionary<Type, string> _typeToAlias = new ConcurrentDictionary<Type, string>();
+	    readonly ConcurrentDictionary<string, Type> _aliasToType = new();
+	    readonly ConcurrentDictionary<Type, string> _typeToAlias = new();
 
-        public void AddAlias<TDomainType>(string alias)
-        {
-            var type = typeof(TDomainType);
-            _aliasToType[alias] = type;
-            _typeToAlias[type] = alias;
-        }
+	    public void AddAlias<TDomainType>(string alias)
+	    {
+		    var type = typeof(TDomainType);
+		    _aliasToType[alias] = type;
+		    _typeToAlias[type] = alias;
+	    }
 
-        public Type GetType(string name)
-        {
-            try
-            {
-                return _aliasToType[name];
+	    public Type GetType(string name)
+	    {
+		    try
+		    {
+			    return _aliasToType[name];
 
-            }
-            catch (Exception exception)
-            {
-                throw new ArgumentException(string.Format("Could not get type for {0}", name), exception);
-            }
-        }
+		    }
+		    catch (Exception exception)
+		    {
+			    throw new ArgumentException($"Could not get type for {name}", exception);
+		    }
+	    }
 
-        public string GetName(Type type)
-        {
-            try
-            {
-                return _typeToAlias[type];
+	    public string GetName(Type type)
+	    {
+		    try
+		    {
+			    return _typeToAlias[type];
 
-            }
-            catch (Exception exception)
-            {
-                throw new ArgumentException(string.Format("Could not get name for {0}", type), exception);
-            }
-        }
+		    }
+		    catch (Exception exception)
+		    {
+			    throw new ArgumentException($"Could not get name for {type}", exception);
+		    }
+	    }
     }
 }

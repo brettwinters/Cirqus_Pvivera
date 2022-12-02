@@ -40,7 +40,7 @@ namespace d60.Cirqus.Tests.Contracts.AggregateRootRepository
 
         static SomeEvent NewEvent(string aggregateRootId, int sequenceNumber)
         {
-	        //TODO Uncomment (delete)
+	        //TODO Remove once sure it works (delete)
             return new SomeEvent
             {
                 Meta =

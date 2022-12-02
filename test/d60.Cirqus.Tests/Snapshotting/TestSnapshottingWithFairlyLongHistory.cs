@@ -54,7 +54,8 @@ namespace d60.Cirqus.Tests.Snapshotting
             var commandProcessor = GetCommandProcessor(useCaching);
             var processedCommands = 0L;
 
-            TakeTime(string.Format("Processing {0} commands distributed among {1} roots", numberOfCommands, numberOfRoots),
+            TakeTime(
+	            $"Processing {numberOfCommands} commands distributed among {numberOfRoots} roots",
                 () => Enumerable.Range(0, numberOfCommands)
                     .Select(i => new CrushItRealGood(getRandomRootId(), 0.0001m))
                     .ToList()
@@ -164,11 +165,11 @@ caching in use: {3}",
                 return InnerEventStore.Stream(globalSequenceNumber);
             }
 
-            public long GetNextGlobalSequenceNumber()
-            {
-                return InnerEventStore.GetNextGlobalSequenceNumber();
-            }
-
+            //TODO Remove once sure it works
+            // public long GetNextGlobalSequenceNumber()
+            // {
+            //     return InnerEventStore.GetNextGlobalSequenceNumber();
+            // }
             public long GetLastGlobalSequenceNumber()
             {
 	            return InnerEventStore.GetLastGlobalSequenceNumber();

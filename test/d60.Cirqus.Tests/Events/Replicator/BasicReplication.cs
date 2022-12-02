@@ -121,7 +121,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
                 Data = data,
                 Meta =
                 {
-	                //TODO Uncomment
+	                //TODO Remove once sure it works
                     [DomainEvent.MetadataKeys.GlobalSequenceNumber] = GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString(),
                     [DomainEvent.MetadataKeys.AggregateRootId] = aggregateRootId.ToString(),
                     [DomainEvent.MetadataKeys.SequenceNumber] = GetNextSeqNoFor(aggregateRootId).ToString(Metadata.NumberCulture),

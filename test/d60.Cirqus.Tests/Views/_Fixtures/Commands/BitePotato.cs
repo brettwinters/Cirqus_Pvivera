@@ -1,7 +1,7 @@
 using d60.Cirqus.Commands;
-using d60.Cirqus.Tests.Views.NewViewManager.AggregateRoots;
+using d60.Cirqus.Tests.Views.ViewManager.AggregateRoots;
 
-namespace d60.Cirqus.Tests.Views.NewViewManager.Commands
+namespace d60.Cirqus.Tests.Views.ViewManager.Commands
 {
     public class BitePotato : ExecutableCommand
     {

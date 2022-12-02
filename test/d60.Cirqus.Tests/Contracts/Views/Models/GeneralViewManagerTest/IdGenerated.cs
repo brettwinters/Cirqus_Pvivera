@@ -10,7 +10,7 @@ namespace d60.Cirqus.Tests.Contracts.Views.Models.GeneralViewManagerTest
 
         public string GetId()
         {
-            return string.Format("{0}/{1}", IdBase, Pointer);
+            return $"{IdBase}/{Pointer}";
         }
     }
 }

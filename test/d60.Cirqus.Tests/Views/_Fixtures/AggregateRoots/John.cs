@@ -1,8 +1,8 @@
 using d60.Cirqus.Aggregates;
 using d60.Cirqus.Events;
-using d60.Cirqus.Tests.Views.NewViewManager.Events;
+using d60.Cirqus.Tests.Views.ViewManager.Events;
 
-namespace d60.Cirqus.Tests.Views.NewViewManager.AggregateRoots
+namespace d60.Cirqus.Tests.Views.ViewManager.AggregateRoots
 {
     public class John : AggregateRoot, IEmit<BaptizedSomeone>
     {

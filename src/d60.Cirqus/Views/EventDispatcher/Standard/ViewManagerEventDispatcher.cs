@@ -368,16 +368,20 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		{
 			return;
 		}
-
-		// Fast-track events if possible: If we can dispatch events directly, we do it now
-		var nextSequenceNumberInLineForFastTrackDispatch = lowestSequenceNumberSuccessfullyProcessed + 1;
 		
-		if (events.Any() && nextSequenceNumberInLineForFastTrackDispatch == events.First().GetGlobalSequenceNumber())
+		//TODO Remove once sure it works
+		// var nextSequenceNumberInLineForFastTrackDispatch = lowestSequenceNumberSuccessfullyProcessed + 1;
+		// if (events.Any() && nextSequenceNumberInLineForFastTrackDispatch == events.First().GetGlobalSequenceNumber())
+		
+		// Fast-track events if possible: If we can dispatch events directly, we do it now
+		// If the event's first global sequence number is greater then the last one processed by the
+		// view manager then stream dispatch directly to the view manager
+		if (events.Any() && events.First().GetGlobalSequenceNumber() > lowestSequenceNumberSuccessfullyProcessed)
 		{
 			DispatchBatchToViewManagers(viewManagers, events, positions);
 
 			lowestSequenceNumberSuccessfullyProcessed = events.Last().GetGlobalSequenceNumber();
-
+			
 			// if we've done enough, quit now
 			if (lowestSequenceNumberSuccessfullyProcessed >= sequenceNumberToCatchUpTo)
 			{
@@ -387,7 +391,6 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 
 		// Regular dispatch: We must replay - start from here:
 		var sequenceNumberToReplayFrom = lowestSequenceNumberSuccessfullyProcessed + 1;
-
 		foreach (var batch in eventStore.Stream(sequenceNumberToReplayFrom).Batch(MaxDomainEventsPerBatch))
 		{
 			DispatchBatchToViewManagers(viewManagers, batch, positions);

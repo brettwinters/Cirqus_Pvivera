@@ -29,12 +29,12 @@ public class InMemoryEventStore : IEventStore, IEnumerable<EventData>
 
 		lock (_lock)
 		{
-			//TODO Uncomment
+			//TODO Remove once sure it works
 			//var globalSequenceNumberToAssign = _globalSequenceNumber;
 
 			foreach (var e in batch)
 			{
-				//TODO Uncomment
+				//TODO Remove once sure it works
 				//e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = globalSequenceNumberToAssign.ToString(Metadata.NumberCulture);
 				e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
 
@@ -110,13 +110,11 @@ public class InMemoryEventStore : IEventStore, IEnumerable<EventData>
 		}
 	}
 
-	public long GetNextGlobalSequenceNumber()
-	{
-		//TODO Uncomment
-		//return _globalSequenceNumber;
-		return -1;
-	}
-
+	//TODO Remove once sure it works
+	// public long GetNextGlobalSequenceNumber()
+	// {
+	//		return _globalSequenceNumber;
+	// }
 	public long GetLastGlobalSequenceNumber()
 	{
 		lock (_lock)

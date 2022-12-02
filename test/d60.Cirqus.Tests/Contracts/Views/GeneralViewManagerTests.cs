@@ -173,7 +173,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
 
             if (loadedView == null)
             {
-                throw new AssertionException(string.Format("Could not find view with ID '{0}'", metadataKey));
+                throw new AssertionException($"Could not find view with ID '{metadataKey}'");
             }
 
             return loadedView;

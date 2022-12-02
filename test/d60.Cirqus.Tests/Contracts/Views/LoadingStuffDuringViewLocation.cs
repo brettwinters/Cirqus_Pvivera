@@ -18,8 +18,7 @@ namespace d60.Cirqus.Tests.Contracts.Views
     {
         TFactory _factory;
         TestContext _context;
-
-
+        
         protected override void DoSetUp() {
             CirqusLoggerFactory.Current = new ConsoleLoggerFactory(minLevel: Logger.Level.Debug);
 

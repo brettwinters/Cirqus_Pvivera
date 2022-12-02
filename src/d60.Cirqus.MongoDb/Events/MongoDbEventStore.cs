@@ -55,16 +55,6 @@ public class MongoDbEventStore : IEventStore
 					} 
 				)
 			);
-			// _eventBatches.Indexes.CreateOne(
-			// 	new CreateIndexModel<MongoEventBatch>(
-			// 		Builders<MongoEventBatch>.IndexKeys.Ascending(TimestampDocPath),
-			// 		new CreateIndexOptions
-			// 		{
-			// 			Name = TimestampUniquenessIndexName,
-			// 			Unique = true
-			// 		} 
-			// 	)
-			// );
 		}
 	}
 
@@ -145,23 +135,22 @@ public class MongoDbEventStore : IEventStore
 		}
 	}
 
-	public long GetNextGlobalSequenceNumber()
-	{
-		//TODO Uncomment
-		return GlobalSequenceNumberService.GetNewGlobalSequenceNumber();
-		// var doc = _eventBatches
-		// 	.Find(_ => true)
-		// 	.As<BsonDocument>()
-		// 	.Sort(Builders<MongoEventBatch>.Sort.Descending(GlobalSeqNoDocPath))
-		// 	.Limit(1)
-		// 	.SingleOrDefault();
-		//
-		// return doc == null
-		// 	? 0
-		// 	: doc[EventsDocPath].AsBsonArray
-		// 		.Select(e => e[MetaDocPath][DomainEvent.MetadataKeys.GlobalSequenceNumber].ToInt64())
-		// 		.Max() + 1;
-	}
+	//TODO Remove once sure it works
+	// public long GetNextGlobalSequenceNumber()
+	// {
+	// 	var doc = _eventBatches
+	// 		.Find(_ => true)
+	// 		.As<BsonDocument>()
+	// 		.Sort(Builders<MongoEventBatch>.Sort.Descending(GlobalSeqNoDocPath))
+	// 		.Limit(1)
+	// 		.SingleOrDefault();
+	// 	
+	// 	return doc == null
+	// 		? 0
+	// 		: doc[EventsDocPath].AsBsonArray
+	// 			.Select(e => e[MetaDocPath][DomainEvent.MetadataKeys.GlobalSequenceNumber].ToInt64())
+	// 			.Max() + 1;
+	// }
 
 	public long GetLastGlobalSequenceNumber()
 	{
@@ -190,12 +179,12 @@ public class MongoDbEventStore : IEventStore
 			throw new InvalidOperationException($"Attempted to save batch {batchId}, but the batch of events was empty!");
 		}
 
-		//TODO uncomment
+		//TODO Remove once sure it works
 		//var nextGlobalSeqNo = GetNextGlobalSequenceNumber();
 
 		foreach (var e in batch)
 		{
-			//TODO Uncomment
+			//TODO Remove once sure it works
 			//e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = GetNextGlobalSequenceNumber().ToString(Metadata.NumberCulture);
 			//e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextGlobalSeqNo++).ToString(Metadata.NumberCulture);
 			e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
@@ -282,12 +271,14 @@ public class MongoDbEventStore : IEventStore
 		}
 	}
 
-	Dictionary<string, string> GetMetadataAsDictionary(Metadata meta)
+	Dictionary<string, string> GetMetadataAsDictionary(
+		Metadata meta)
 	{
 		return meta.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 	}
 
-	Metadata GetDictionaryAsMetadata(Dictionary<string, string> dictionary)
+	Metadata GetDictionaryAsMetadata(
+		Dictionary<string, string> dictionary)
 	{
 		var metadata = new Metadata();
 		foreach (var kvp in dictionary)
@@ -304,15 +295,19 @@ public class MongoDbEventStore : IEventStore
 		var data = e.Bin ?? GetBytesFromBsonValue(e.Body);
 
 		return EventData.FromMetadata(meta, data);
-	}
 
-	byte[] GetBytesFromBsonValue(BsonValue body)
-	{
-		var doc = body.AsBsonDocument;
+		#region
 
-		// make sure to replace ¤ with $ again
-		ReplacePropertyPrefixes(doc, "¤", "$");
+		byte[] GetBytesFromBsonValue(BsonValue body)
+		{
+			var doc = body.AsBsonDocument;
 
-		return Encoding.UTF8.GetBytes(doc.ToString());
+			// make sure to replace ¤ with $ again
+			ReplacePropertyPrefixes(doc, "¤", "$");
+
+			return Encoding.UTF8.GetBytes(doc.ToString());
+		}
+
+		#endregion
 	}
 }

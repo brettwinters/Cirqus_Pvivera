@@ -119,12 +119,12 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
 
             var charWidth = (int)(valueWidth * elapsedSeconds / max);
 
-            var time = string.Format("{0:##0}:{1:00}.{2:0}", when.TotalMinutes, when.Seconds, when.Milliseconds/100)
-                .PadRight(scaleWidth);
+            var time = $"{when.TotalMinutes:##0}:{when.Seconds:00}.{when.Milliseconds / 100:0}"
+	            .PadRight(scaleWidth);
 
-            var eventsPerSecondString = string.Format("{0:0} e/s", numberOfEvents / elapsedSeconds);
+            var eventsPerSecondString = $"{numberOfEvents / elapsedSeconds:0} e/s";
 
-            return string.Format("{0}: {1}{2}{3:0}", time, new string('*', charWidth), new string(' ', valueWidth - charWidth + scaleWidth - eventsPerSecondString.Length), eventsPerSecondString);
+            return $"{time}: {new string('*', charWidth)}{new string(' ', valueWidth - charWidth + scaleWidth - eventsPerSecondString.Length)}{eventsPerSecondString:0}";
         }
 
         TimeSpan RoundToInterval(TimeSpan timeSpan, long ticksPerInterval)
@@ -184,11 +184,11 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
                     {DomainEvent.MetadataKeys.GlobalSequenceNumber, globalSequenceNumber.ToString(Metadata.NumberCulture)},
                 },
                 AnInt = _random.Next(1000),
-                SomeStringValue = string.Format("This is a random number: {0}", _random.Next(10)),
+                SomeStringValue = $"This is a random number: {_random.Next(10)}",
                 Stuff = Enumerable.Range(0, _random.Next(4))
                     .Select(n => new Something
                     {
-                        Text = string.Format("Thing # {0}", n)
+                        Text = $"Thing # {n}"
                     })
                     .ToList()
             };

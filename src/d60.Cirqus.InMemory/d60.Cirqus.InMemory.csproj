@@ -4,9 +4,15 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<ReleaseVersion>6.0.1</ReleaseVersion>
+		<ReleaseVersion>6.1.0</ReleaseVersion>
 		<PackageId>d60.Cirqus.InMemory</PackageId>
-		<Version>6.0.1</Version>
+		<Version>6.1.0</Version>
+		<PackageId>d60.Cirqus.InMemory</PackageId>
+		<Authors>brettwinters</Authors>
+		<Company>Mercenta</Company>
+		<PackageDescription>Major upgrade</PackageDescription>
+		<RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
+		<Configurations>Release;Debug</Configurations>
 	</PropertyGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />

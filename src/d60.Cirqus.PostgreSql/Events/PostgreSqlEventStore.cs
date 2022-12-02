@@ -94,11 +94,12 @@ END$$;
                 using (var connection = GetConnection())
                 using (var tx = connection.BeginTransaction())
                 {
-                    var nextSequenceNumber = GetNextGlobalSequenceNumber(connection, tx);
+	                //TODO Remove once sure it works
+                    // var nextSequenceNumber = GetNextGlobalSequenceNumber(connection, tx);
 
                     foreach (var e in eventList)
                     {
-	                    //TODO Uncomment
+	                    //TODO Remove once sure it works
                         //e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextSequenceNumber++).ToString(Metadata.NumberCulture);
                         e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
                     }
@@ -156,20 +157,21 @@ INSERT INTO ""{0}"" (
             }
         }
 
-        long GetNextGlobalSequenceNumber(NpgsqlConnection conn, NpgsqlTransaction tx)
-        {
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.Transaction = tx;
-                cmd.CommandText = string.Format(@"SELECT MAX(""globSeqNo"") FROM ""{0}""", _tableName);
-
-                var result = cmd.ExecuteScalar();
-
-                return result != DBNull.Value
-                    ? (long)result + 1
-                    : 0;
-            }
-        }
+        //TODO Remove once sure it works
+        // long GetNextGlobalSequenceNumber(NpgsqlConnection conn, NpgsqlTransaction tx)
+        // {
+        //     using (var cmd = conn.CreateCommand())
+        //     {
+        //         cmd.Transaction = tx;
+        //         cmd.CommandText = string.Format(@"SELECT MAX(""globSeqNo"") FROM ""{0}""", _tableName);
+        //
+        //         var result = cmd.ExecuteScalar();
+        //
+        //         return result != DBNull.Value
+        //             ? (long)result + 1
+        //             : 0;
+        //     }
+        // }
         
         
 
@@ -249,16 +251,17 @@ SELECT ""data"", ""meta"" FROM ""{0}"" WHERE ""globSeqNo"" >= @cutoff ORDER BY "
             return EventData.FromMetadata(_metadataSerializer.Deserialize(Encoding.UTF8.GetString(meta)), data);
         }
 
-        public long GetNextGlobalSequenceNumber()
-        {
-            using (var connection = GetConnection())
-            {
-                using (var tx = connection.BeginTransaction())
-                {
-                    return GetNextGlobalSequenceNumber(connection, tx);
-                }
-            }
-        }
+        //TODO Remove once sure it works
+        // public long GetNextGlobalSequenceNumber()
+        // {
+        //     using (var connection = GetConnection())
+        //     {
+        //         using (var tx = connection.BeginTransaction())
+        //         {
+        //             return GetNextGlobalSequenceNumber(connection, tx);
+        //         }
+        //     }
+        // }
         
         public long GetLastGlobalSequenceNumber()
         {

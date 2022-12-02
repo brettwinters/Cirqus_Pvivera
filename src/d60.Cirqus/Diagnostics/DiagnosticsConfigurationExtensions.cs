@@ -159,18 +159,19 @@ public static class DiagnosticsConfigurationExtensions
 			return _innerEventStore.Stream(globalSequenceNumber);
 		}
 		
-		public long GetNextGlobalSequenceNumber()
-		{
-			var stopwatch = Stopwatch.StartNew();
-			try
-			{
-				return _innerEventStore.GetNextGlobalSequenceNumber();
-			}
-			finally
-			{
-				_operationProfiler.RecordGlobalSequenceNumberGetNext(stopwatch.Elapsed);
-			}
-		}
+		//TODO Remove once sure it works
+		// public long GetNextGlobalSequenceNumber()
+		// {
+		// 	var stopwatch = Stopwatch.StartNew();
+		// 	try
+		// 	{
+		// 		return _innerEventStore.GetNextGlobalSequenceNumber();
+		// 	}
+		// 	finally
+		// 	{
+		// 		_operationProfiler.RecordGlobalSequenceNumberGetNext(stopwatch.Elapsed);
+		// 	}
+		// }
 
 		public long GetLastGlobalSequenceNumber()
 		{

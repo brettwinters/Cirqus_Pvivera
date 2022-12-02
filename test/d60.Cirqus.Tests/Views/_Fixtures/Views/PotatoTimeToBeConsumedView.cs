@@ -1,10 +1,10 @@
 using System;
 using d60.Cirqus.Extensions;
-using d60.Cirqus.Tests.Views.NewViewManager.Events;
+using d60.Cirqus.Tests.Views.ViewManager.Events;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
 
-namespace d60.Cirqus.Tests.Views.NewViewManager.Views
+namespace d60.Cirqus.Tests.Views.ViewManager.Views
 {
     public class PotatoTimeToBeConsumedView : IViewInstance<InstancePerAggregateRootLocator>,
         ISubscribeTo<PotatoCreated>,
@@ -37,7 +37,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager.Views
 
         public override string ToString()
         {
-            return string.Format("{0} / {1} / {2} / {3}", Id, Name, TimeOfCreation, TimeToBeEaten);
+            return $"{Id} / {Name} / {TimeOfCreation} / {TimeToBeEaten}";
         }
     }
 }

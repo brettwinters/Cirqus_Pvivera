@@ -4,10 +4,9 @@ using MongoDB.Driver;
 
 namespace d60.Cirqus.Tests.MongoDb
 {
-    public class MongoHelper
+    public static class MongoHelper
     {
-
-        public static string TestDbName = "mongotestdb";
+	    private static readonly string TestDbName = "mongotestdb";
 
         public static IMongoDatabase InitializeTestDatabase(
 	        bool dropExistingDatabase = true)
@@ -16,14 +15,6 @@ namespace d60.Cirqus.Tests.MongoDb
             var config = Configuration.Get();
             var connectionString = config.GetConnectionString(TestDbName);
             var url = new MongoUrl(connectionString);
-
-
-            //var connectionStringSettings = ConfigurationManager.ConnectionStrings["mongotestdb"];
-            //if (connectionStringSettings == null)
-            //{
-            //    throw new ConfigurationErrorsException("Could not find MongoDB test database connection string with the name 'mongotestdb' in app.config");
-            //}         
-            //var url = new MongoUrl(connectionStringSettings.ConnectionString);
 
             var databaseName = GetDatabaseName(url);
             var client = new MongoClient(url);
@@ -39,19 +30,18 @@ namespace d60.Cirqus.Tests.MongoDb
             return database;
         }
 
-        public static string GetDatabaseName(MongoUrl url)
+        private static string GetDatabaseName(MongoUrl url)
         {
             var databaseName = url.DatabaseName;
 
             var teamCityAgentNumber = Environment.GetEnvironmentVariable("tcagent");
-            int number;
 
-            if (string.IsNullOrWhiteSpace(teamCityAgentNumber) || !int.TryParse(teamCityAgentNumber, out number))
+            if (string.IsNullOrWhiteSpace(teamCityAgentNumber) || !int.TryParse(teamCityAgentNumber, out var number))
             {
                 return databaseName;
             }
 
-            return string.Format("{0}_{1}", databaseName, number);
+            return $"{databaseName}_{number}";
         }
     }
 }

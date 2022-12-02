@@ -94,11 +94,7 @@ namespace d60.Cirqus.Tests.Diagnostics
 				string aggregateRootId)
 			{
 				_calls.Add(
-					string.Format(
-						"RecordAggregateRootGet {0}, {1}",
-						elapsed,
-						aggregateRootId
-					)
+					$"RecordAggregateRootGet {elapsed}, {aggregateRootId}"
 				);
 			}
 
@@ -158,12 +154,11 @@ namespace d60.Cirqus.Tests.Diagnostics
 				return _innerEventStore.Stream(globalSequenceNumber);
 			}
 
-			public long GetNextGlobalSequenceNumber()
-			{
-				return _innerEventStore.GetNextGlobalSequenceNumber();
-			}
-
-			//TODO Uncoment
+			//TODO Remove once sure it works
+			// public long GetNextGlobalSequenceNumber()
+			// {
+			// 	return _innerEventStore.GetNextGlobalSequenceNumber();
+			// }
 			public long GetLastGlobalSequenceNumber()
 			{
 				return _innerEventStore.GetLastGlobalSequenceNumber();

@@ -172,15 +172,12 @@ namespace d60.Cirqus.Tests.Diagnostics
 
         public override string ToString()
         {
-            return string.Format(@"Aggregate root hydration times
-{0}
+            return $@"Aggregate root hydration times
+{string.Join(Environment.NewLine, _aggregateRootHydrationTimes.Select(kvp => $"    {kvp.Key}: {kvp.Value}"))}
 
-Time spent saving events: {1}
+Time spent saving events: {TimeSpan.FromMilliseconds(_millisecondsSpentSavingEvents)}
 
-Time spent getting next sequence number: {2}",
-                                             string.Join(Environment.NewLine, _aggregateRootHydrationTimes.Select(kvp => string.Format("    {0}: {1}", kvp.Key, kvp.Value))),
-                                             TimeSpan.FromMilliseconds(_millisecondsSpentSavingEvents),
-                                             TimeSpan.FromMilliseconds(_millisecondsSpentGettingNextSequenceNumber));
+Time spent getting next sequence number: {TimeSpan.FromMilliseconds(_millisecondsSpentGettingNextSequenceNumber)}";
         }
     }
 }

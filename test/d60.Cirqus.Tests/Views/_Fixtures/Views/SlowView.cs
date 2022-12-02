@@ -1,9 +1,9 @@
 ﻿using System.Threading;
-using d60.Cirqus.Tests.Views.NewViewManager.Events;
+using d60.Cirqus.Tests.Views.ViewManager.Events;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
 
-namespace d60.Cirqus.Tests.Views.NewViewManager.Views
+namespace d60.Cirqus.Tests.Views.ViewManager.Views
 {
     public class SlowView : IViewInstance<InstancePerAggregateRootLocator>,
         ISubscribeTo<PotatoCreated>,

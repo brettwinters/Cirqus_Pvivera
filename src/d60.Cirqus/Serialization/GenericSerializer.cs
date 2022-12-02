@@ -13,7 +13,8 @@ public class GenericSerializer
 		Formatting = Formatting.Indented
 	};
 
-	public string Serialize(object obj)
+	public string Serialize(
+		object obj)
 	{
 		try
 		{

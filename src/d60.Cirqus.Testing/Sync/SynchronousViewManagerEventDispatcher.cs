@@ -13,7 +13,7 @@ using d60.Cirqus.Views.ViewManagers;
 namespace d60.Cirqus.Testing;
 
 /// <summary>
-/// In-memory view that gets its events by having them dispatched directly
+/// In-memory dispatcher that gets its events by having them dispatched directly
 /// </summary>
 public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 {
@@ -58,7 +58,8 @@ public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 		}
 	}
 
-	public void Dispatch(IEnumerable<DomainEvent> events)
+	public void Dispatch(
+		IEnumerable<DomainEvent> events)
 	{
 		var context = new DefaultViewContext(_aggregateRootRepository, _domainTypeNameMapper, events);
 
@@ -72,7 +73,10 @@ public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 		foreach (var viewManager in viewManagers)
 		{
 			var thisParticularPosition = viewManager.GetPosition().Result;
-			if (thisParticularPosition >= eventList.Max(e => e.GetGlobalSequenceNumber())) continue;
+			if (thisParticularPosition >= eventList.Max(e => e.GetGlobalSequenceNumber()))
+			{
+				continue;
+			}
 
 			_logger.Debug("Dispatching batch of {0} events to {1}", eventList.Count, viewManager);
 

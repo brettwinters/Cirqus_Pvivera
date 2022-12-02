@@ -184,12 +184,11 @@ And we will repeat again here, at the bottom: There was never any problem. We we
                 return _innerEventStore.Stream(globalSequenceNumber);
             }
 
-            public long GetNextGlobalSequenceNumber()
-            {
-                return _innerEventStore.GetNextGlobalSequenceNumber();
-            }
-            
-            //TODO Uncomment
+            //TODO Remove once sure it works
+            // public long GetNextGlobalSequenceNumber()
+            // {
+            //     return _innerEventStore.GetNextGlobalSequenceNumber();
+            // }
             public long GetLastGlobalSequenceNumber()
             {
                 return _innerEventStore.GetLastGlobalSequenceNumber();

@@ -55,11 +55,10 @@ namespace d60.Cirqus.MsSql.Events
                 {
                     using (var tx = conn.BeginTransaction())
                     {
-                        var globalSequenceNumber = GetNextGlobalSequenceNumber(conn, tx);
-
+	                    //TODO Remove once sure it works
+                        //var globalSequenceNumber = GetNextGlobalSequenceNumber(conn, tx);
                         foreach (var e in eventList)
                         {
-	                        //TODO Uncomment
                             //e.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (globalSequenceNumber++).ToString(Metadata.NumberCulture);
                             e.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
                         }
@@ -280,20 +279,21 @@ SELECT TOP 2000 [meta],[data] FROM [{0}]
             }
         }
 
-        public long GetNextGlobalSequenceNumber()
-        {
-            var globalSequenceNumber = 0L;
-
-            WithConnection(conn =>
-            {
-                using (var tx = conn.BeginTransaction())
-                {
-                    globalSequenceNumber = GetNextGlobalSequenceNumber(conn, tx);
-                }
-            });
-
-            return globalSequenceNumber;
-        }
+        //TODO Remove once sure it works
+        // public long GetNextGlobalSequenceNumber()
+        // {
+        //     var globalSequenceNumber = 0L;
+        //
+        //     WithConnection(conn =>
+        //     {
+        //         using (var tx = conn.BeginTransaction())
+        //         {
+        //             globalSequenceNumber = GetNextGlobalSequenceNumber(conn, tx);
+        //         }
+        //     });
+        //
+        //     return globalSequenceNumber;
+        // }
         
         public long GetLastGlobalSequenceNumber()
         {
@@ -325,20 +325,21 @@ SELECT TOP 2000 [meta],[data] FROM [{0}]
             return EventData.FromMetadata(JsonConvert.DeserializeObject<Metadata>(meta), data);
         }
 
-        long GetNextGlobalSequenceNumber(SqlConnection conn, SqlTransaction tx)
-        {
-            using (var cmd = conn.CreateCommand())
-            {
-                cmd.Transaction = tx;
-                cmd.CommandText = string.Format("SELECT MAX(globSeqNo) FROM [{0}]", _tableName);
-
-                var result = cmd.ExecuteScalar();
-
-                return result != DBNull.Value
-                    ? (long)result + 1
-                    : 0;
-            }
-        }
+        //TODO Remove once sure it works
+        // long GetNextGlobalSequenceNumber(SqlConnection conn, SqlTransaction tx)
+        // {
+        //     using (var cmd = conn.CreateCommand())
+        //     {
+        //         cmd.Transaction = tx;
+        //         cmd.CommandText = string.Format("SELECT MAX(globSeqNo) FROM [{0}]", _tableName);
+        //
+        //         var result = cmd.ExecuteScalar();
+        //
+        //         return result != DBNull.Value
+        //             ? (long)result + 1
+        //             : 0;
+        //     }
+        // }
 
         /// <summary>
         /// WARNING: WILL DROP ALL EVENTS WITHOUT WARNING

@@ -13,7 +13,9 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 
 	readonly Func<Type, string> _typeToNameFunction;
 
-	CustomizableDomainTypeNameMapper(Func<Type, string> typeToNameFunction, bool caseSensitive)
+	private CustomizableDomainTypeNameMapper(
+		Func<Type, string> typeToNameFunction, 
+		bool caseSensitive)
 	{
 		_typeToNameFunction = typeToNameFunction;
 
@@ -22,7 +24,8 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 	}
 
 	/// <summary>
-	/// Constructs a case insensitive <see cref="CustomizableDomainTypeNameMapper"/> that uses <see cref="MemberInfo.Name"/> as the default name (i.e.
+	/// Constructs a case insensitive <see cref="CustomizableDomainTypeNameMapper"/>
+	/// that uses <see cref="MemberInfo.Name"/> as the default name (i.e.
 	/// the short type name without any kind of assembly or namespace names in it)
 	/// </summary>
 	public static CustomizableDomainTypeNameMapper UseShortTypeNames()
@@ -31,17 +34,21 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 	}
 
 	/// <summary>
-	/// Constructs a case sensitive <see cref="CustomizableDomainTypeNameMapper"/> that uses the given function to map each found type to a type name
+	/// Constructs a case sensitive <see cref="CustomizableDomainTypeNameMapper"/> that
+	/// uses the given function to map each found type to a type name
 	/// </summary>
-	public static CustomizableDomainTypeNameMapper CustomCaseSensitive(Func<Type, string> typeToNameFunction)
+	public static CustomizableDomainTypeNameMapper CustomCaseSensitive(
+		Func<Type, string> typeToNameFunction)
 	{
 		return new CustomizableDomainTypeNameMapper(typeToNameFunction, true);
 	}
 
 	/// <summary>
-	/// Constructs a case insensitive <see cref="CustomizableDomainTypeNameMapper"/> that uses the given function to map each found type to a type name
+	/// Constructs a case insensitive <see cref="CustomizableDomainTypeNameMapper"/> that
+	/// uses the given function to map each found type to a type name
 	/// </summary>
-	public static CustomizableDomainTypeNameMapper CustomCaseInsensitive(Func<Type, string> typeToNameFunction)
+	public static CustomizableDomainTypeNameMapper CustomCaseInsensitive(
+		Func<Type, string> typeToNameFunction)
 	{
 		return new CustomizableDomainTypeNameMapper(typeToNameFunction, false);
 	}
@@ -49,7 +56,8 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 	/// <summary>
 	/// Scans the given assembly for aggregate root types and domain event types to be added
 	/// </summary>
-	public CustomizableDomainTypeNameMapper WithTypesFrom(Assembly assembly)
+	public CustomizableDomainTypeNameMapper WithTypesFrom(
+		Assembly assembly)
 	{
 		foreach (var type in assembly.GetTypes())
 		{
@@ -84,7 +92,8 @@ public class CustomizableDomainTypeNameMapper : IDomainTypeNameMapper
 		return this;
 	}
 
-	public CustomizableDomainTypeNameMapper AddTypes(params Type[] typesToAdd)
+	public CustomizableDomainTypeNameMapper AddTypes(
+		params Type[] typesToAdd)
 	{
 		foreach (var type in typesToAdd)
 		{

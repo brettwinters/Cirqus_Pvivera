@@ -10,14 +10,14 @@ using d60.Cirqus.MongoDb.Config;
 using d60.Cirqus.MongoDb.Views;
 using d60.Cirqus.Serialization;
 using d60.Cirqus.Tests.MongoDb;
-using d60.Cirqus.Tests.Views.NewViewManager.Commands;
-using d60.Cirqus.Tests.Views.NewViewManager.Views;
+using d60.Cirqus.Tests.Views.ViewManager.Commands;
+using d60.Cirqus.Tests.Views.ViewManager.Views;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers.Locators;
 using MongoDB.Driver;
 using NUnit.Framework;
 
-namespace d60.Cirqus.Tests.Views.NewViewManager
+namespace d60.Cirqus.Tests.Views.ViewManager
 {
     [TestFixture, Category(TestCategories.MongoDb)]
     public class TestViewManagerEventDispatcher : FixtureBase
@@ -135,9 +135,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
         [Test]
         public void BasicDispatchOfSomeEvents()
         {
-	        
-	        
-            var allPotatoesView = new MongoDbViewManager<AllPotatoesView>(_mongoDatabase);
+	        var allPotatoesView = new MongoDbViewManager<AllPotatoesView>(_mongoDatabase);
             var potatoTimeToBeConsumedView = new MongoDbViewManager<PotatoTimeToBeConsumedView>(_mongoDatabase);
 
             _dispatcher.AddViewManager(allPotatoesView);

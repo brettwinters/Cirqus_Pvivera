@@ -233,7 +233,7 @@ public class TestCirqusTests : CirqusTests
 		var view = new InMemoryViewManager<ViewA>();
 
 		Configure(x => x.EventDispatcher(d => d
-			.UseSynchronousViewManangerEventDispatcher(view)
+			.UseSynchronousViewManagerEventDispatcher(view)
 			.WithViewContext(new Dictionary<string, object>
 			{
 				{"Tag", new Tag()}
@@ -252,7 +252,7 @@ public class TestCirqusTests : CirqusTests
 
 		Configure(x => x
 			.EventDispatcher(d => d
-				.UseSynchronousViewManangerEventDispatcher(a, b)
+				.UseSynchronousViewManagerEventDispatcher(a, b)
 				.WithViewContext(new Dictionary<string, object>
 				{
 					{"Tag", new Tag()}
@@ -270,7 +270,7 @@ public class TestCirqusTests : CirqusTests
 	public void ExceptionsInViewsBubblesToSurface() {
 		var view = new InMemoryViewManager<ThrowingView>();
 
-		Configure(x => x.EventDispatcher(d => d.UseSynchronousViewManangerEventDispatcher(view)));
+		Configure(x => x.EventDispatcher(d => d.UseSynchronousViewManagerEventDispatcher(view)));
 
 		Should.Throw<ApplicationException>(() => Emit(NewId<RootA>(), new EventA1()))
 			.InnerException.ShouldBeOfType<InvalidOperationException>()

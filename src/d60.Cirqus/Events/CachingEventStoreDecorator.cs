@@ -79,10 +79,11 @@ public class CachingEventStoreDecorator : IEventStore, IDisposable
 		}
 	}
 	
-	public long GetNextGlobalSequenceNumber()
-	{
-		return _innerEventStore.GetNextGlobalSequenceNumber();
-	}
+	//TODO Remove once sure it works
+	// public long GetNextGlobalSequenceNumber()
+	// {
+	// 	return _innerEventStore.GetNextGlobalSequenceNumber();
+	// }
 
 	public long GetLastGlobalSequenceNumber()
 	{

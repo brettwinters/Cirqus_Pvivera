@@ -16,7 +16,7 @@ using d60.Cirqus.Views.ViewManagers;
 using MongoDB.Driver;
 using NUnit.Framework;
 
-namespace d60.Cirqus.Tests.Views.NewViewManager
+namespace d60.Cirqus.Tests.Views.ViewManager
 {
     [TestFixture, Category(TestCategories.MongoDb), 
      Description("Verifies that the event store is not queried when the directly dispatched events fit " +
@@ -24,8 +24,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
     public class TestViewManagerEventDispatcherWithOptimization : FixtureBase
     {
 	    ViewManagerEventDispatcher _dispatcher;
-
-        ICommandProcessor _commandProcessor;
+	    ICommandProcessor _commandProcessor;
         IMongoDatabase _mongoDatabase;
         ThrowingEventStore _thisBadBoyEnsuresThatTheEventStoreIsNotUsed;
         
@@ -61,14 +60,11 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
         {
 	        long _position = -1;
 
-	        public string Id
-	        {
-		        get { return string.Format("testviewmanager-{0}", GetHashCode()); }
-	        }
+	        public string Id => $"testviewmanager-{GetHashCode()}";
 
-	        public async Task<long> GetPosition(bool canGetFromCache = true)
+	        public Task<long> GetPosition(bool canGetFromCache = true)
 	        {
-		        return _position;
+		        return Task.FromResult(_position);
 	        }
 
 	        public void Dispatch(IViewContext viewContext, IEnumerable<DomainEvent> batch, IViewManagerProfiler viewManagerProfiler)
@@ -92,7 +88,7 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
 
 			        if (stopwatch.Elapsed > timeout)
 			        {
-				        throw new TimeoutException(string.Format("oh noes, the view did not catch up within {0} timeout!", timeout));
+				        throw new TimeoutException($"oh noes, the view did not catch up within {timeout} timeout!");
 			        }
 		        }
 	        }
@@ -115,6 +111,8 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
 	        public IEnumerable<EventData> Load(string aggregateRootId, long firstSeq = 0)
 	        {
 		        if (!Throw) yield break;
+		        
+		        Assert.Fail("this event store prevents loading");
 
 		        throw new InvalidOperationException("this event store prevents loading");
 	        }
@@ -122,22 +120,28 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
 	        public IEnumerable<EventData> Stream(long globalSequenceNumber = 0)
 	        {
 		        if (!Throw) yield break;
+		        
+		        //Assert.Fail("this event store prevents streaming");
 
 		        throw new InvalidOperationException("this event store prevents streaming");
 	        }
 
-	        public long GetNextGlobalSequenceNumber()
-	        {
-		        if (!Throw) return 0;
-
-		        throw new InvalidOperationException("this event store prevents the getting of the next sequence number");
-	        }
+	        // public long GetNextGlobalSequenceNumber()
+	        // {
+		       //  if (!Throw) return 0;
+		       //  
+		       //  Assert.Fail("this event store prevents the getting of the next sequence number");
+		       //  
+		       //  throw new InvalidOperationException("this event store prevents the getting of the next sequence number");
+	        // }
 
 	        public long GetLastGlobalSequenceNumber()
 	        {
 		        if (!Throw) return 0;
+		        
+		        Assert.Fail("this event store prevents the getting of the last sequence number");
 
-		        throw new InvalidOperationException("this event store prevents the getting of the next sequence number");
+		        throw new InvalidOperationException("this event store prevents the getting of the last sequence number");
 	        }
         }
 
@@ -182,7 +186,9 @@ namespace d60.Cirqus.Tests.Views.NewViewManager
             CommandProcessingResult result = null;
             10.Times(() => result = _commandProcessor.ProcessCommand(new LeCommand("someId")));
 
-            testViewManager.WaitUntilProcessed(result, TimeSpan.FromSeconds(3)).Wait();
+            testViewManager.WaitUntilProcessed(result, TimeSpan.FromSeconds(30)).Wait();
+            
+            Assert.That(testViewManager.GetPosition().Result, Is.EqualTo(9));
         }
     }
 }

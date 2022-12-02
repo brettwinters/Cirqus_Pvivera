@@ -39,11 +39,13 @@ namespace d60.Cirqus.Tests.Snapshotting
 
             if (firstSerialization != roundtrippedSerialization)
             {
-                throw new AssertionException(string.Format(@"Oh noes!!
+                throw new AssertionException(
+	                $@"Oh noes!!
 
-{0}
+{firstSerialization}
 
-{1}", firstSerialization, roundtrippedSerialization));
+{roundtrippedSerialization}"
+                );
             }
         }
         // ReSharper restore UnusedMember.Local
@@ -71,7 +73,7 @@ namespace d60.Cirqus.Tests.Snapshotting
             public ClassWithConstructionValidation(int value)
             {
                 Value = value;
-                if (value <= 0) throw new ArgumentException(string.Format("Oh noes: {0}", value));
+                if (value <= 0) throw new ArgumentException($"Oh noes: {value}");
             }
         }
     }

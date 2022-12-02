@@ -138,7 +138,7 @@ this time by using actual MongoDB underneath
                         // just keep on knowing
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(string.Format("Unknown current state: {0}", currentState));
+                        throw new ArgumentOutOfRangeException($"Unknown current state: {currentState}");
                 }
             }
 

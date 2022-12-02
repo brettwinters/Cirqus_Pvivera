@@ -42,7 +42,7 @@ public class SpecialViewDispatcherHelper<TViewInstance> where TViewInstance : IS
 		DomainEvent domainEvent,
 		TViewInstance view)
 	{
-		//TODO Uncomment
+		//TODO Remove once sure it works
 		var lastGlobalSequenceNumber = DateTime.Parse(domainEvent.Meta[DomainEvent.MetadataKeys.TimeUtc]).Ticks;
 		//var lastGlobalSequenceNumber = domainEvent.GetGlobalSequenceNumber();
 

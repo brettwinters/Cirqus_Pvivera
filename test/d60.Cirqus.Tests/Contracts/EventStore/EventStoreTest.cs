@@ -66,7 +66,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             Assert.That(loadedEvents[1].GetSequenceNumber(), Is.EqualTo(2));
         }
 
-        //TODO Uncomment
+        //TODO Remove once sure it works
         // [Test]
         // public void AssignsGlobalSequenceNumberToEvents()
         // {
@@ -392,7 +392,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             Assert.AreEqual(0, _eventStore.Load("agg2").Count());
         }
 
-        // TODO Uncomment
+        // TODO Remove once sure it works
         // [TestCase(0)]
         // [TestCase(1)]
         // [TestCase(10)]
@@ -427,7 +427,8 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
         {
             CirqusLoggerFactory.Current = new NullLoggerFactory();
 
-            TakeTime(string.Format("Save {0} batches with {1} events in each", numberOfBatches, numberOfEventsPerBatch),
+            TakeTime(
+	            $"Save {numberOfBatches} batches with {numberOfEventsPerBatch} events in each",
                 () =>
                 {
                     var seqNo = 0;
@@ -453,11 +454,11 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             _eventStore.Save(Guid.NewGuid(), Enumerable.Range(0, numberOfEvents).Select(i => Event(seqNo++, "rootid")));
 
             TakeTime(
-                string.Format("First time read stream of {0} events", numberOfEvents),
+	            $"First time read stream of {numberOfEvents} events",
                 () => _eventStore.Load("rootid").ToList());
 
             TakeTime(
-                string.Format("Second time read stream of {0} events", numberOfEvents),
+	            $"Second time read stream of {numberOfEvents} events",
                 () => _eventStore.Load("rootid").ToList());
         }
 
@@ -472,7 +473,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             _eventStore.Save(Guid.NewGuid(), Enumerable.Range(0, numberOfEvents).Select(i => Event(seqNo++, "rootid")));
 
             TakeTime(
-                string.Format("Read stream of {0} events", numberOfEvents),
+	            $"Read stream of {numberOfEvents} events",
                 () => _eventStore.Stream().ToList());
         }
 
@@ -506,7 +507,7 @@ namespace d60.Cirqus.Tests.Contracts.EventStore
             return EventData.FromMetadata(
 	            new Metadata
 	            {
-		            //TODO Uncomment (actually remove)
+		            //TODO Remove once sure it works (actually remove)
 	                [DomainEvent.MetadataKeys.GlobalSequenceNumber] = GlobalSequenceNumberService.GetNewGlobalSequenceNumber().ToString(Metadata.NumberCulture),
 	                [DomainEvent.MetadataKeys.SequenceNumber] = seq.ToString(Metadata.NumberCulture),
 	                [DomainEvent.MetadataKeys.AggregateRootId] = aggregateRootId,

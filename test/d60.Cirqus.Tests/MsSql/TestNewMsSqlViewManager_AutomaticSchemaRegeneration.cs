@@ -58,7 +58,7 @@ namespace d60.Cirqus.Tests.MsSql
 
                 using (var cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = string.Format("alter table [{0}] drop column [{1}];", tableName, columnName);
+                    cmd.CommandText = $"alter table [{tableName}] drop column [{columnName}];";
 
                     cmd.ExecuteNonQuery();
                 }

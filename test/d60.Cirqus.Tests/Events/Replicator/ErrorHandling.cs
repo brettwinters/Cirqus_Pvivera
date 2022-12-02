@@ -83,13 +83,13 @@ namespace d60.Cirqus.Tests.Events.Replicator
 		        return _innerEventStore.Stream(globalSequenceNumber);
 	        }
 
-	        public long GetNextGlobalSequenceNumber()
-	        {
-		        PossiblyThrowError();
-
-		        return _innerEventStore.GetNextGlobalSequenceNumber();
-	        }
-
+	        //TODO Remove once sure it works
+	        // public long GetNextGlobalSequenceNumber()
+	        // {
+		       //  PossiblyThrowError();
+	        //
+		       //  return _innerEventStore.GetNextGlobalSequenceNumber();
+	        // }
 	        public long GetLastGlobalSequenceNumber()
 	        {
 		        PossiblyThrowError();
@@ -168,7 +168,7 @@ namespace d60.Cirqus.Tests.Events.Replicator
                     .ToList()
                     .ForEach(e => _source.Save(Guid.NewGuid(), new[] {e}.Select(e2 => _serializer.Serialize(e2))));
                 
-                // TODO Uncomment
+                // TODO Remove once sure it works
                 // while (_destination.GetNextGlobalSequenceNumber() < numberOfEvents)
                 // {
                 //     Thread.Sleep(numberOfEvents);

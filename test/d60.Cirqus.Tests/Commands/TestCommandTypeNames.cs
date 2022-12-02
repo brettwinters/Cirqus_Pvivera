@@ -48,8 +48,7 @@ namespace d60.Cirqus.Tests.Commands
                 {
                     if (!e.Meta.ContainsKey(DomainEvent.MetadataKeys.CommandTypeName))
                     {
-                        throw new AssertionException(string.Format("Could not find the '{0}' key in the command's metadata - had only {1}",
-                            DomainEvent.MetadataKeys.CommandTypeName, string.Join(", ", e.Meta.Select(kvp => string.Format("{0}={1}", kvp.Key, kvp.Value)))));
+                        throw new AssertionException($"Could not find the '{DomainEvent.MetadataKeys.CommandTypeName}' key in the command's metadata - had only {string.Join(", ", e.Meta.Select(kvp => $"{kvp.Key}={kvp.Value}"))}");
                     }
 
                     return e.Meta[DomainEvent.MetadataKeys.CommandTypeName];

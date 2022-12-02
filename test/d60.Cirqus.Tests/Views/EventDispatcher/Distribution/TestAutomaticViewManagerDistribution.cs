@@ -79,8 +79,8 @@ Distribution:
 
 Views:
 {1}",
-    string.Join(Environment.NewLine, state.GetCurrentState().Select(s => string.Format("    {0}: {1}", s.ManagerId, string.Join(", ", s.ViewIds)))),
-    string.Join(Environment.NewLine, viewManagers.Select(v => string.Format("    {0}: {1}", v.GetPosition().Result, v.GetType().GetPrettyName()))));
+    string.Join(Environment.NewLine, state.GetCurrentState().Select(s => $"    {s.ManagerId}: {string.Join(", ", s.ViewIds)}")),
+    string.Join(Environment.NewLine, viewManagers.Select(v => $"    {v.GetPosition().Result}: {v.GetType().GetPrettyName()}")));
                 };
                 statusTimer.Start();
 

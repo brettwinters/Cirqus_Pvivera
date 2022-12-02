@@ -11,7 +11,7 @@ namespace d60.Cirqus.Tests.Contracts.Views.Models.LoadingStuffDuringViewLocation
     {
         protected override IEnumerable<string> GetViewIds(IViewContext context, DomainEvent e)
         {
-            if (!(e is NodeAttachedToParentNode)) throw new ArgumentException(String.Format("Can't handle {0}", e));
+            if (!(e is NodeAttachedToParentNode)) throw new ArgumentException($"Can't handle {e}");
 
             var node = context.Load<Node>(e.GetAggregateRootId());
 

@@ -29,8 +29,8 @@ namespace d60.Cirqus.Tests.MongoDb
         [TestCase(1000)]
         [TestCase(10000)]
         [TestCase(100000)]
-        // [TestCase(1000000, Ignore = TestCategories.IgnoreLongRunning)]
-        // [TestCase(10000000, Ignore = TestCategories.IgnoreLongRunning)]
+        [LongRunningTestCase(1000000)]
+        [LongRunningTestCase(10000000)]
         public void VerifyLazinessOfStreamingApi(int eventCount)
         {
             Console.Write("Generating {0} events... ", eventCount);

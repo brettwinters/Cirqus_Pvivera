@@ -66,13 +66,15 @@ namespace d60.Cirqus.SQLite
 
         public void Save(Guid batchId, IEnumerable<EventData> batch)
         {
-            var nextGlobalSequenceNumber = GetNextGlobalSequenceNumber();
+
+	        //TODO Remove once sure it works
+	        // var nextGlobalSequenceNumber = GetNextGlobalSequenceNumber();
 
             var domainEventsList = batch.ToList();
 
             foreach (var domainEvent in domainEventsList)
             {
-	            //TODO Uncomment
+	            //TODO Remove once sure it works
                 //domainEvent.Meta[DomainEvent.MetadataKeys.GlobalSequenceNumber] = (nextGlobalSequenceNumber++).ToString(Metadata.NumberCulture);
                 domainEvent.Meta[DomainEvent.MetadataKeys.BatchId] = batchId.ToString();
             }
@@ -138,17 +140,18 @@ namespace d60.Cirqus.SQLite
                 yield return EventData.FromMetadata(_metadataSerializer.Deserialize(Encoding.UTF8.GetString(e.Meta)), e.Data);
             }
         }
-
-        public long GetNextGlobalSequenceNumber()
-        {
-            var eventsTable = _connection.Table<Event>();
-
-            var nextGlobalSequenceNumber = eventsTable.Any()
-                ? eventsTable.Max(e => e.GlobalSequenceNumber) + 1
-                : 0;
-
-            return nextGlobalSequenceNumber;
-        }
+		
+        //TODO Remove once sure it works
+        // public long GetNextGlobalSequenceNumber()
+        // {
+        //     var eventsTable = _connection.Table<Event>();
+        //
+        //     var nextGlobalSequenceNumber = eventsTable.Any()
+        //         ? eventsTable.Max(e => e.GlobalSequenceNumber) + 1
+        //         : 0;
+        //
+        //     return nextGlobalSequenceNumber;
+        // }
 
         public long GetLastGlobalSequenceNumber()
         {

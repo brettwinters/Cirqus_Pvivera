@@ -45,7 +45,7 @@ namespace d60.Cirqus.Tests.PostgreSql
                 using (var cmd = connection.CreateCommand()) {
                     connection.Open();
 
-                    cmd.CommandText = string.Format(@"DROP TABLE IF EXISTS ""{0}"" CASCADE", tableName);
+                    cmd.CommandText = $@"DROP TABLE IF EXISTS ""{tableName}"" CASCADE";
 
                     cmd.ExecuteNonQuery();
                 }
@@ -66,7 +66,7 @@ namespace d60.Cirqus.Tests.PostgreSql
 
                 using (var command = connection.CreateCommand())
                 {
-                    command.CommandText = string.Format(@" create database ""{0}""", databaseName);
+                    command.CommandText = $@" create database ""{databaseName}""";
 
                     command.ExecuteNonQuery();
                 }

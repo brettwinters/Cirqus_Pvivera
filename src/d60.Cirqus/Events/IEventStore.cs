@@ -30,7 +30,7 @@ public interface IEventStore
 	/// Gets the next available global sequence number.
 	/// This will be the number used on the first event in the next saved event batch.
 	/// </summary>
-	long GetNextGlobalSequenceNumber();
+	//long GetNextGlobalSequenceNumber();
 
 	long GetLastGlobalSequenceNumber();
 }

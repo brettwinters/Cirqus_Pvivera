@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ReleaseVersion>6.0.1</ReleaseVersion>
+    <ReleaseVersion>6.1.0</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +17,6 @@
     <None Remove="EntityFramework\**" />
     <None Remove="MsSql\**" />
     <Compile Remove="Views\EventDispatcher\Standard\TestSpecialViewManagerEventDispatcher.cs" />
-    <Compile Remove="Views\EventDispatcher\Standard\TestTwoDispatchesOneView.cs" />
     <Compile Remove="_Copied\InMemoryEventStore.cs" />
   </ItemGroup>
 
@@ -29,6 +28,7 @@
   <ItemGroup>
     <Compile Include="Contracts\EventStore\CachedEventStoreFactory.cs" />
     <Compile Include="Contracts\EventStore\EventStoreTest.cs" />
+    <Compile Include="Contracts\EventStore\Factories\CachedEventStoreFactory.cs" />
     <Compile Include="Contracts\EventStore\Factories\InMemoryEventStoreFactory.cs" />
     <Compile Include="Contracts\EventStore\Factories\MongoDbEventStoreFactory.cs" />
     <Compile Include="Contracts\EventStore\Factories\MsSqlEventStoreFactory.cs" />
@@ -218,13 +218,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Scrutor" Version="4.2.0" />
-    <PackageReference Include="Shouldly" Version="3.0.2" />
+    <PackageReference Include="Shouldly" Version="4.1.0" />
     <PackageReference Include="Sprache" Version="2.3.1" />
-<!--    <PackageReference Include="xunit" Version="2.4.2" />-->
-<!--    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">-->
-<!--      <PrivateAssets>all</PrivateAssets>-->
-<!--      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>-->
-<!--    </PackageReference>-->
   </ItemGroup>
 
   <ItemGroup>
