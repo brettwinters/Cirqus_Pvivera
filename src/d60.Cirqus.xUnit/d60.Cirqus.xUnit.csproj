@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ReleaseVersion>6.1.0</ReleaseVersion>
+    <ReleaseVersion>6.2.0</ReleaseVersion>
     <PackageId>d60.Cirqus.xUnit</PackageId>
-    <Version>6.1.0</Version>
+    <Version>6.2.0</Version>
     <Authors>brettwinters</Authors>
     <Company>Mercenta</Company>
     <PackageDescription>Tidy up links</PackageDescription>
