@@ -16,13 +16,15 @@ public class HandlerViewLocator : ViewLocator
 {
 	readonly ConcurrentDictionary<Type, MethodInfo> _handlerMethodsByDomainEventType = new();
 
-	protected override IEnumerable<string> GetViewIds(IViewContext context, DomainEvent e)
+	protected override IEnumerable<string> GetViewIds(
+		IViewContext context, 
+		DomainEvent e)
 	{
 		var handlerMethod = _handlerMethodsByDomainEventType.GetOrAdd(e.GetType(), GetHandlerMethodFor);
 
 		if (handlerMethod == null)
 		{
-			return new string[0];
+			return Array.Empty<string>();
 		}
 
 		try
@@ -37,7 +39,8 @@ public class HandlerViewLocator : ViewLocator
 		}
 	}
 
-	MethodInfo GetHandlerMethodFor(Type domainEventType)
+	MethodInfo GetHandlerMethodFor(
+		Type domainEventType)
 	{
 		var typesToCheck = new[] { domainEventType }
 			.Concat(domainEventType.GetInterfaces())
@@ -52,7 +55,7 @@ public class HandlerViewLocator : ViewLocator
 	IEnumerable<Type> GetBaseTypes(Type type)
 	{
 		return type.BaseType == null
-			? new Type[0]
+			? Type.EmptyTypes
 			: new[] { type.BaseType }.Concat(GetBaseTypes(type.BaseType));
 	}
 }

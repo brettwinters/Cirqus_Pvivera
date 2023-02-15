@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<WarningsAsErrors>Nullable</WarningsAsErrors>
-		<ReleaseVersion>6.2.0</ReleaseVersion>
+		<ReleaseVersion>7.0.0</ReleaseVersion>
 		<PackageId>d60.Cirqus.InMemory</PackageId>
-		<Version>6.2.0</Version>
+		<Version>7.0.0</Version>
 		<PackageId>d60.Cirqus.InMemory</PackageId>
 		<Authors>brettwinters</Authors>
 		<Company>Mercenta</Company>

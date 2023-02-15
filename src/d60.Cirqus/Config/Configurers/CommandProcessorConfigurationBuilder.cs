@@ -43,7 +43,8 @@ internal class CommandProcessorConfigurationBuilder :
 		return this;
 	}
 
-	public IOptionalConfiguration<ICommandProcessor> EventDispatcher(Action<EventDispatcherConfigurationBuilder> configure)
+	public IOptionalConfiguration<ICommandProcessor> EventDispatcher(
+		Action<EventDispatcherConfigurationBuilder> configure)
 	{
 		configure(new EventDispatcherConfigurationBuilder(_services));
 		return this;

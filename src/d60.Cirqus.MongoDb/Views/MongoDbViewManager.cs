@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -6,7 +7,6 @@ using System.Threading.Tasks;
 using d60.Cirqus.Events;
 using d60.Cirqus.Extensions;
 using d60.Cirqus.Logging;
-using d60.Cirqus.MongoDb.Events;
 using d60.Cirqus.Views.ViewManagers;
 using d60.Cirqus.Views.ViewManagers.Locators;
 using MongoDB.Driver;
@@ -14,26 +14,25 @@ using MongoDB.Driver;
 namespace d60.Cirqus.MongoDb.Views;
 
 public class MongoDbViewManager<TViewInstance> 
-	: AbstractViewManager<TViewInstance> where TViewInstance : class, IViewInstance, ISubscribeTo, new()
+	: AbstractViewManager<TViewInstance> 
+	where TViewInstance : class, IViewInstance, ISubscribeTo, new()
 {
-	const string CurrentPositionPropertyName = "LastGlobalSequenceNumber";
-	const long DefaultPosition = -1;
-	readonly ViewDispatcherHelper<TViewInstance> _dispatcherHelper = new();
-	readonly IMongoCollection<TViewInstance> _viewCollection;
-	readonly IMongoCollection<PositionDoc> _positionCollection;
-	readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
-	readonly Logger _logger = CirqusLoggerFactory.Current.GetCurrentClassLogger();
-	readonly string _currentPositionDocId;
-	long _cachedPosition;
-	volatile bool _purging;
-
-
+	private const string CurrentPositionPropertyName = "LastGlobalSequenceNumber";
+	private const long DefaultPosition = -1;
+	private readonly ViewDispatcherHelper<TViewInstance> _dispatcherHelper = new();
+	private readonly IMongoCollection<TViewInstance> _viewCollection;
+	private readonly IMongoCollection<PositionDoc> _positionCollection;
+	private readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
+	private readonly Logger _logger = CirqusLoggerFactory.Current.GetCurrentClassLogger();
+	private readonly string _currentPositionDocId;
+	private long _cachedPosition = -1;
+	private volatile bool _purging;
+	
 	/// <summary>
 	/// Gets the server from the collection string. You must include the name of the collection
 	/// in the connection string
 	/// </summary>
-	public MongoDbViewManager(
-		string mongoDbConnectionString)
+	public MongoDbViewManager(string mongoDbConnectionString) 
 		: this(GetDatabaseFromConnectionString(mongoDbConnectionString))
 	{
 	}
@@ -61,8 +60,6 @@ public class MongoDbViewManager<TViewInstance>
 
 		_logger.Info("Create index in '{0}': '{1}'", collectionName, CurrentPositionPropertyName);
 		
-		// _viewCollection.CreateIndex(IndexKeys<TViewInstance>.Ascending(i => i.LastGlobalSequenceNumber), IndexOptions.SetName(CurrentPositionPropertyName));
-		
 		_viewCollection.Indexes.CreateOne(
 			new CreateIndexModel<TViewInstance>(
 				Builders<TViewInstance>.IndexKeys.Ascending(i => i.LastGlobalSequenceNumber),
@@ -78,17 +75,14 @@ public class MongoDbViewManager<TViewInstance>
 	/// <summary>
 	/// The Name of the collection is the name of the ViewManager instance type
 	/// </summary>
-	public MongoDbViewManager(IMongoDatabase database)
-		: this(database, typeof(TViewInstance).Name)
+	public MongoDbViewManager(IMongoDatabase database): this(database, typeof(TViewInstance).Name)
 	{
 	}
 
-
-
-
-	class PositionDoc
+	private class PositionDoc
 	{
 		public string Id { get; set; }
+		
 		public long CurrentPosition { get; set; }
 	}
 
@@ -101,13 +95,14 @@ public class MongoDbViewManager<TViewInstance>
 	public override TViewInstance Load(
 		string viewId)
 	{
-		//return _viewCollection.FindOneById(viewId);
-		return _viewCollection.Find(x => x.Id == viewId).SingleOrDefault();
+		return _viewCollection
+			.Find(x => x.Id == viewId)
+			.SingleOrDefault();
 	}
 
 	public override void Delete(string viewId)
 	{
-
+		throw new NotImplementedException("Use soft delete");
 	}
 
 	public override string Id => $"{typeof(TViewInstance).GetPrettyName()}/{_viewCollection}";
@@ -115,88 +110,56 @@ public class MongoDbViewManager<TViewInstance>
 	public override async Task<long> GetPosition(
 		bool canGetFromCache = true)
 	{
-		// if(canGetFromCache && false)
-		// {
-		// 	return GetPositionFromMemory()
-		// 	       ?? GetPositionFromPersistentCache()
-		// 	       ?? GetPositionFromViewInstances()
-		// 	       ?? GetDefaultPosition();
-		// }
-
-		// return GetPositionFromPersistentCache()
-		//        ?? GetPositionFromViewInstances()
-		//        ?? GetDefaultPosition();
-
+		// Original author used "if(canGetFromCache && false)" but this would always
+		// be false and therefore never used. Also found a bug in the Purge() method 
+		// where the _cachedPosition was updated after UpdatePersistentCache leading to 
+		// the issue of -1 / 0 once purged. I think...
+		var cachePosition = canGetFromCache ? GetPositionFromMemory() : null;
 		
+		return cachePosition
+		       ?? await GetPositionFromPersistentCacheAsync() 
+		       ?? await GetPositionFromViewInstancesAsync() 
+		       ?? DefaultPosition;
 
-		var position = GetPositionFromPersistentCache() 
-		               ?? GetPositionFromViewInstances()
-		               ?? GetDefaultPosition();
-
-		return position;
-
-
-		#region
-		
-		static long GetDefaultPosition()
-		{
-			return DefaultPosition;
-		}
-		
-		long? GetPositionFromMemory()
+        #region
+        
+        long? GetPositionFromMemory()
 		{
 			var value = Interlocked.Read(ref _cachedPosition);
-		
 			if (value != DefaultPosition)
 			{
 				return value;
 			}
-		
 			return null;
 		}
 
-		long? GetPositionFromPersistentCache()
+        // I think this is used is because sometimes there is a mismatch between when
+        // the instances are updated and when the position is fetched.
+        async Task<long?> GetPositionFromPersistentCacheAsync()
+        {
+	        var currentPositionDocument = await _positionCollection
+			        .Find(x => x.Id == _currentPositionDocId)
+			        .SingleOrDefaultAsync();
+
+	        return currentPositionDocument?.CurrentPosition;
+        }
+
+        // The only reason this is here is so that if the Persistent cache is 
+        // deleted then it can still find it's position
+        async Task<long?> GetPositionFromViewInstancesAsync()
 		{
-			var currentPositionDocument = 
-				_positionCollection
-				.Find(x => x.Id == _currentPositionDocId)
-				.SingleOrDefault();
-
-			return currentPositionDocument?.CurrentPosition;
-		}
-
-		// long? GetPositionFromViewInstance()
-		// {
-		// 	var viewIds = _viewLocator.GetAffectedViewIds();
-		// }
-
-		long? GetPositionFromViewInstances()
-		{
-			// with MongoDB, we cannot know for sure how many events we've successfully processed of those that
-			// have sequence numbers between the MIN and MAX sequence numbers currently stored in our views
-			// - therefore, to be safe, we need to pick the MIN as our starting point....
-			
-			var viewWithTheLowestGlobalSequenceNumber = _viewCollection
+			var viewWithTheLowestGlobalSequenceNumber = await _viewCollection
 				.Find(_ => true)
 				.Limit(1)
 				.SortBy(x => x.LastGlobalSequenceNumber)
-				.FirstOrDefault();
+				.FirstOrDefaultAsync();
 
-			if (viewWithTheLowestGlobalSequenceNumber == null)
-			{
-				return null;
-			}
-		
-			var lowPosition = viewWithTheLowestGlobalSequenceNumber.LastGlobalSequenceNumber;
-		
-			return lowPosition;
+			return viewWithTheLowestGlobalSequenceNumber?.LastGlobalSequenceNumber;
 		}
 		
 		#endregion
 	}
-
 	
-
 	public override void Purge()
 	{
 		try
@@ -208,8 +171,6 @@ public class MongoDbViewManager<TViewInstance>
 			_viewCollection.DeleteMany(_ => true);
 
 			UpdatePersistentCache(DefaultPosition);
-
-			Interlocked.Exchange(ref _cachedPosition, DefaultPosition);
 		}
 		finally
 		{
@@ -217,7 +178,7 @@ public class MongoDbViewManager<TViewInstance>
 		}
 	}
 
-	void UpdatePersistentCache(
+	private void UpdatePersistentCache(
 		long newPosition)
 	{
 		_logger.Debug("Updating persistent position cache to {0}", newPosition);
@@ -237,13 +198,16 @@ public class MongoDbViewManager<TViewInstance>
 		IEnumerable<DomainEvent> batch, 
 		IViewManagerProfiler viewManagerProfiler)
 	{
-		if(_purging) return;
-
-		var cachedViewInstances = new Dictionary<string, TViewInstance>();
-
+		if (_purging)
+		{
+			return;
+		}
+		
 		var eventList = batch.ToList();
-
-		if(!eventList.Any()) return;
+		if (!eventList.Any())
+		{
+			return;
+		}
 
 		if(BatchDispatchEnabled)
 		{
@@ -251,10 +215,15 @@ public class MongoDbViewManager<TViewInstance>
 			eventList.Clear();
 			eventList.Add(domainEventBatch);
 		}
+		
+		var cachedViewInstances = new Dictionary<string, TViewInstance>();
 
 		foreach(var e in eventList)
 		{
-			if(!ViewLocator.IsRelevant<TViewInstance>(e)) continue;
+			if (!ViewLocator.IsRelevant<TViewInstance>(e))
+			{
+				continue;
+			}
 
 			var stopwatch = Stopwatch.StartNew();
 
@@ -276,11 +245,30 @@ public class MongoDbViewManager<TViewInstance>
 
 		UpdatePersistentCache(eventList.Max(e => e.GetGlobalSequenceNumber()));
 	}
-
-	void FlushCacheToDatabase(
+	
+	private TViewInstance GetOrCreateViewInstance(
+		string viewId, 
 		Dictionary<string, TViewInstance> cachedViewInstances)
 	{
-		if(!cachedViewInstances.Any()) return;
+		if(cachedViewInstances.TryGetValue(viewId, out var instanceToReturn))
+		{
+			return instanceToReturn;
+		}
+
+		instanceToReturn = _viewCollection
+			.Find(x => x.Id == viewId)
+			.SingleOrDefault();
+
+		return instanceToReturn ?? _dispatcherHelper.CreateNewInstance(viewId);
+	}
+
+	private void FlushCacheToDatabase(
+		Dictionary<string, TViewInstance> cachedViewInstances)
+	{
+		if (!cachedViewInstances.Any())
+		{
+			return;
+		}
 
 		_logger.Debug(
 			"Flushing {0} view instances to '{1}'", 
@@ -297,24 +285,8 @@ public class MongoDbViewManager<TViewInstance>
 			);
 		}
 	}
-
-	TViewInstance GetOrCreateViewInstance(
-		string viewId, 
-		Dictionary<string, TViewInstance> cachedViewInstances)
-	{
-		if(cachedViewInstances.TryGetValue(viewId, out var instanceToReturn))
-		{
-			return instanceToReturn;
-		}
-
-		instanceToReturn = _viewCollection.Find(x => x.Id == viewId).SingleOrDefault() 
-		                   ?? _dispatcherHelper.CreateNewInstance(viewId);
-
-		return instanceToReturn;
-	}
-
-
-	static IMongoDatabase GetDatabaseFromConnectionString(
+	
+	private static IMongoDatabase GetDatabaseFromConnectionString(
 		string mongoDbConnectionString)
 	{
 		var mongoUrl = new MongoUrl(mongoDbConnectionString);

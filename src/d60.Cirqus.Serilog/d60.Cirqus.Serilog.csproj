@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>d60.Cirqus.Serilog</PackageId>
-    <Version>6.2.0</Version>
+    <Version>7.0.0</Version>
     <Authors>brettwinters</Authors>
     <Company>Mercenta</Company>
     <PackageDescription>Tidy up links</PackageDescription>
     <RepositoryUrl>https://github.com/brettwinters/Cirqus_Pvivera</RepositoryUrl>
-    <ReleaseVersion>6.2.0</ReleaseVersion>
+    <ReleaseVersion>7.0.0</ReleaseVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Serilog" Version="2.12.0" />

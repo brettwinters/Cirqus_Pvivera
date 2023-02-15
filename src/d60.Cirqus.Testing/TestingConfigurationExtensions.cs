@@ -11,7 +11,7 @@ namespace d60.Cirqus.Testing;
 
 public static class TestingConfigurationExtensions
 {
-	public static SynchronousViewManagerEventDispatcherConfiguationBuilder UseSynchronousViewManagerEventDispatcher(
+	public static SynchronousViewManagerEventDispatcherConfigurationBuilder UseSynchronousViewManagerEventDispatcher(
 		this EventDispatcherConfigurationBuilder builder, params IViewManager[] viewManagers)
 	{
 		var viewManagerConfigurationContainer = builder.Clone();
@@ -36,6 +36,6 @@ public static class TestingConfigurationExtensions
 			return eventDispatcher;
 		});
 
-		return new SynchronousViewManagerEventDispatcherConfiguationBuilder(viewManagerConfigurationContainer);
+		return new SynchronousViewManagerEventDispatcherConfigurationBuilder(viewManagerConfigurationContainer);
 	}
 }

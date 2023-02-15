@@ -13,7 +13,8 @@ public static class TypeExtensions
 	/// <summary>
 	/// Gets the type for the class that implements <see cref="IViewInstance"/> if possible
 	/// </summary>
-	public static Type GetViewType(this IViewManager viewManager)
+	public static Type GetViewType(
+		this IViewManager viewManager)
 	{
 		var type = viewManager.GetType();
 

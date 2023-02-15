@@ -28,7 +28,8 @@ public class ViewManagerEventDispatcherConfigurationBuilder : NewConfigurationBu
 	/// Makes the given dictionary of items available in the <see cref="IViewContext"/> passed to the view's
 	/// locator and the view itself
 	/// </summary>
-	public ViewManagerEventDispatcherConfigurationBuilder WithViewContext(IDictionary<string, object> viewContextItems)
+	public ViewManagerEventDispatcherConfigurationBuilder WithViewContext(
+		IDictionary<string, object> viewContextItems)
 	{
 		if (viewContextItems == null)
 		{

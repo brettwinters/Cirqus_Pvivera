@@ -82,7 +82,8 @@ public class ViewDispatcherHelper<TViewInstance> where TViewInstance : ISubscrib
 	/// <summary>
 	/// Creates a new view instance with the given <paramref name="viewId"/>
 	/// </summary>
-	public TViewInstance CreateNewInstance(string viewId)
+	public TViewInstance CreateNewInstance(
+		string viewId)
 	{
 		return new TViewInstance
 		{

@@ -39,7 +39,8 @@ public class TestContextConfigurationBuilder : IOptionalConfiguration<TestContex
 		return this;
 	}
 
-	public IOptionalConfiguration<TestContext> EventDispatcher(Action<EventDispatcherConfigurationBuilder> configure)
+	public IOptionalConfiguration<TestContext> EventDispatcher(
+		Action<EventDispatcherConfigurationBuilder> configure)
 	{
 		configure(new EventDispatcherConfigurationBuilder(_services));
 		return this;

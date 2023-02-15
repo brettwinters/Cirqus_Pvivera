@@ -40,7 +40,11 @@ namespace d60.Cirqus.Tests.Snapshotting
         {
             var handleTimes = new ConcurrentQueue<DispatchStats>();
             var viewManager = CreateViewManager();
-            var commandProcessor = CreateCommandProcessor(enableSnapshotting, viewManager, handleTimes);
+            var commandProcessor = CreateCommandProcessor(
+	            enableSnapshotting: enableSnapshotting, 
+	            viewManager: viewManager, 
+	            handleTimes: handleTimes
+	        );
 
             var stopwatch = Stopwatch.StartNew();
 

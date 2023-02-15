@@ -14,22 +14,25 @@ public class CompositeEventDispatcher : IAwaitableEventDispatcher
 {
 	readonly List<IEventDispatcher> _eventDispatchers;
 
-	public CompositeEventDispatcher(params IEventDispatcher[] eventDispatchers)
+	public CompositeEventDispatcher(
+		params IEventDispatcher[] eventDispatchers)
 		:this((IEnumerable<IEventDispatcher>)eventDispatchers)
 	{
 	}
 
-	public CompositeEventDispatcher(IEnumerable<IEventDispatcher> eventDispatchers)
+	private CompositeEventDispatcher(IEnumerable<IEventDispatcher> eventDispatchers)
 	{
 		_eventDispatchers = eventDispatchers.ToList();
 	}
 
-	public void Initialize(bool purgeExistingViews = false)
+	public void Initialize(
+		bool purgeExistingViews = false)
 	{
 		_eventDispatchers.ForEach(d => d.Initialize(purgeExistingViews));
 	}
 
-	public void Dispatch(IEnumerable<DomainEvent> events)
+	public void Dispatch(
+		IEnumerable<DomainEvent> events)
 	{
 		_eventDispatchers.ForEach(d => d.Dispatch(events));
 	}
@@ -42,7 +45,9 @@ public class CompositeEventDispatcher : IAwaitableEventDispatcher
 		return Task.WhenAll(_eventDispatchers.OfType<IAwaitableEventDispatcher>().Select(x => x.WaitUntilProcessed<TViewInstance>(result, timeout)));
 	}
 
-	public Task WaitUntilProcessed(CommandProcessingResult result, TimeSpan timeout)
+	public Task WaitUntilProcessed(
+		CommandProcessingResult result, 
+		TimeSpan timeout)
 	{
 		return Task.WhenAll(_eventDispatchers.OfType<IAwaitableEventDispatcher>().Select(x => x.WaitUntilProcessed(result, timeout)));
 	}

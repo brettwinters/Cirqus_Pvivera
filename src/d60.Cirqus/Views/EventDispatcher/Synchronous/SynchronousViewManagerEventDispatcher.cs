@@ -10,10 +10,12 @@ using d60.Cirqus.Serialization;
 using d60.Cirqus.Views;
 using d60.Cirqus.Views.ViewManagers;
 
-namespace d60.Cirqus.Testing;
+namespace d60.Cirqus.Views;
 
 /// <summary>
-/// In-memory dispatcher that gets its events by having them dispatched directly
+/// In-memory dispatcher that gets its events by having them dispatched directly.
+/// When its initialised it streams everything to the view models and then after than
+/// all the events that come from the CommandProcessor.
 /// </summary>
 public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 {
@@ -40,7 +42,8 @@ public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 		_domainTypeNameMapper = domainTypeNameMapper;
 	}
 
-	public void SetContextItems(IDictionary<string, object> contextItems)
+	public void SetContextItems(
+		IDictionary<string, object> contextItems)
 	{
 		if (contextItems == null) throw new ArgumentNullException("contextItems");
 
@@ -50,7 +53,8 @@ public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 		}
 	}
 
-	public void Initialize(bool purgeExistingViews = false)
+	public void Initialize(
+		bool purgeExistingViews = false)
 	{
 		foreach (var batch in _eventStore.Stream().Batch(1000))
 		{
@@ -61,7 +65,11 @@ public class SynchronousViewManagerEventDispatcher : IEventDispatcher
 	public void Dispatch(
 		IEnumerable<DomainEvent> events)
 	{
-		var context = new DefaultViewContext(_aggregateRootRepository, _domainTypeNameMapper, events);
+		var context = new DefaultViewContext(
+			aggregateRootRepository: _aggregateRootRepository, 
+			domainTypeNameMapper: _domainTypeNameMapper, 
+			eventBatch: events
+		);
 
 		foreach (var kvp in _viewContextItems)
 		{

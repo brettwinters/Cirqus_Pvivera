@@ -20,7 +20,7 @@ namespace d60.Cirqus.Tests.Contracts.Serialization
     //[TestFixture(typeof(PostgreSqlEventStoreFactory), Category = TestCategories.PostgreSql)]
     //[TestFixture(typeof(NtfsEventStoreFactory))]
     //[TestFixture(typeof(SQLiteEventStoreFactory), Category = TestCategories.SQLite)]
-    public class CustomSerilization<TEventStoreFactory> 
+    public class CustomSerialization<TEventStoreFactory> 
         : FixtureBase where TEventStoreFactory 
         : IEventStoreFactory, new()
     {
@@ -36,7 +36,8 @@ namespace d60.Cirqus.Tests.Contracts.Serialization
             _commandProcessor = CreateCommandProcessor(config => config
                 .EventStore(e => e.Register(c => factory.GetEventStore()))
                 .EventDispatcher(e => e.UseViewManagerEventDispatcher(_viewManager))
-                .Options(o => o.UseCustomDomainEventSerializer(new BinaryDomainEventSerializer())));
+                // changed BinaryDomainEventSerializer => JsonDomainEventSerializer
+                .Options(o => o.UseCustomDomainEventSerializer(new JsonDomainEventSerializer())));
 
             RegisterForDisposal(_commandProcessor);
         }

@@ -10,9 +10,9 @@ namespace d60.Cirqus.Config.Configurers;
 /// </summary>
 public class DependentViewManagerEventDispatcherSettings
 {
-	readonly List<ViewManagerWaitHandle> _waitHandles = new List<ViewManagerWaitHandle>();
-	readonly List<IViewManager> _dependentViewManagers = new List<IViewManager>(); 
-	readonly Dictionary<string, object> _viewContextItems = new Dictionary<string, object>();
+	readonly List<ViewManagerWaitHandle> _waitHandles = new();
+	readonly List<IViewManager> _dependentViewManagers = new(); 
+	readonly Dictionary<string, object> _viewContextItems = new();
 
 	/// <summary>
 	/// Constructs the settings builder with default settings
@@ -22,20 +22,11 @@ public class DependentViewManagerEventDispatcherSettings
 		MaxDomainEventsPerBatch = 100;
 	}
 
-	internal List<ViewManagerWaitHandle> WaitHandles
-	{
-		get { return _waitHandles; }
-	}
+	internal List<ViewManagerWaitHandle> WaitHandles => _waitHandles;
 
-	internal List<IViewManager> DependentViewManagers
-	{
-		get { return _dependentViewManagers; }
-	}
+	internal List<IViewManager> DependentViewManagers => _dependentViewManagers;
 
-	internal Dictionary<string, object> ViewContextItems
-	{
-		get { return _viewContextItems; }
-	}
+	internal Dictionary<string, object> ViewContextItems => _viewContextItems;
 
 	/// <summary>
 	/// Registers the <see cref="DependentViewManagerEventDispatcher"/> with the given wait handle

@@ -27,24 +27,27 @@ public class AutoDistributionViewManagerEventDispatcher : IDisposable, IEventDis
 	readonly Timer _distributeViewsTimer;
 	ViewManagerEventDispatcher _eventDispatcher;
 
-	readonly List<IViewManager> _viewManagers = new List<IViewManager>();
+	readonly List<IViewManager> _viewManagers = new();
 
 	/// <summary>
 	/// Constructs the <see cref="AutoDistributionViewManagerEventDispatcher"/>
 	/// </summary>
-	public AutoDistributionViewManagerEventDispatcher(string id, IAutoDistributionState autoDistributionState)
+	public AutoDistributionViewManagerEventDispatcher(
+		string id, 
+		IAutoDistributionState autoDistributionState)
 	{
 		_id = id;
 		_autoDistributionState = autoDistributionState;
 
 		_heartbeatTimer = new Timer(1000);
-		_heartbeatTimer.Elapsed += (sender, args) => EmitHeartbeat(true);
+		_heartbeatTimer.Elapsed += (_, _) => EmitHeartbeat(true);
 
 		_distributeViewsTimer = new Timer(4000);
-		_distributeViewsTimer.Elapsed += (sender, args) => DistributeViews();
+		_distributeViewsTimer.Elapsed += (_, _) => DistributeViews();
 	}
 
-	void EmitHeartbeat(bool runDistribution)
+	void EmitHeartbeat(
+		bool runDistribution)
 	{
 		try
 		{

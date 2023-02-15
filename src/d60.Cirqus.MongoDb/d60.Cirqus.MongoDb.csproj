@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ReleaseVersion>6.2.0</ReleaseVersion>
+    <ReleaseVersion>0.9</ReleaseVersion>
     <PackageId>d60.Cirqus.MongoDb</PackageId>
-    <Version>6.2.0</Version>
+    <Version>7.0.0</Version>
     <Authors>brettwinters</Authors>
     <Company>Mercenta</Company>
     <PackageDescription>Tidy up links</PackageDescription>
@@ -16,7 +16,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.19.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\d60.Cirqus\d60.Cirqus.csproj" />

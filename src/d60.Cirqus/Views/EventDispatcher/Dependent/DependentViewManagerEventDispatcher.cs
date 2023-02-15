@@ -20,7 +20,7 @@ namespace d60.Cirqus.Views;
 /// dependency, causing it to catch up to those views instead of catching
 /// up to the event store
 /// </summary>
-public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable, IAwaitableEventDispatcher
+public class DependentViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 {
 	static Logger _logger;
 
@@ -45,8 +45,8 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 		TimeSpan.FromSeconds(30),
 	});
 
-	readonly ConcurrentQueue<Work> _work = new ConcurrentQueue<Work>();
-	readonly Timer _automaticCatchUpTimer = new Timer();
+	readonly ConcurrentQueue<Work> _work = new();
+	readonly Timer _automaticCatchUpTimer = new();
 	readonly List<IViewManager> _dependencies;
 	readonly List<IViewManager> _viewManagers;
 	readonly IEventStore _eventStore;
@@ -64,7 +64,14 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 	/// <summary>
 	/// Constructs the event dispatcher
 	/// </summary>
-	public DependentViewManagerEventDispatcher(IEnumerable<IViewManager> dependencies, IEnumerable<IViewManager> viewManagers, IEventStore eventStore, IDomainEventSerializer domainEventSerializer, IAggregateRootRepository aggregateRootRepository, IDomainTypeNameMapper domainTypeNameMapper, Dictionary<string, object> viewContextItems)
+	public DependentViewManagerEventDispatcher(
+		IEnumerable<IViewManager> dependencies, 
+		IEnumerable<IViewManager> viewManagers, 
+		IEventStore eventStore, 
+		IDomainEventSerializer domainEventSerializer, 
+		IAggregateRootRepository aggregateRootRepository, 
+		IDomainTypeNameMapper domainTypeNameMapper, 
+		Dictionary<string, object> viewContextItems)
 	{
 		_dependencies = dependencies.ToList();
 		_viewManagers = viewManagers.ToList();
@@ -85,7 +92,7 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 	/// </summary>
 	public int MaxDomainEventsPerBatch
 	{
-		get { return _maxDomainEventsPerBatch; }
+		get => _maxDomainEventsPerBatch;
 		set
 		{
 			if (value < 1)
@@ -99,7 +106,8 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 	/// <summary>
 	/// Sets the profiler that the event dispatcher should use to aggregate timing information
 	/// </summary>
-	public void SetProfiler(IViewManagerProfiler viewManagerProfiler)
+	public void SetProfiler(
+		IViewManagerProfiler viewManagerProfiler)
 	{
 		if (viewManagerProfiler == null)
 		{
@@ -129,7 +137,6 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 			try
 			{
 				CatchUp();
-
 				_backoffHelper.Reset();
 			}
 			catch (Exception exception)
@@ -150,17 +157,17 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 			Thread.Sleep(1000);
 			return;
 		}
-
-		//TODO Remove once sure it works
-		// var sequenceNumberToCatchUpTo = GetPosition(_dependencies, _eventStore.GetNextGlobalSequenceNumber() - 1);
-		var sequenceNumberToCatchUpTo = GetPosition(_dependencies, _eventStore.GetLastGlobalSequenceNumber());
+		
+		var sequenceNumberToCatchUpTo = GetPosition(
+			viewManagers: _dependencies, 
+			defaultValue: _eventStore.GetLastGlobalSequenceNumber()
+		);
 
 		var positions = _viewManagers
 			.Select(viewManager => new Pos(viewManager, viewManager.GetPosition().Result))
 			.ToDictionary(a => a.ViewManager);
 
 		var currentPosition = positions.Min(a => a.Value.Position);
-
 		if (currentPosition >= sequenceNumberToCatchUpTo)
 		{
 			return;
@@ -204,7 +211,9 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 		}
 	}
 
-	static long GetPosition(List<IViewManager> viewManagers, long defaultValue)
+	static long GetPosition(
+		List<IViewManager> viewManagers, 
+		long defaultValue)
 	{
 		if (!viewManagers.Any())
 		{
@@ -212,7 +221,6 @@ public class DependentViewManagerEventDispatcher : IEventDispatcher, IDisposable
 		}
 
 		var positionTasks = viewManagers.Select(d => d.GetPosition()).ToArray();
-            
 		Task.WaitAll(positionTasks);
             
 		var sequenceNumberToCatchUpTo = positionTasks.Min(t => t.Result);

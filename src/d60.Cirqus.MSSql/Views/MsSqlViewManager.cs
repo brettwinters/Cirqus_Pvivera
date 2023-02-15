@@ -58,14 +58,12 @@ namespace d60.Cirqus.MsSql.Views
         //{
         //}
 
-        public override string Id
-        {
-            get { return string.Format("{0}/{1}", typeof (TViewInstance).GetPrettyName(), _tableName); }
-        }
+        public override string Id => $"{typeof(TViewInstance).GetPrettyName()}/{_tableName}";
 
         public bool BatchDispatchEnabled { get; set; }
 
-        public override async Task<long> GetPosition(bool canGetFromCache = true)
+        public override async Task<long> GetPosition(
+	        bool canGetFromCache = true)
         {
             if (canGetFromCache && false)
             {
@@ -101,7 +99,7 @@ namespace d60.Cirqus.MsSql.Views
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.Transaction = tx;
-                        cmd.CommandText = string.Format("SELECT [Position] FROM [{0}] WHERE Id = @id", _positionTableName);
+                        cmd.CommandText = $"SELECT [Position] FROM [{_positionTableName}] WHERE Id = @id";
 
                         cmd.Parameters.Add("id", SqlDbType.NVarChar, PrimaryKeySize).Value = _tableName;
 

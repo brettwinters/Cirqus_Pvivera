@@ -3,7 +3,8 @@
 namespace d60.Cirqus.Views.ViewManagers;
 
 /// <summary>
-/// Base interface of something that subscribes to a domain event. This one is not meant to be implemented (because it doesn't really do anything)
+/// Base interface of something that subscribes to a domain event.
+/// This one is not meant to be implemented (because it doesn't really do anything)
 /// </summary>
 public interface ISubscribeTo { }
 

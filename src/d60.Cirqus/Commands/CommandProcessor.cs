@@ -63,7 +63,8 @@ public class CommandProcessor : ICommandProcessor
 	}
 
 	/// <summary>
-	/// Initializes the event dispatcher, giving e.g. views a chance to catch up to the current state
+	/// Initializes the event dispatcher, giving e.g. views a chance to catch up to the current
+	/// state
 	/// </summary>
 	public CommandProcessor Initialize()
 	{
@@ -73,8 +74,8 @@ public class CommandProcessor : ICommandProcessor
 	}
 
 	/// <summary>
-	/// Accesses the options for this command processor. Mutating the options might/might not have any
-	/// effect if the command processor has been initialized
+	/// Accesses the options for this command processor. Mutating the options might/might not
+	/// have any effect if the command processor has been initialized
 	/// </summary>
 	public Options Options => _options;
 
@@ -142,20 +143,16 @@ public class CommandProcessor : ICommandProcessor
 		{
 			var message =
 				string.Format(
-					"An error ocurred while dispatching events with global sequence numbers {0} to event dispatcher." +
+					"An error occurred while dispatching events with global sequence numbers {0} to event dispatcher." +
 					" The events were properly saved in the event store, but you might need to re-initialize the" +
 					" event dispatcher",
 					string.Join(", ", emittedDomainEvents.Select(e => e.GetGlobalSequenceNumber())));
 
 			throw new ApplicationException(message, exception);
 		}
-
-		//TODO Remove once sure it works
+		
 		return emittedDomainEvents.Any()
 			? CommandProcessingResult.WithNewPosition(emittedDomainEvents.Max(e => e.GetGlobalSequenceNumber()))
-			// ? CommandProcessingResult.WithNewPosition(
-			// 	emittedDomainEvents.Max(e => e.GetGlobalSequenceNumber()), 
-			// 	emittedDomainEvents.Max(Ticks))
 			: CommandProcessingResult.NoEvents();
 	}
 

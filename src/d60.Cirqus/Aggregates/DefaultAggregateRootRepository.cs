@@ -18,7 +18,10 @@ public class DefaultAggregateRootRepository : IAggregateRootRepository
 	private readonly IDomainEventSerializer _domainEventSerializer;
 	private readonly IDomainTypeNameMapper _domainTypeNameMapper;
 
-	public DefaultAggregateRootRepository(IEventStore eventStore, IDomainEventSerializer domainEventSerializer, IDomainTypeNameMapper domainTypeNameMapper) {
+	public DefaultAggregateRootRepository(
+		IEventStore eventStore, 
+		IDomainEventSerializer domainEventSerializer, 
+		IDomainTypeNameMapper domainTypeNameMapper) {
 		_eventStore = eventStore;
 		_domainEventSerializer = domainEventSerializer;
 		_domainTypeNameMapper = domainTypeNameMapper;

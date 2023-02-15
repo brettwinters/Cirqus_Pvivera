@@ -14,19 +14,20 @@ using d60.Cirqus.Views.ViewManagers.Locators;
 namespace d60.Cirqus.Views;
 
 /// <summary>
-/// In-memory view that gets its events by having them dispatched directly
+/// In-memory dispatcher that gets its events by having them dispatched directly
 /// </summary>
-public class InMemoryViewEventDispatcher<TViewInstance> : IEventDispatcher where TViewInstance : class, IViewInstance, ISubscribeTo, new()
+public class InMemoryViewEventDispatcher<TViewInstance> 
+	: IEventDispatcher 
+	where TViewInstance : class, IViewInstance, ISubscribeTo, new()
 {
 	private readonly IEventStore _eventStore;
 	readonly IAggregateRootRepository _aggregateRootRepository;
 	readonly IDomainEventSerializer _domainEventSerializer;
 	readonly IDomainTypeNameMapper _domainTypeNameMapper;
-	readonly ConcurrentDictionary<string, TViewInstance> _views = new ConcurrentDictionary<string, TViewInstance>();
-	readonly ViewDispatcherHelper<TViewInstance> _dispatcher = new ViewDispatcherHelper<TViewInstance>();
+	readonly ConcurrentDictionary<string, TViewInstance> _views = new();
+	readonly ViewDispatcherHelper<TViewInstance> _dispatcher = new();
 	readonly ViewLocator _viewLocator = ViewLocator.GetLocatorFor<TViewInstance>();
 	readonly Logger _logger = CirqusLoggerFactory.Current.GetCurrentClassLogger();
-
 	bool _stopped;
 
 	public InMemoryViewEventDispatcher(
@@ -47,7 +48,8 @@ public class InMemoryViewEventDispatcher<TViewInstance> : IEventDispatcher where
 	/// </summary>
 	public bool SkipInitialization { get; set; }
 
-	public void Initialize(bool purgeExistingViews = false)
+	public void Initialize(
+		bool purgeExistingViews = false)
 	{
 		if (SkipInitialization)
 		{
@@ -85,7 +87,11 @@ public class InMemoryViewEventDispatcher<TViewInstance> : IEventDispatcher where
 
 		try
 		{
-			var viewContext = new DefaultViewContext(_aggregateRootRepository, _domainTypeNameMapper, events);
+			var viewContext = new DefaultViewContext(
+				aggregateRootRepository: _aggregateRootRepository, 
+				domainTypeNameMapper: _domainTypeNameMapper, 
+				eventBatch: events
+			);
 			
 			foreach (var e in events)
 			{
@@ -103,9 +109,7 @@ public class InMemoryViewEventDispatcher<TViewInstance> : IEventDispatcher where
 						try
 						{
 							var viewInstance = _views.GetOrAdd(viewId, id => _dispatcher.CreateNewInstance(id));
-
 							_dispatcher.DispatchToView(viewContext, e, viewInstance);
-
 						}
 						catch (Exception exception)
 						{

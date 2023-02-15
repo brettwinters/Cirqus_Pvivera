@@ -8,10 +8,13 @@ using d60.Cirqus.Views.ViewManagers.Locators;
 namespace d60.Cirqus.InMemory.Views;
 
 /// <summary>
-/// In-memory catch-up view manager that can be used when your command processing happens on multiple machines
-/// or if you want your in-mem views to be residing on another machine than the one that does the command processing.
+/// In-memory catch-up view manager that can be used when your command processing happens
+/// on multiple machines or if you want your in-mem views to be residing on another machine
+/// than the one that does the command processing.
 /// </summary>
-public class InMemoryViewManager<TViewInstance> : AbstractViewManager<TViewInstance> where TViewInstance : class, IViewInstance, ISubscribeTo, new()
+public class InMemoryViewManager<TViewInstance> 
+	: AbstractViewManager<TViewInstance> 
+	where TViewInstance : class, IViewInstance, ISubscribeTo, new()
 {
 	readonly ConcurrentDictionary<string, TViewInstance> _views;
 	readonly ViewDispatcherHelper<TViewInstance> _dispatcher = new();

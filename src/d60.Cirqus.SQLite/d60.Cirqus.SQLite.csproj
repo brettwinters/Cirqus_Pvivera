@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <ReleaseVersion>6.2.0</ReleaseVersion>
+    <ReleaseVersion>7.0.0</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>

@@ -22,14 +22,14 @@ namespace d60.Cirqus.Views;
 /// </summary>
 public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 {
-	static Logger _logger;
+	private static Logger _logger;
 
 	static ViewManagerEventDispatcher()
 	{
 		CirqusLoggerFactory.Changed += f => _logger = f.GetCurrentClassLogger();
 	}
 
-	readonly BackoffHelper _backoffHelper = new BackoffHelper(new[]
+	private readonly BackoffHelper _backoffHelper = new BackoffHelper(new[]
 	{
 		TimeSpan.FromMilliseconds(100),
 		TimeSpan.FromMilliseconds(100),
@@ -55,34 +55,28 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		TimeSpan.FromSeconds(30),
 	});
 
-	/// <summary>
-	/// Use a concurrent queue to store views so that it's safe to traverse in the background even though new views may 
-	/// be added to it at runtime
-	/// </summary>
-	readonly ConcurrentDictionary<IViewManager, object> _viewManagers = new ConcurrentDictionary<IViewManager, object>();
-	readonly ConcurrentQueue<PieceOfWork> _work = new ConcurrentQueue<PieceOfWork>();
-	readonly IDictionary<string, object> _viewContextItems = new Dictionary<string, object>();
-	readonly IAggregateRootRepository _aggregateRootRepository;
-	readonly IEventStore _eventStore;
-	readonly IDomainEventSerializer _domainEventSerializer;
-	readonly IDomainTypeNameMapper _domainTypeNameMapper;
-
-	readonly Timer _automaticCatchUpTimer = new Timer();
-	readonly Thread _worker;
-
-	volatile bool _keepWorking = true;
-
-	int _maxDomainEventsPerBatch = 100;
-
-	long _sequenceNumberToCatchUpTo = -1;
-
-	IViewManagerProfiler _viewManagerProfiler = new NullProfiler();
+	// Use a concurrent dict to store views so that it's safe to traverse in the background
+	// even though new views may be added to it at runtime
+	private readonly ConcurrentDictionary<IViewManager, object> _viewManagers = new();
+	private readonly ConcurrentQueue<PieceOfWork> _work = new();
+	private readonly IDictionary<string, object> _viewContextItems = new Dictionary<string, object>();
+	private readonly IAggregateRootRepository _aggregateRootRepository;
+	private readonly IEventStore _eventStore;
+	private readonly IDomainEventSerializer _domainEventSerializer;
+	private readonly IDomainTypeNameMapper _domainTypeNameMapper;
+	private readonly Timer _automaticCatchUpTimer = new Timer();
+	private readonly Thread _worker;
+	private volatile bool _keepWorking = true;
+	private int _maxDomainEventsPerBatch = 100;
+	private long _sequenceNumberToCatchUpTo = -1;
+	private bool _disposed;
+	private IViewManagerProfiler _viewManagerProfiler = new NullProfiler();
 
 	/// <summary>
 	/// Constructs the event dispatcher
 	/// </summary>
 	public ViewManagerEventDispatcher(
-		IAggregateRootRepository aggregateRootRepository, 
+		IAggregateRootRepository aggregateRootRepository,
 		IEventStore eventStore,
 		IDomainEventSerializer domainEventSerializer, 
 		IDomainTypeNameMapper domainTypeNameMapper, 
@@ -124,7 +118,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		_viewManagerProfiler = viewManagerProfiler;
 	}
 
-	public void SetContextItems(IDictionary<string, object> contextItems)
+	public void SetContextItems(
+		IDictionary<string, object> contextItems)
 	{
 		if (contextItems == null)
 		{
@@ -187,8 +182,69 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		_automaticCatchUpTimer.Start();
 		_worker.Start();
 	}
+	
+	/// <summary>
+	/// Streams then all events from the event store to the view managers then waits for
+	/// them to catch up. 
+	/// </summary>
+	public async Task FullCatchUpAsync(
+		TimeSpan timeout)
+	{
+		var position = _eventStore.GetLastGlobalSequenceNumber();
+		_logger.Debug("Initiating immediate full catchup to Global Sequence Number {0}", position);
 
-	public void Dispatch(IEnumerable<DomainEvent> events)
+		foreach (var batch in _eventStore.Stream().Batch(1000))
+		{
+			if (_disposed)
+			{
+				_logger.Warn("Event processing stopped during FullCatchUpAsync since we're disposing");
+				return;
+			}
+
+			_logger.Debug("Process batch of {0} events", batch.Count());
+			
+			DirectDispatch(batch.Select(e => _domainEventSerializer.Deserialize(e)));
+		}
+
+		await WaitUntilProcessed(
+			result: CommandProcessingResult.WithNewPosition(position),
+			timeout: timeout
+		);
+
+		#region
+
+		void DirectDispatch(
+			IEnumerable<DomainEvent> events)
+		{
+			var context = new DefaultViewContext(
+				aggregateRootRepository: _aggregateRootRepository, 
+				domainTypeNameMapper: _domainTypeNameMapper, 
+				eventBatch: events
+			);
+
+			foreach (var kvp in _viewContextItems)
+			{
+				context.Items[kvp.Key] = kvp.Value;
+			}
+
+			var eventList = events.ToList();
+
+			foreach (var viewManager in _viewManagers.Keys)
+			{
+				_logger.Debug("Dispatching batch of {0} events to {1}", eventList.Count, viewManager);
+			
+				// Doing this where multiple streams exist could result in the view manager position
+				// bring out of sync with the instance positions. But this is not a problem since
+				// we guarantee that the next global sequence number MUST be higher
+				viewManager.Dispatch(context, eventList, _viewManagerProfiler);
+			}
+		}
+
+		#endregion
+	}
+	
+	public void Dispatch(
+		IEnumerable<DomainEvent> events)
 	{
 		if (events == null)
 		{
@@ -196,7 +252,6 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		}
 
 		var list = events.ToList();
-
 		if (!list.Any())
 		{
 			return;
@@ -231,7 +286,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 	}
 
 	/// <summary>
-	/// Waits until all view with the specified view instance type have successfully processed event at least up until those that were emitted
+	/// Waits until all view with the specified view instance type have successfully
+	/// processed event at least up until those that were emitted
 	/// as part of processing the command that yielded the given result
 	/// </summary>
 	public async Task WaitUntilProcessed(
@@ -242,7 +298,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		{
 			throw new ArgumentNullException(nameof(result));
 		}
-		await Task.WhenAll(
+		
+        await Task.WhenAll(
 			_viewManagers.Keys
 				.Select(v => v.WaitUntilProcessed(result, timeout))
 				.ToArray()
@@ -285,7 +342,7 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		}
 	}
 
-	void DoWork()
+	private void DoWork()
 	{
 		_logger.Info("View manager background thread started");
 
@@ -311,7 +368,6 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 					viewManagers: _viewManagers.Keys.ToArray(), 
 					events: pieceOfWork.Events
 				);
-
 				_backoffHelper.Reset();
 			}
 			catch (Exception exception)
@@ -334,7 +390,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		_logger.Info("View manager background thread stopped!");
 	}
 
-	void CatchUpTo(
+
+	private void CatchUpTo(
 		long sequenceNumberToCatchUpTo, 
 		IEventStore eventStore, 
 		bool cachedInformationAllowed, 
@@ -369,13 +426,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 			return;
 		}
 		
-		//TODO Remove once sure it works
-		// var nextSequenceNumberInLineForFastTrackDispatch = lowestSequenceNumberSuccessfullyProcessed + 1;
-		// if (events.Any() && nextSequenceNumberInLineForFastTrackDispatch == events.First().GetGlobalSequenceNumber())
-		
-		// Fast-track events if possible: If we can dispatch events directly, we do it now
-		// If the event's first global sequence number is greater then the last one processed by the
-		// view manager then stream dispatch directly to the view manager
+		// First, if there are events (from the Command processing) we send them directly
+		// to the ViewManager.
 		if (events.Any() && events.First().GetGlobalSequenceNumber() > lowestSequenceNumberSuccessfullyProcessed)
 		{
 			DispatchBatchToViewManagers(viewManagers, events, positions);
@@ -390,14 +442,14 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		}
 
 		// Regular dispatch: We must replay - start from here:
-		var sequenceNumberToReplayFrom = lowestSequenceNumberSuccessfullyProcessed + 1;
+        var sequenceNumberToReplayFrom = lowestSequenceNumberSuccessfullyProcessed + 1;
 		foreach (var batch in eventStore.Stream(sequenceNumberToReplayFrom).Batch(MaxDomainEventsPerBatch))
 		{
 			DispatchBatchToViewManagers(viewManagers, batch, positions);
 		}
 	}
 
-	class Pos
+	private class Pos
 	{
 		public Pos(IViewManager viewManager, long position)
 		{
@@ -406,10 +458,14 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		}
 
 		public IViewManager ViewManager { get; private set; }
+		
 		public long Position { get; private set; }
 	}
 
-	void DispatchBatchToViewManagers(IEnumerable<IViewManager> viewManagers, IEnumerable<EventData> batch, Dictionary<IViewManager, Pos> positions)
+	private void DispatchBatchToViewManagers(
+		IEnumerable<IViewManager> viewManagers, 
+		IEnumerable<EventData> batch, 
+		Dictionary<IViewManager, Pos> positions)
 	{
 		var eventList = batch
 			.Select(e => _domainEventSerializer.Deserialize(e))
@@ -418,7 +474,7 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		DispatchBatchToViewManagers(viewManagers, eventList, positions);
 	}
 
-	void DispatchBatchToViewManagers(
+	private void DispatchBatchToViewManagers(
 		IEnumerable<IViewManager> viewManagers,
 		List<DomainEvent> eventList, 
 		Dictionary<IViewManager, Pos> positions)
@@ -432,7 +488,11 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 				continue;
 			}
 
-			var context = new DefaultViewContext(_aggregateRootRepository, _domainTypeNameMapper, eventList);
+			var context = new DefaultViewContext(
+				aggregateRootRepository: _aggregateRootRepository, 
+				domainTypeNameMapper: _domainTypeNameMapper, 
+				eventBatch: eventList
+			);
 			_viewContextItems.InsertInto(context.Items);
 
 			_logger.Debug("Dispatching batch of {0} events to {1}", eventList.Count, viewManager);
@@ -441,14 +501,27 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 		}
 	}
 
-	class PieceOfWork
+	private class PieceOfWork
 	{
-		PieceOfWork()
+		private PieceOfWork()
 		{
 			Events = new List<DomainEvent>();
 		}
 
-		public static PieceOfWork FullCatchUp(bool purgeExistingViews)
+		public static PieceOfWork FullCatchUp(
+			List<DomainEvent> recentlyEmittedEvents)
+		{
+			return new PieceOfWork
+			{
+				CatchUpAsFarAsPossible = true,
+				CanUseCachedInformation = false,
+				PurgeViewsFirst = false,
+				Events = recentlyEmittedEvents
+			};
+		}
+
+		public static PieceOfWork FullCatchUp(
+			bool purgeExistingViews)
 		{
 			return new PieceOfWork
 			{
@@ -458,7 +531,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 			};
 		}
 
-		public static PieceOfWork JustCatchUp(List<DomainEvent> recentlyEmittedEvents)
+		public static PieceOfWork JustCatchUp(
+			List<DomainEvent> recentlyEmittedEvents)
 		{
 			return new PieceOfWork
 			{
@@ -469,22 +543,20 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 			};
 		}
 
-		public List<DomainEvent> Events { get; private set; }
+		public List<DomainEvent> Events { get; private init; }
 
-		public bool CatchUpAsFarAsPossible { get; private set; }
+		public bool CatchUpAsFarAsPossible { get; private init; }
 
-		public bool CanUseCachedInformation { get; private set; }
+		public bool CanUseCachedInformation { get; private init; }
 
-		public bool PurgeViewsFirst { get; private set; }
+		public bool PurgeViewsFirst { get; private init; }
 
 		public override string ToString()
 		{
 			return $"Catch up {(CatchUpAsFarAsPossible ? "to MAX" : "to latest")} (allow cache: {CanUseCachedInformation}, purge: {PurgeViewsFirst})";
 		}
 	}
-
-	bool _disposed;
-
+	
 	~ViewManagerEventDispatcher()
 	{
 		Dispose(false);
@@ -500,7 +572,8 @@ public class ViewManagerEventDispatcher : IDisposable, IAwaitableEventDispatcher
 	/// Stops the background timer and shuts down the worker thread
 	/// </summary>
 	/// <param name="disposing"></param>
-	protected virtual void Dispose(bool disposing)
+	protected virtual void Dispose(
+		bool disposing)
 	{
 		if (_disposed)
 		{
